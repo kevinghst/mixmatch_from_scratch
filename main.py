@@ -30,8 +30,8 @@ else:
     print('No GPU available, using the CPU instead.')
     device = torch.device("cpu")
 
-
-train_dataset, val_dataset = DataSet("SST")
+dataset = DataSet("SST")
+train_dataset, val_dataset = dataset.get_dataset("SST")
 
 # The DataLoader needs to know our batch size for training, so we specify it 
 # here. For fine-tuning BERT on a specific task, the authors recommend a batch 

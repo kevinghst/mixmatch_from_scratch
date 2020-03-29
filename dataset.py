@@ -8,7 +8,7 @@ class DataSet():
         self.task = task
         self.tokenizer = BertTokenizer.from_pretrained('bert-base-uncased', do_lower_case=True)
 
-    def preproces(self, sentences, labels):
+    def preprocess(self, sentences, labels):
          # Tokenize all of the sentences and map the tokens to thier word IDs.
         input_ids = []
         attention_masks = []
