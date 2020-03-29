@@ -113,7 +113,8 @@ trainer = Trainer(
     device=device,
     scheduler=scheduler,
     train_loader=train_dataloader,
-    val_loader=validation_dataloader
+    val_loader=validation_dataloader,
+    cfg=cfg
 )
 
 trainer.train(epochs)
