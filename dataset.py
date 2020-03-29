@@ -65,8 +65,8 @@ class DataSet():
         sentences_dev = df_dev.sentence.values[1:]
         labels_dev = df_dev.label.values[1:]
 
-        input_ids_train, attention_masks_train, label_ids_train = preprocess(sentences_train, labels_train, tokenizer)
-        input_ids_dev, attention_masks_dev, label_ids_dev = preprocess(sentences_dev, labels_dev, tokenizer)
+        input_ids_train, attention_masks_train, label_ids_train = self.preprocess(sentences_train, labels_train, tokenizer)
+        input_ids_dev, attention_masks_dev, label_ids_dev = self.preprocess(sentences_dev, labels_dev, tokenizer)
 
         # Print sentence 0, now as a list of IDs.
         print('Original: ', sentences_train[0])
