@@ -1,5 +1,5 @@
 import torch
-
+import torch.nn as nn
 import argparse
 import os
 import sys
@@ -14,6 +14,24 @@ from dataset import DataSet
 from train import Trainer
 
 from torch.utils.data import DataLoader, RandomSampler, SequentialSampler
+
+parser = argparse.ArgumentParser(description='SSL for NLP')
+
+parser.add_argument('--seed', default=42, type=int)
+parser.add_argument('--lr', default=2e-5, type=float)
+parser.add_argument('--do_lower_case', default=True, type=bool)
+
+parser.add_argument('--train_batch_size', default=32, type=int)
+parser.add_argument('--val_batch_size', default=32, type=int)
+
+parser.add_argument('--data_parallel', default=True, type=bool)
+
+parser.add_argument('--model_file', default="", type=str)
+parser.add_argument('--task', default="SST", type=str)
+
+cfg, unknown = parser.parse_known_args()
+
+
 
 # If there's a GPU available...
 if torch.cuda.is_available():    
@@ -30,27 +48,23 @@ else:
     print('No GPU available, using the CPU instead.')
     device = torch.device("cpu")
 
-dataset = DataSet("SST")
+dataset = DataSet(cfg.task)
 train_dataset, val_dataset = dataset.get_dataset()
 
-# The DataLoader needs to know our batch size for training, so we specify it 
-# here. For fine-tuning BERT on a specific task, the authors recommend a batch 
-# size of 16 or 32.
-batch_size = 32
 
 # Create the DataLoaders for our training and validation sets.
 # We'll take training samples in random order. 
 train_dataloader = DataLoader(
             train_dataset,  # The training samples.
             sampler = RandomSampler(train_dataset), # Select batches randomly
-            batch_size = batch_size # Trains with this batch size.
+            batch_size = cfg.train_batch_size # Trains with this batch size.
         )
 
 # For validation the order doesn't matter, so we'll just read them sequentially.
 validation_dataloader = DataLoader(
             val_dataset, # The validation samples.
             sampler = SequentialSampler(val_dataset), # Pull out batches sequentially.
-            batch_size = batch_size # Evaluate with this batch size.
+            batch_size = cfg.val_batch_size # Evaluate with this batch size.
         )
 
 # Load BertForSequenceClassification, the pretrained BERT model with a single 
@@ -66,10 +80,14 @@ model = BertForSequenceClassification.from_pretrained(
 # Tell pytorch to run this model on the GPU.
 model.cuda()
 
+# Parallel GPU mode
+if cfg.data_parallel:
+    model = nn.DataParallel(model)
+
 # Note: AdamW is a class from the huggingface library (as opposed to pytorch) 
 # I believe the 'W' stands for 'Weight Decay fix"
 optimizer = AdamW(model.parameters(),
-                  lr = 2e-5, # args.learning_rate - default is 5e-5, our notebook had 2e-5
+                  lr = cfg.lr, # args.learning_rate - default is 5e-5, our notebook had 2e-5
                   eps = 1e-8 # args.adam_epsilon  - default is 1e-8.
                 )
 

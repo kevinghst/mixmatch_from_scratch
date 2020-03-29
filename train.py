@@ -7,26 +7,12 @@ import torch
 
 from utils import *
 
-# Set the seed value all over the place to make this reproducible.
-seed_val = 42
-
-random.seed(seed_val)
-np.random.seed(seed_val)
-torch.manual_seed(seed_val)
-torch.cuda.manual_seed_all(seed_val)
-
-# We'll store a number of quantities such as training and validation loss, 
-# validation accuracy, and timings.
-training_stats = []
-
-# Measure the total training time for the whole run.
-total_t0 = time.time()
 
 class Trainer():
     def __init__(
             self, 
             model=None, optimizer=None, device=None, scheduler=None,
-            train_loader=None, val_loader=None
+            train_loader=None, val_loader=None, cfg=None
         ):
         self.model = model
         self.optimizer = optimizer
@@ -34,8 +20,26 @@ class Trainer():
         self.scheduler = scheduler
         self.train_loader = train_loader
         self.val_loader = val_loader
+        self.cfg = cfg
 
     def train(self, epochs):
+        cfg = self.cfg
+        # Set the seed value all over the place to make this reproducible.
+        seed_val = cfg.seed
+
+        random.seed(seed_val)
+        np.random.seed(seed_val)
+        torch.manual_seed(seed_val)
+        torch.cuda.manual_seed_all(seed_val)
+
+        # We'll store a number of quantities such as training and validation loss, 
+        # validation accuracy, and timings.
+        training_stats = []
+
+        # Measure the total training time for the whole run.
+        total_t0 = time.time()
+
+
         for epoch_i in range(0, epochs):
             model = self.model
             optimizer = self.optimizer
