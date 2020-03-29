@@ -25,8 +25,8 @@ total_t0 = time.time()
 class Trainer():
     def __init__(
             self, 
-            model=model, optimizer=optimizer, device=device, scheduler=scheduler,
-            train_loader=train_loader, val_loader=val_loader
+            model=None, optimizer=None, device=None, scheduler=None,
+            train_loader=None, val_loader=None
         ):
         self.model = model
         self.optimizer = optimizer
