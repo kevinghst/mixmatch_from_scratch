@@ -27,6 +27,7 @@ from transformers import BertTokenizer
 import time
 import datetime
 import random
+import numpy as np
 
 task = "SST"
 task_path = "https://firebasestorage.googleapis.com/v0/b/mtl-sentence-representations.appspot.com/o/data%2FSST-2.zip?alt=media&token=aabc5f6b-e466-44a2-b9b4-cf6337f84ac8"
