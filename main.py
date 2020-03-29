@@ -31,7 +31,7 @@ else:
     device = torch.device("cpu")
 
 dataset = DataSet("SST")
-train_dataset, val_dataset = dataset.get_dataset("SST")
+train_dataset, val_dataset = dataset.get_dataset()
 
 # The DataLoader needs to know our batch size for training, so we specify it 
 # here. For fine-tuning BERT on a specific task, the authors recommend a batch 
