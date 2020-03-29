@@ -75,7 +75,7 @@ class Trainer():
                     elapsed = format_time(time.time() - t0)
             
                     # Report progress.
-                    print('  Batch {:>5,}  of  {:>5,}.    Elapsed: {:}.'.format(step, len(train_dataloader), elapsed))
+                    print('  Batch {:>5,}  of  {:>5,}.    Elapsed: {:}.'.format(step, len(train_loader), elapsed))
 
                 # Unpack this training batch from our dataloader. 
                 #
@@ -130,7 +130,7 @@ class Trainer():
                 scheduler.step()
 
             # Calculate the average loss over all of the batches.
-            avg_train_loss = total_train_loss / len(train_dataloader)            
+            avg_train_loss = total_train_loss / len(train_loader)            
     
             # Measure how long this epoch took.
             training_time = format_time(time.time() - t0)
