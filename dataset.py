@@ -2,6 +2,7 @@ import pandas as pd
 from transformers import BertTokenizer
 from torch.utils.data import TensorDataset, random_split
 import torch
+import pdb
 
 class DataSet():
     def __init__(self, cfg):
@@ -39,6 +40,7 @@ class DataSet():
 
         input_ids = torch.cat(input_ids, dim=0)
         attention_masks = torch.cat(attention_masks, dim=0)
+        pdb.set_trace()
         labels = torch.tensor(labels.astype(int))
 
         return input_ids, attention_masks, labels
