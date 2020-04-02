@@ -22,19 +22,22 @@ class Trainer():
         self.val_loader = val_loader
         self.cfg = cfg
 
-    def train(self, epochs):
-        cfg = self.cfg
-        # Set the seed value all over the place to make this reproducible.
-        seed_val = cfg.seed
-
-        torch.manual_seed(seed_val)
-        torch.cuda.manual_seed(seed_val)
-        torch.cuda.manual_seed_all(seed_val)  # if you are using multi-GPU.
-        np.random.seed(seed_val)  # Numpy module.
-        random.seed(seed_val)  # Python random module.
-        torch.manual_seed(seed_val)
+    def seed_torch(self, seed):
+        random.seed(seed)
+        os.environ['PYTHONHASHSEED'] = str(seed)
+        np.random.seed(seed)
+        torch.manual_seed(seed)
+        torch.cuda.manual_seed(seed)
+        torch.cuda.manual_seed_all(seed) # if you are using multi-GPU.
         torch.backends.cudnn.benchmark = False
         torch.backends.cudnn.deterministic = True
+
+
+    def train(self, epochs):
+        cfg = self.cfg
+
+        # Set the seed value all over the place to make this reproducible.        
+        self.seed_torch(cfg.seed)
 
         # We'll store a number of quantities such as training and validation loss, 
         # validation accuracy, and timings.
@@ -45,6 +48,9 @@ class Trainer():
 
 
         for epoch_i in range(0, epochs):
+            best_val_acc = 0
+            best_epoch = 0
+
             model = self.model
             optimizer = self.optimizer
             device = self.device
@@ -215,6 +221,10 @@ class Trainer():
             avg_val_accuracy = total_eval_accuracy / len(val_loader)
             print("  Accuracy: {0:.2f}".format(avg_val_accuracy))
 
+            # update best val accuracy
+            if avg_val_accuracy > best_val_acc:
+                best_epoch = epoch_i
+
             # Calculate the average loss over all of the batches.
             avg_val_loss = total_eval_loss / len(val_loader)
     
@@ -240,4 +250,6 @@ class Trainer():
         print("Training complete!")
 
         print("Total training took {:} (h:mm:ss)".format(format_time(time.time()-total_t0)))
+        print("Best Validation Accuracy: {0:.2f}".format(best_val_acc))
+        print("Best Epoch: {}".format(best_epoch)
 
