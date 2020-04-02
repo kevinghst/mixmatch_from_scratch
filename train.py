@@ -47,11 +47,10 @@ class Trainer():
         # Measure the total training time for the whole run.
         total_t0 = time.time()
 
+        best_val_acc = 0
+        best_epoch = 0
 
         for epoch_i in range(0, epochs):
-            best_val_acc = 0
-            best_epoch = 0
-
             model = self.model
             optimizer = self.optimizer
             device = self.device
@@ -224,7 +223,6 @@ class Trainer():
 
             # update best val accuracy
             if avg_val_accuracy > best_val_acc:
-                pdb.set_trace()
                 best_val_acc = avg_val_accuracy
                 best_epoch = epoch_i
 
