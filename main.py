@@ -29,7 +29,7 @@ parser.add_argument('--data_parallel', default=True, type=bool)
 parser.add_argument('--model_file', default="", type=str)
 parser.add_argument('--task', default="SST", type=str)
 
-parser.add_argument('--train_ratio', default=1.0, type=float)
+parser.add_argument('--train_cap', default=-1, type=float)
 
 cfg, unknown = parser.parse_known_args()
 
