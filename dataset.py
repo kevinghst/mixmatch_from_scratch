@@ -56,7 +56,7 @@ class DataSet():
             df_dev['label'] = df_dev['label'].astype(int)
          
         if self.cfg.train_cap > 0:
-            df_train = df_train.sample(self.cfg.train_cap)
+            df_train = df_train.sample(self.cfg.train_cap, random_state=self.cfg.seed)
 
         # Report the number of sentences.
         print('Number of training sentences: {:,}\n'.format(df_train.shape[0]))
