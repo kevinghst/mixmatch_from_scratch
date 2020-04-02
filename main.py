@@ -31,6 +31,8 @@ parser.add_argument('--task', default="SST", type=str)
 
 parser.add_argument('--train_cap', default=-1, type=int)
 
+parser.add_argument('--epochs', default=3, type=int)
+
 cfg, unknown = parser.parse_known_args()
 
 
@@ -98,11 +100,10 @@ optimizer = AdamW(model.parameters(),
 # Number of training epochs. The BERT authors recommend between 2 and 4. 
 # We chose to run for 4, but we'll see later that this may be over-fitting the
 # training data.
-epochs = 3
 
 # Total number of training steps is [number of batches] x [number of epochs]. 
 # (Note that this is not the same as the number of training samples).
-total_steps = len(train_dataloader) * epochs
+total_steps = len(train_dataloader) * cfg.epochs
 
 # Create the learning rate scheduler.
 scheduler = get_linear_schedule_with_warmup(optimizer, 
@@ -119,4 +120,4 @@ trainer = Trainer(
     cfg=cfg
 )
 
-trainer.train(epochs)
+trainer.train(cfg.epochs)
