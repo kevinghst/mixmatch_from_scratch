@@ -31,6 +31,7 @@ class Trainer():
         np.random.seed(seed_val)
         torch.manual_seed(seed_val)
         torch.cuda.manual_seed_all(seed_val)
+        torch.backends.cudnn.deterministic=True
 
         # We'll store a number of quantities such as training and validation loss, 
         # validation accuracy, and timings.
