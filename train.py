@@ -222,6 +222,7 @@ class Trainer():
 
             # update best val accuracy
             if avg_val_accuracy > best_val_acc:
+                best_val_acc = avg_val_accuracy
                 best_epoch = epoch_i
 
             # Calculate the average loss over all of the batches.
