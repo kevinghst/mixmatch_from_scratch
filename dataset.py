@@ -4,8 +4,8 @@ from torch.utils.data import TensorDataset, random_split
 import torch
 
 class DataSet():
-    def __init__(self, task):
-        self.task = task
+    def __init__(self, cfg):
+        self.cfg = cfg
         self.tokenizer = BertTokenizer.from_pretrained('bert-base-uncased', do_lower_case=True)
 
     def preprocess(self, sentences, labels):
@@ -43,13 +43,17 @@ class DataSet():
 
         return input_ids, attention_masks, labels
 
+
     def get_dataset(self):
         # Load the dataset into a pandas dataframe.
-        if self.task == "SST":
+        if self.cfg.task == "SST":
             df_train = pd.read_csv("./SST-2/train.tsv", delimiter='\t', header=None, names=['sentence', 'label'])
             df_dev = pd.read_csv("./SST-2/dev.tsv", delimiter='\t', header=None, names=['sentence', 'label'])
             df_test = pd.read_csv("./SST-2/test.tsv", delimiter='\t', header=None, names=['idx', 'sentence'])
         
+         
+        df_train = df_train.sample(int(df_train.shape[0] * self.cfg.train_ratio))
+
         # Report the number of sentences.
         print('Number of training sentences: {:,}\n'.format(df_train.shape[0]))
         print('Number of dev sentences: {:,}\n'.format(df_dev.shape[0]))
