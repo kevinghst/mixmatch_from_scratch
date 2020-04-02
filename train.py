@@ -27,11 +27,14 @@ class Trainer():
         # Set the seed value all over the place to make this reproducible.
         seed_val = cfg.seed
 
-        random.seed(seed_val)
-        np.random.seed(seed_val)
-        torch.manual_seed(seed_val)
-        torch.cuda.manual_seed_all(seed_val)
-        torch.backends.cudnn.deterministic=True
+        torch.manual_seed(seed)
+        torch.cuda.manual_seed(seed)
+        torch.cuda.manual_seed_all(seed)  # if you are using multi-GPU.
+        np.random.seed(seed)  # Numpy module.
+        random.seed(seed)  # Python random module.
+        torch.manual_seed(seed)
+        torch.backends.cudnn.benchmark = False
+        torch.backends.cudnn.deterministic = True
 
         # We'll store a number of quantities such as training and validation loss, 
         # validation accuracy, and timings.
