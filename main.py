@@ -50,7 +50,7 @@ else:
     print('No GPU available, using the CPU instead.')
     device = torch.device("cpu")
 
-dataset = DataSet(cfg.task)
+dataset = DataSet(cfg)
 train_dataset, val_dataset = dataset.get_dataset()
 
 
