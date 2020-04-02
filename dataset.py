@@ -40,8 +40,7 @@ class DataSet():
 
         input_ids = torch.cat(input_ids, dim=0)
         attention_masks = torch.cat(attention_masks, dim=0)
-        pdb.set_trace()
-        labels = torch.tensor(labels.astype(int))
+        labels = torch.tensor(labels)
 
         return input_ids, attention_masks, labels
 
@@ -49,10 +48,12 @@ class DataSet():
     def get_dataset(self):
         # Load the dataset into a pandas dataframe.
         if self.cfg.task == "SST":
-            df_train = pd.read_csv("./SST-2/train.tsv", delimiter='\t', header=None, names=['sentence', 'label'])
-            df_dev = pd.read_csv("./SST-2/dev.tsv", delimiter='\t', header=None, names=['sentence', 'label'])
-            df_test = pd.read_csv("./SST-2/test.tsv", delimiter='\t', header=None, names=['idx', 'sentence'])
-        
+            df_train = pd.read_csv("./SST-2/train.tsv", delimiter='\t', header=None, names=['sentence', 'label']).iloc[1:]
+            df_dev = pd.read_csv("./SST-2/dev.tsv", delimiter='\t', header=None, names=['sentence', 'label']).iloc[1:]
+            df_test = pd.read_csv("./SST-2/test.tsv", delimiter='\t', header=None, names=['idx', 'sentence']).iloc[1:]
+             
+            df_train['label'] = df_train['label'].astype(int)
+            df_dev['label'] = df_dev['label'].astype(int)
          
         df_train = df_train.sample(int(df_train.shape[0] * self.cfg.train_ratio))
 
