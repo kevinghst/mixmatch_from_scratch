@@ -118,10 +118,17 @@ class Trainer():
                 # arge given and what flags are set. For our useage here, it returns
                 # the loss (because we provided labels) and the "logits"--the model
                 # outputs prior to activation.
-                logits = model(b_input_ids, 
-                                     token_type_ids=None, 
-                                     attention_mask=b_input_mask, 
-                                     labels=b_labels)
+
+                hidden = model(
+                        b_input_ids,
+                        token_type_ids=None,
+                        attention_mask=b_input_mask,
+                        labels=b_labels,
+                        output_h=True
+                    )
+                # hidden = 768 dimension
+                logits = model(input_h = hidden)
+
 
                 loss_fct = CrossEntropyLoss()
                 loss = loss_fct(logits.view(-1, cfg.num_labels), b_labels.view(-1))
@@ -209,16 +216,6 @@ class Trainer():
                                            token_type_ids=None, 
                                            attention_mask=b_input_mask,
                                            labels=b_labels)
-
-                    hidden = model(
-                            b_input_ids,
-                            token_type_ids=None,
-                            attention_mask=b_input_mask,
-                            labels=b_labels,
-                            output_h=True
-                        )
-                    pdb.set_trace()
-                    logits = model(input_h = hidden)
                     
                     loss_fct = CrossEntropyLoss()
                     loss = loss_fct(logits.view(-1, cfg.num_labels), b_labels.view(-1))
