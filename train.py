@@ -135,6 +135,7 @@ class Trainer():
                 # hidden = 768 dimension
 
                 l = np.random.beta(cfg.alpha, cfg.alpha)
+                pdb.set_trace()
                 sup_l = max(l, 1-l) if cfg.sup_mixup else 1
 
                 sup_idx = torch.randperm(sup_hidden.size(0))
