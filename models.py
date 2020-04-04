@@ -37,6 +37,7 @@ class BertForSequenceClassificationCustom(BertPreTrainedModel):
         pooled_output = self.dropout(pooled_output)
         logits = self.classifier(pooled_output)
 
-        outputs = (logits,) + outputs[2:]  # add hidden states and attention if they are here
+        outputs = logits
+        #outputs = (logits,) + outputs[2:]  # add hidden states and attention if they are here
 
         return outputs  # logits, (hidden_states), (attentions)

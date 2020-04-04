@@ -124,7 +124,6 @@ class Trainer():
                                      labels=b_labels)
 
                 loss_fct = CrossEntropyLoss()
-                pdb.set_trace()
                 loss = loss_fct(logits.view(-1, model.config.num_labels), b_labels.view(-1))
 
                 # Accumulate the training loss over all of the batches so that we can
