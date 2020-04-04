@@ -249,7 +249,7 @@ class Trainer():
 
             # Report the final accuracy for this validation run.
             avg_val_accuracy = total_eval_accuracy / len(val_loader)
-            print("  Accuracy: {0:.2f}".format(avg_val_accuracy))
+            print("  Accuracy: {0:.4f}".format(avg_val_accuracy))
 
             # update best val accuracy
             if avg_val_accuracy > best_val_acc:
