@@ -32,6 +32,7 @@ parser.add_argument('--data_parallel', default=True, type=bool)
 
 parser.add_argument('--model_file', default="", type=str)
 parser.add_argument('--task', default="SST", type=str)
+parser.add_argument('--num_labels', default=2, type=int)
 
 parser.add_argument('--train_cap', default=-1, type=int)
 
@@ -79,7 +80,7 @@ validation_dataloader = DataLoader(
 # linear classification layer on top. 
 model = BertForSequenceClassificationCustom.from_pretrained(
     "bert-base-uncased", # Use the 12-layer BERT model, with an uncased vocab.
-    num_labels = 2, # The number of output labels--2 for binary classification.
+    num_labels = cfg.num_labels, # The number of output labels--2 for binary classification.
                     # You can increase this for multi-class tasks.   
     output_attentions = False, # Whether the model returns attentions weights.
     output_hidden_states = False, # Whether the model returns all hidden-states.
