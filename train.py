@@ -122,7 +122,7 @@ class Trainer():
                                      token_type_ids=None, 
                                      attention_mask=b_input_mask, 
                                      labels=b_labels)
-
+                pdb.set_trace()
                 loss_fct = CrossEntropyLoss()
                 loss = loss_fct(logits.view(-1, model.num_labels), b_labels.view(-1))
 
