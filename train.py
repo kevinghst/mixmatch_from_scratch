@@ -124,7 +124,7 @@ class Trainer():
                                      labels=b_labels)
 
                 loss_fct = CrossEntropyLoss()
-                loss = loss_fct(logits.view(-1, model.config.num_labels), b_labels.view(-1))
+                loss = loss_fct(logits.view(-1, model.num_labels), b_labels.view(-1))
 
                 # Accumulate the training loss over all of the batches so that we can
                 # calculate the average loss at the end. `loss` is a Tensor containing a
