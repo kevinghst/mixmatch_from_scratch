@@ -204,11 +204,15 @@ class Trainer():
                     # https://huggingface.co/transformers/v2.2.0/model_doc/bert.html#transformers.BertForSequenceClassification
                     # Get the "logits" output by the model. The "logits" are the output
                     # values prior to applying an activation function like the softmax.
-                    (loss, logits) = model(b_input_ids, 
+
+                    logits = model(b_input_ids, 
                                            token_type_ids=None, 
                                            attention_mask=b_input_mask,
                                            labels=b_labels)
-            
+                    
+                    loss_fct = CrossEntropyLoss()
+                    loss = loss_fct(logits.view(-1, cfg.num_labels), b_labels.view(-1))
+
                 # Accumulate the validation loss.
                 total_eval_loss += loss.item()
 
