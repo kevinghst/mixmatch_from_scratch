@@ -145,8 +145,6 @@ class Trainer():
 
                 sup_logits = model(input_h = mixed_sup_h)
 
-                pdb.set_trace()
-
                 loss = -torch.sum(F.log_softmax(sup_logits, dim=1) * mixed_sup_label, dim=1)
                 loss = torch.mean(loss)
 
