@@ -22,22 +22,28 @@ class BertForSequenceClassificationCustom(BertPreTrainedModel):
         head_mask=None,
         inputs_embeds=None,
         labels=None,
+        output_h=False,
+        input_h=None
     ):
-        outputs = self.bert(
-            input_ids,
-            attention_mask=attention_mask,
-            token_type_ids=token_type_ids,
-            position_ids=position_ids,
-            head_mask=head_mask,
-            inputs_embeds=inputs_embeds,
-        )
+        if input_h is None:
+            outputs = self.bert(
+                input_ids,
+                attention_mask=attention_mask,
+                token_type_ids=token_type_ids,
+                position_ids=position_ids,
+                head_mask=head_mask,
+                inputs_embeds=inputs_embeds,
+            )
 
-        pooled_output = outputs[1]
+            pooled_output = outputs[1]
+            if output_h:
+                return pooled_output
+        else:
+            pooled_output = input_h
+        #outputs = (logits,) + outputs[2:]  # add hidden states and attention if they are here
 
         pooled_output = self.dropout(pooled_output)
         logits = self.classifier(pooled_output)
-
         outputs = logits
-        #outputs = (logits,) + outputs[2:]  # add hidden states and attention if they are here
-
+        
         return outputs  # logits, (hidden_states), (attentions)
