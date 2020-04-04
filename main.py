@@ -26,7 +26,7 @@ parser.add_argument('--train_batch_size', default=32, type=int)
 parser.add_argument('--val_batch_size', default=32, type=int)
 
 # MixmMatch
-parser.add_argument('--mixup', action='store_true')
+parser.add_argument('--sup_mixup', action='store_true')
 parser.add_argument('--alpha', default=0.75, type=float)
 
 parser.add_argument('--data_parallel', default=True, type=bool)
