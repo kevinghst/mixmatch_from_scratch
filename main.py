@@ -19,6 +19,7 @@ from torch.utils.data import DataLoader, RandomSampler, SequentialSampler
 parser = argparse.ArgumentParser(description='SSL for NLP')
 
 parser.add_argument('--seed', default=42, type=int)
+parser.add_argument('--data_seed', default=42, type=int)
 parser.add_argument('--lr', default=2e-5, type=float)
 parser.add_argument('--do_lower_case', default=True, type=bool)
 
