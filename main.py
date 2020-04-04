@@ -7,9 +7,10 @@ import sys
 import time
 import random
 import numpy as np
-from transformers import BertForSequenceClassification, AdamW, BertConfig
+from transformers import AdamW, BertConfig
 from transformers import get_linear_schedule_with_warmup
 
+from models import BertForSequenceClassificationCustom
 from dataset import DataSet
 from train import Trainer
 
@@ -23,6 +24,9 @@ parser.add_argument('--do_lower_case', default=True, type=bool)
 
 parser.add_argument('--train_batch_size', default=32, type=int)
 parser.add_argument('--val_batch_size', default=32, type=int)
+
+# MixmMatch
+parser.add_argument('--mixup', action='store_true')
 
 parser.add_argument('--data_parallel', default=True, type=bool)
 
@@ -73,7 +77,7 @@ validation_dataloader = DataLoader(
 
 # Load BertForSequenceClassification, the pretrained BERT model with a single 
 # linear classification layer on top. 
-model = BertForSequenceClassification.from_pretrained(
+model = BertForSequenceClassificationCustom.from_pretrained(
     "bert-base-uncased", # Use the 12-layer BERT model, with an uncased vocab.
     num_labels = 2, # The number of output labels--2 for binary classification.
                     # You can increase this for multi-class tasks.   
