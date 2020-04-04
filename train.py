@@ -217,7 +217,7 @@ class Trainer():
                             labels=b_labels,
                             output_h=True
                         )
-
+                    pdb.set_trace()
                     logits = model(input_h = hidden)
                     
                     loss_fct = CrossEntropyLoss()
