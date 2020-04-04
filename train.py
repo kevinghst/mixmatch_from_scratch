@@ -2,6 +2,7 @@ import time
 import datetime
 import random
 import numpy as np
+from torch.nn import CrossEntropyLoss
 
 import torch
 
@@ -117,10 +118,13 @@ class Trainer():
                 # arge given and what flags are set. For our useage here, it returns
                 # the loss (because we provided labels) and the "logits"--the model
                 # outputs prior to activation.
-                loss, logits = model(b_input_ids, 
+                logits = model(b_input_ids, 
                                      token_type_ids=None, 
                                      attention_mask=b_input_mask, 
                                      labels=b_labels)
+
+                loss_fct = CrossEntropyLoss()
+                loss = loss_fct(logits.view(-1, model.config.num_labels), b_labels.view(-1))
 
                 # Accumulate the training loss over all of the batches so that we can
                 # calculate the average loss at the end. `loss` is a Tensor containing a
