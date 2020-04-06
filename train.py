@@ -35,8 +35,81 @@ class Trainer():
         torch.backends.cudnn.benchmark = False
         torch.backends.cudnn.deterministic = True
 
+    def train(self):
+        model = self.model
+        optimizer = self.optimizer
+        device = self.device
+        scheduler = self.scheduler
+        train_loader = self.train_loader
 
-    def train(self, epochs):
+        total_train_loss = 0
+        model.train
+
+        # For each batch of training data...
+        for step, batch in enumerate(train_loader):
+
+            # Progress update every 40 batches.
+            if step % 40 == 0 and not step == 0:
+                # Calculate elapsed time in minutes.
+                elapsed = format_time(time.time() - t0)
+            
+                # Report progress.
+                print('  Batch {:>5,}  of  {:>5,}.    Elapsed: {:}.'.format(step, len(train_loader), elapsed))
+
+            b_input_ids = batch[0].to(device)
+            b_input_mask = batch[1].to(device)
+            b_labels = batch[2].to(device)
+
+            model.zero_grad()        
+
+            # convert label_ids to hot vector
+            sup_size = b_input_ids.size(0)
+            label_ids = torch.zeros(sup_size, 2).scatter_(1, b_labels.cpu().view(-1,1), 1).cuda()
+
+
+            sup_hidden = model(
+                    b_input_ids,
+                    token_type_ids=None,
+                    attention_mask=b_input_mask,
+                    labels=b_labels,
+                    output_h=True
+                )
+            # hidden = 768 dimension
+
+            l = np.random.beta(cfg.alpha, cfg.alpha)
+            sup_l = max(l, 1-l) if cfg.sup_mixup else 1
+
+            sup_idx = torch.randperm(sup_hidden.size(0))
+            sup_h_a, sup_h_b = sup_hidden, sup_hidden[sup_idx]
+            sup_label_a, sup_label_b = label_ids, label_ids[sup_idx]
+            mixed_sup_h = sup_l * sup_h_a + (1 - sup_l) * sup_h_b
+            mixed_sup_label = sup_l * sup_label_a + (1 - sup_l) * sup_label_b
+
+            sup_logits = model(input_h = mixed_sup_h)
+
+            loss = -torch.sum(F.log_softmax(sup_logits, dim=1) * mixed_sup_label, dim=1)
+            loss = torch.mean(loss)
+
+            total_train_loss += loss.item()
+
+            # Perform a backward pass to calculate the gradients.
+            loss.backward()
+
+            # Clip the norm of the gradients to 1.0.
+            # This is to help prevent the "exploding gradients" problem.
+            torch.nn.utils.clip_grad_norm_(model.parameters(), 1.0)
+
+            optimizer.step()
+
+            # Update the learning rate.
+            scheduler.step()
+
+        # Calculate the average loss over all of the batches.
+        avg_train_loss = total_train_loss / len(train_loader)    
+        return avg_train_loss
+
+
+    def iterate(self, epochs):
         cfg = self.cfg
 
         # Set the seed value all over the place to make this reproducible.        
@@ -54,10 +127,7 @@ class Trainer():
 
         for epoch_i in range(0, epochs):
             model = self.model
-            optimizer = self.optimizer
             device = self.device
-            scheduler = self.scheduler
-            train_loader = self.train_loader
             val_loader = self.val_loader
     
             # ========================================
@@ -73,104 +143,7 @@ class Trainer():
             # Measure how long the training epoch takes.
             t0 = time.time()
 
-            # Reset the total loss for this epoch.
-            total_train_loss = 0
-
-            # Put the model into training mode. Don't be mislead--the call to 
-            # `train` just changes the *mode*, it doesn't *perform* the training.
-            # `dropout` and `batchnorm` layers behave differently during training
-            # vs. test (source: https://stackoverflow.com/questions/51433378/what-does-model-train-do-in-pytorch)
-            model.train()
-
-            # For each batch of training data...
-            for step, batch in enumerate(train_loader):
-
-                # Progress update every 40 batches.
-                if step % 40 == 0 and not step == 0:
-                    # Calculate elapsed time in minutes.
-                    elapsed = format_time(time.time() - t0)
-            
-                    # Report progress.
-                    print('  Batch {:>5,}  of  {:>5,}.    Elapsed: {:}.'.format(step, len(train_loader), elapsed))
-
-                # Unpack this training batch from our dataloader. 
-                #
-                # As we unpack the batch, we'll also copy each tensor to the GPU using the 
-                # `to` method.
-                #
-                # `batch` contains three pytorch tensors:
-                #   [0]: input ids 
-                #   [1]: attention masks
-                #   [2]: labels 
-                b_input_ids = batch[0].to(device)
-                b_input_mask = batch[1].to(device)
-                b_labels = batch[2].to(device)
-
-                # Always clear any previously calculated gradients before performing a
-                # backward pass. PyTorch doesn't do this automatically because 
-                # accumulating the gradients is "convenient while training RNNs". 
-                # (source: https://stackoverflow.com/questions/48001598/why-do-we-need-to-call-zero-grad-in-pytorch)
-                model.zero_grad()        
-
-                # Perform a forward pass (evaluate the model on this training batch).
-                # The documentation for this `model` function is here: 
-                # https://huggingface.co/transformers/v2.2.0/model_doc/bert.html#transformers.BertForSequenceClassification
-                # It returns different numbers of parameters depending on what arguments
-                # arge given and what flags are set. For our useage here, it returns
-                # the loss (because we provided labels) and the "logits"--the model
-                # outputs prior to activation.
-
-                # convert label_ids to hot vector
-                sup_size = b_input_ids.size(0)
-                label_ids = torch.zeros(sup_size, 2).scatter_(1, b_labels.cpu().view(-1,1), 1).cuda()
-
-
-                sup_hidden = model(
-                        b_input_ids,
-                        token_type_ids=None,
-                        attention_mask=b_input_mask,
-                        labels=b_labels,
-                        output_h=True
-                    )
-                # hidden = 768 dimension
-
-                l = np.random.beta(cfg.alpha, cfg.alpha)
-                sup_l = max(l, 1-l) if cfg.sup_mixup else 1
-
-                sup_idx = torch.randperm(sup_hidden.size(0))
-                sup_h_a, sup_h_b = sup_hidden, sup_hidden[sup_idx]
-                sup_label_a, sup_label_b = label_ids, label_ids[sup_idx]
-                mixed_sup_h = sup_l * sup_h_a + (1 - sup_l) * sup_h_b
-                mixed_sup_label = sup_l * sup_label_a + (1 - sup_l) * sup_label_b
-
-                sup_logits = model(input_h = mixed_sup_h)
-
-                loss = -torch.sum(F.log_softmax(sup_logits, dim=1) * mixed_sup_label, dim=1)
-                loss = torch.mean(loss)
-
-                # Accumulate the training loss over all of the batches so that we can
-                # calculate the average loss at the end. `loss` is a Tensor containing a
-                # single value; the `.item()` function just returns the Python value 
-                # from the tensor.
-                total_train_loss += loss.item()
-
-                # Perform a backward pass to calculate the gradients.
-                loss.backward()
-
-                # Clip the norm of the gradients to 1.0.
-                # This is to help prevent the "exploding gradients" problem.
-                torch.nn.utils.clip_grad_norm_(model.parameters(), 1.0)
-
-                # Update parameters and take a step using the computed gradient.
-                # The optimizer dictates the "update rule"--how the parameters are
-                # modified based on their gradients, the learning rate, etc.
-                optimizer.step()
-
-                # Update the learning rate.
-                scheduler.step()
-
-            # Calculate the average loss over all of the batches.
-            avg_train_loss = total_train_loss / len(train_loader)            
+            avg_train_loss = self.train()
     
             # Measure how long this epoch took.
             training_time = format_time(time.time() - t0)
@@ -202,30 +175,11 @@ class Trainer():
             # Evaluate data for one epoch
             for batch in val_loader:
         
-                # Unpack this training batch from our dataloader. 
-                #
-                # As we unpack the batch, we'll also copy each tensor to the GPU using 
-                # the `to` method.
-                #
-                # `batch` contains three pytorch tensors:
-                #   [0]: input ids 
-                #   [1]: attention masks
-                #   [2]: labels 
                 b_input_ids = batch[0].to(device)
                 b_input_mask = batch[1].to(device)
                 b_labels = batch[2].to(device)
         
-                # Tell pytorch not to bother with constructing the compute graph during
-                # the forward pass, since this is only needed for backprop (training).
                 with torch.no_grad():        
-
-                    # Forward pass, calculate logit predictions.
-                    # token_type_ids is the same as the "segment ids", which 
-                    # differentiates sentence 1 and 2 in 2-sentence tasks.
-                    # The documentation for this `model` function is here: 
-                    # https://huggingface.co/transformers/v2.2.0/model_doc/bert.html#transformers.BertForSequenceClassification
-                    # Get the "logits" output by the model. The "logits" are the output
-                    # values prior to applying an activation function like the softmax.
 
                     logits = model(b_input_ids, 
                                            token_type_ids=None, 
