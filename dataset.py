@@ -39,6 +39,7 @@ class DataSet():
 
         input_ids = torch.cat(input_ids, dim=0)
         attention_masks = torch.cat(attention_masks, dim=0)
+        segment_ids = torch.cat(segment_ids, dim=0)
         labels = torch.tensor(labels)
 
         return input_ids, attention_masks, segment_ids, labels
