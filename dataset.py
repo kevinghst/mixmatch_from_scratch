@@ -13,6 +13,7 @@ class DataSet():
          # Tokenize all of the sentences and map the tokens to thier word IDs.
         input_ids = []
         attention_masks = []
+        segment_ids = []
 
         # For every sentence...
         for sent in sentences:
@@ -32,17 +33,15 @@ class DataSet():
                                 return_tensors = 'pt',     # Return pytorch tensors.
                         )
       
-            # Add the encoded sentence to the list.    
             input_ids.append(encoded_dict['input_ids'])
-      
-            # And its attention mask (simply differentiates padding from non-padding).
             attention_masks.append(encoded_dict['attention_mask'])
+            segment_ids.append(encoded_dict['token_type_ids'])
 
         input_ids = torch.cat(input_ids, dim=0)
         attention_masks = torch.cat(attention_masks, dim=0)
         labels = torch.tensor(labels)
 
-        return input_ids, attention_masks, labels
+        return input_ids, attention_masks, segment_ids, labels
 
 
     def get_dataset(self):
@@ -73,15 +72,15 @@ class DataSet():
         sentences_dev = df_dev.sentence.values[1:]
         labels_dev = df_dev.label.values[1:]
 
-        input_ids_train, attention_masks_train, label_ids_train = self.preprocess(sentences_train, labels_train)
-        input_ids_dev, attention_masks_dev, label_ids_dev = self.preprocess(sentences_dev, labels_dev)
+        input_ids_train, attention_masks_train, seg_ids_train, label_ids_train = self.preprocess(sentences_train, labels_train)
+        input_ids_dev, attention_masks_dev, seg_ids_dev, label_ids_dev = self.preprocess(sentences_dev, labels_dev)
 
         # Print sentence 0, now as a list of IDs.
         print('Original: ', sentences_train[0])
         print('Token IDs:', input_ids_train[0])
 
         # Combine the training inputs into a TensorDataset.
-        train_dataset = TensorDataset(input_ids_train, attention_masks_train, label_ids_train)
-        val_dataset = TensorDataset(input_ids_dev, attention_masks_dev, label_ids_dev)
+        train_dataset = TensorDataset(input_ids_train, attention_masks_train, seg_ids_train, label_ids_train)
+        val_dataset = TensorDataset(input_ids_dev, attention_masks_dev, seg_ids_dev, label_ids_dev)
 
         return train_dataset, val_dataset

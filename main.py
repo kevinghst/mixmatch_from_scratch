@@ -10,6 +10,7 @@ import numpy as np
 from transformers import AdamW, BertConfig
 from transformers import get_linear_schedule_with_warmup
 
+from models_new import Classifier
 from models import BertForSequenceClassificationCustom
 from dataset import DataSet
 from train import Trainer
@@ -42,6 +43,23 @@ parser.add_argument('--epochs', default=3, type=int)
 
 cfg, unknown = parser.parse_known_args()
 
+class AttributeDict(dict): 
+    __getattr__ = dict.__getitem__
+    __setattr__ = dict.__setitem__
+
+model_cfg = {
+	"dim": 768,
+	"dim_ff": 3072,
+	"n_layers": 12,
+	"p_drop_attn": 0.1,
+	"n_heads": 12,
+	"p_drop_hidden": 0.1,
+	"max_len": 512,
+	"n_segments": 2,
+	"vocab_size": 30522
+}
+
+model_cfg = AttributeDict(model_cfg)
 
 
 # If there's a GPU available...
@@ -80,13 +98,15 @@ validation_dataloader = DataLoader(
 
 # Load BertForSequenceClassification, the pretrained BERT model with a single 
 # linear classification layer on top. 
-model = BertForSequenceClassificationCustom.from_pretrained(
-    "bert-base-uncased", # Use the 12-layer BERT model, with an uncased vocab.
-    num_labels = cfg.num_labels, # The number of output labels--2 for binary classification.
-                    # You can increase this for multi-class tasks.   
-    output_attentions = False, # Whether the model returns attentions weights.
-    output_hidden_states = False, # Whether the model returns all hidden-states.
-)
+#model = BertForSequenceClassificationCustom.from_pretrained(
+#    "bert-base-uncased", # Use the 12-layer BERT model, with an uncased vocab.
+#    num_labels = cfg.num_labels, # The number of output labels--2 for binary classification.
+#                    # You can increase this for multi-class tasks.   
+#    output_attentions = False, # Whether the model returns attentions weights.
+#    output_hidden_states = False, # Whether the model returns all hidden-states.
+#)
+
+model = Classifier(model_cfg, cfg.num_labels)
 
 # Tell pytorch to run this model on the GPU.
 model.cuda()
@@ -127,4 +147,4 @@ trainer = Trainer(
     cfg=cfg
 )
 
-trainer.train(cfg.epochs)
+trainer.iterate(cfg.epochs)

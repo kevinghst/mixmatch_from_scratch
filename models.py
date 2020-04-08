@@ -2,6 +2,7 @@ from transformers import BertPreTrainedModel, BertModel
 import torch.nn as nn
 from torch.nn import CrossEntropyLoss, MSELoss
 
+
 class BertForSequenceClassificationCustom(BertPreTrainedModel):
     def __init__(self, config):
         super().__init__(config)
