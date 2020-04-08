@@ -41,6 +41,7 @@ class Trainer():
         device = self.device
         scheduler = self.scheduler
         train_loader = self.train_loader
+        cfg = self.cfg
 
         total_train_loss = 0
         model.train
