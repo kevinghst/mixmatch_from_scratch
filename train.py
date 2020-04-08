@@ -68,13 +68,19 @@ class Trainer():
             sup_size = b_input_ids.size(0)
             label_ids = torch.zeros(sup_size, 2).scatter_(1, b_labels.cpu().view(-1,1), 1).cuda()
 
-
             sup_hidden = model(
-                input_ids = b_input_ids,
-                segment_ids = b_segment_ids,
-                input_mask=b_input_mask,
+                input_ids=b_input_ids,
+                attention_mask=b_input_mask,
                 output_h=True
             )
+
+
+            #sup_hidden = model(
+            #    input_ids = b_input_ids,
+            #    segment_ids = b_segment_ids,
+            #    input_mask=b_input_mask,
+            #    output_h=True
+            #)
             # hidden = 768 dimension
 
             l = np.random.beta(cfg.alpha, cfg.alpha)
@@ -182,12 +188,18 @@ class Trainer():
                 b_labels = batch[3].to(device)
         
                 with torch.no_grad():        
-
                     logits = model(
-                        input_ids = b_input_ids, 
-                        segment_ids = b_segment_ids,
-                        input_mask = b_input_mask
+                        input_ids=b_input_ids,
+                        attention_mask=b_input_mask
                     )
+
+
+                    #logits = model(
+                    #    input_ids = b_input_ids, 
+                    #    segment_ids = b_segment_ids,
+                    #    input_mask = b_input_mask
+                    #)
+
                     
                     loss_fct = CrossEntropyLoss()
                     loss = loss_fct(logits.view(-1, cfg.num_labels), b_labels.view(-1))
