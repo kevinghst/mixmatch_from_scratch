@@ -9,7 +9,8 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
-from utils.utils import split_last, merge_last
+from utils import split_last, merge_last
+
 
 
 class Config(NamedTuple):
