@@ -70,10 +70,22 @@ class Trainer():
             sup_l = np.random.beta(cfg.alpha, cfg.alpha)
             sup_idx = torch.randperm(batch_size)
 
-            #if cfg.mixup == 'word':
-            #    for i in range(0, batch_size):
-            #        j = sup_idx[i]
-            #        b_input_mask = b_
+            c_input_ids = b_input_ids.clone()
+
+            if cfg.mixup == 'word':
+                for i in range(0, batch_size):
+                    j = sup_idx[i]
+                    if b_num_tokens[i] < b_num_tokens[j]:
+                        i_count = b_num_tokens[i]
+                        j_count = b_num_tokens[j]
+
+                        pdb.set_trace()
+                        first = b_input_ids[i][0..i_count-1]
+
+
+                        b_num_tokens[i] = temp
+                    
+                        
 
             b_input_ids = b_input_ids.to(device)
             b_input_mask = b_input_mask.to(device)
