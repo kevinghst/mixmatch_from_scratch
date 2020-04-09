@@ -48,7 +48,7 @@ class DataSet():
             input_ids.append(encoded_dict['input_ids'])
             attention_masks.append(encoded_dict['attention_mask'])
             segment_ids.append(encoded_dict['token_type_ids'])
-            num_tokens.append(len(tokens))
+            num_tokens.append(len(tokens) + 2)
 
         input_ids = torch.cat(input_ids, dim=0)
         attention_masks = torch.cat(attention_masks, dim=0)

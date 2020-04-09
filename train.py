@@ -57,13 +57,7 @@ class Trainer():
                 # Report progress.
                 print('  Batch {:>5,}  of  {:>5,}.    Elapsed: {:}.'.format(step, len(train_loader), elapsed))
 
-            b_input_ids = batch[0].to(device)
-            b_input_mask = batch[1].to(device)
-            b_segment_ids = batch[2].to(device)
-            b_labels = batch[3].to(device)
-            b_num_tokens = batch[4].to(device)
-
-            pdb.set_trace()
+            b_input_ids, b_input_mask, b_segment_ids, b_labels, b_num_tokens = batch
             
             batch_size = b_input_ids.size(0)
 
@@ -71,10 +65,20 @@ class Trainer():
 
             # convert label_ids to hot vector
             sup_size = b_input_ids.size(0)
-            label_ids = torch.zeros(sup_size, 2).scatter_(1, b_labels.cpu().view(-1,1), 1).cuda()
+            label_ids = torch.zeros(sup_size, 2).scatter_(1, b_labels.view(-1,1), 1).cuda()
 
             sup_l = np.random.beta(cfg.alpha, cfg.alpha)
             sup_idx = torch.randperm(batch_size)
+
+            #if cfg.mixup == 'word':
+            #    for i in range(0, batch_size):
+            #        j = sup_idx[i]
+            #        b_input_mask = b_
+
+            b_input_ids = b_input_ids.to(device)
+            b_input_mask = b_input_mask.to(device)
+            b_segment_ids = b_segment_ids.to(device)
+            b_num_tokens = b_num_tokens.to(device)
 
             sup_logits = model(
                 input_ids=b_input_ids,
