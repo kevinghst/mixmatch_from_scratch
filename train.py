@@ -70,31 +70,21 @@ class Trainer():
             sup_size = b_input_ids.size(0)
             label_ids = torch.zeros(sup_size, 2).scatter_(1, b_labels.cpu().view(-1,1), 1).cuda()
 
-            #sup_hidden = model(
-            #    input_ids=b_input_ids,
-            #    attention_mask=b_input_mask,
-            #    output_h=True
-            #)
-
             sup_l = np.random.beta(cfg.alpha, cfg.alpha)
-            #sup_l = max(l, 1-l) if cfg.sup_mixup else 1
             sup_idx = torch.randperm(batch_size)
 
+            pdb.set_trace()
 
             sup_logits = model(
                 input_ids=b_input_ids,
                 attention_mask=b_input_mask,
-                mixup_cls=cfg.sup_mixup,
+                mixup_cls=cfg.mixup_cls,
                 shuffle_idx=sup_idx,
                 l=sup_l
             )
 
-            #sup_h_a, sup_h_b = sup_hidden, sup_hidden[sup_idx]
             sup_label_a, sup_label_b = label_ids, label_ids[sup_idx]
-            #mixed_sup_h = sup_l * sup_h_a + (1 - sup_l) * sup_h_b
             mixed_sup_label = sup_l * sup_label_a + (1 - sup_l) * sup_label_b
-
-            #sup_logits = model(input_h = mixed_sup_h)
 
             loss = -torch.sum(F.log_softmax(sup_logits, dim=1) * mixed_sup_label, dim=1)
             loss = torch.mean(loss)
