@@ -81,7 +81,7 @@ class Trainer():
                     if i_count < j_count:
                         first = b_input_ids[i][0:i_count-1]
                         second = torch.tensor([1] * (j_count - i_count))
-                        third = c_input_ids[j_count-1:128]
+                        third = c_input_ids[j][j_count-1:128]
 
                         pdb.set_trace()
 
