@@ -79,9 +79,6 @@ class Trainer():
                     j_count = int(b_num_tokens[j])
 
                     if i_count < j_count:
-                        i_count = b_num_tokens[i]
-                        j_count = b_num_tokens[j]
-
                         first = b_input_ids[i][0:i_count-1]
                         second = torch.tensor([1] * (j_count - i_count))
                         third = c_input_ids[j_count-1:128]
