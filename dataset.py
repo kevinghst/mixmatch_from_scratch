@@ -26,13 +26,13 @@ class DataSet():
             #   (6) Create attention masks for [PAD] tokens.
 
             tokens = self.tokenizer.tokenize(sent)
-            paddings = 126 - len(tokens)
+            #paddings = 126 - len(tokens)
             
-            first_padding = 128 - paddings + 1
+            #first_padding = 128 - paddings + 1
 
-            for i in range(first_padding, 129):
-                unused_token = '[UNK]'
-                tokens.append(unused_token)
+            #for i in range(first_padding, 129):
+            #    unused_token = '[UNK]'
+            #    tokens.append(unused_token)
 
             encoded_dict = self.tokenizer.encode_plus(
                                 tokens,                      # Sentence to encode.
@@ -43,6 +43,7 @@ class DataSet():
                                 return_tensors = 'pt',     # Return pytorch tensors.
                                 is_pretokenized = True
                         )
+            pdb.set_trace()
 
             input_ids.append(encoded_dict['input_ids'])
             attention_masks.append(encoded_dict['attention_mask'])
