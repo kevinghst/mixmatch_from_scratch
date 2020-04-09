@@ -31,7 +31,7 @@ class DataSet():
             first_padding = 128 - paddings + 1
 
             for i in range(first_padding, 129):
-                unused_token = '[unused' + str(i) + ']'
+                unused_token = '[unused0]'
                 tokens.append(unused_token)
 
             encoded_dict = self.tokenizer.encode_plus(
