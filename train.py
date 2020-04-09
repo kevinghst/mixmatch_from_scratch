@@ -83,8 +83,9 @@ class Trainer():
                         second = torch.tensor([1] * (j_count - i_count))
                         third = c_input_ids[j][j_count-1:128]
                         combined = torch.cat((first, second, third), 0)
-
+                        pdb.set_trace()
                         b_input_ids[i] = combined
+                        pdb.set_trace()
             
             for i in range(0, batch_size):
                 new_first = b_input_ids[i]
