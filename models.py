@@ -23,7 +23,7 @@ class BertEmbeddings(nn.Module):
         self.LayerNorm = BertLayerNorm(config.hidden_size, eps=config.layer_norm_eps)
         self.dropout = nn.Dropout(config.hidden_dropout_prob)
 
-    def forward(self, input_ids=None, token_type_ids=None, position_ids=None, inputs_embeds=None):
+    def forward(self, input_ids=None, token_type_ids=None, position_ids=None, inputs_embeds=None, mixup=None):
         if input_ids is not None:
             input_shape = input_ids.size()
         else:
@@ -226,7 +226,11 @@ class BertModel(BertPreTrainedModel):
             head_mask = [None] * self.config.num_hidden_layers
 
         embedding_output = self.embeddings(
-            input_ids=input_ids, position_ids=position_ids, token_type_ids=token_type_ids, inputs_embeds=inputs_embeds
+            input_ids=input_ids, 
+            position_ids=position_ids, 
+            token_type_ids=token_type_ids, 
+            inputs_embeds=inputs_embeds,
+            mixup=mixup
         )
 
         encoder_outputs = self.encoder(
