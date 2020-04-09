@@ -49,7 +49,6 @@ class BertEmbeddings(nn.Module):
 
         if inputs_embeds is None:
             inputs_embeds = self.word_embeddings(input_ids)
-            pdb.set_trace()
             if mixup == 'word':
                 embeds_a, embeds_b = inputs_embeds, inputs_embeds[shuffle_idx]
                 inputs_embeds = l * embeds_a + (1-l) * embeds_b
