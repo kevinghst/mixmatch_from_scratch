@@ -6,6 +6,8 @@ import torch
 
 import pdb
 
+BertLayerNorm = torch.nn.LayerNorm
+
 class BertEmbeddings(nn.Module):
     """Construct the embeddings from word, position and token_type embeddings.
     """
