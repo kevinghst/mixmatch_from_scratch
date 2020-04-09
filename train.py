@@ -94,11 +94,11 @@ class Trainer():
                         big_ids = b_input_ids
 
                     if i_count != j_count:
-                        first = b_input_ids[small][0:small_count-1]
+                        first = small_ids[small][0:small_count-1]
                         second = torch.tensor([1] * (big_count - small_count))
-                        third = c_input_ids[big][big_count-1:128]
+                        third = big_ids[big][big_count-1:128]
                         combined = torch.cat((first, second, third), 0)
-                        b_input_ids[small] = combined
+                        small_ids[small] = combined
                         if i_count < j_count:
                             b_input_mask[i] = b_input_mask[j]
             
