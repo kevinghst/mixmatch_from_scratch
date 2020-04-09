@@ -61,6 +61,9 @@ class Trainer():
             b_input_mask = batch[1].to(device)
             b_segment_ids = batch[2].to(device)
             b_labels = batch[3].to(device)
+            b_num_tokens = batch[4].to(device)
+
+            pdb.set_trace()
             
             batch_size = b_input_ids.size(0)
 
