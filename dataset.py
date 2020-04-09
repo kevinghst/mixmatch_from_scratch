@@ -17,6 +17,7 @@ class DataSet():
 
         # For every sentence...
         for sent in sentences:
+            pdb.set_trace()
             # `encode_plus` will:
             #   (1) Tokenize the sentence.
             #   (2) Prepend the `[CLS]` token to the start.
