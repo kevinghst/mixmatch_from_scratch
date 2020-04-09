@@ -82,12 +82,18 @@ class Trainer():
                         first = b_input_ids[i][0:i_count-1]
                         second = torch.tensor([1] * (j_count - i_count))
                         third = c_input_ids[j][j_count-1:128]
+                        combined = torch.cat((first, second, third), 0)
 
-                        pdb.set_trace()
+                        b_input_ids[i] = combined
+            
+            for i in range(0, batch_size):
+                new_first = b_input_ids[i]
+                new_second = c_input_ids[j]
 
-                        b_num_tokens[i] = temp
-                    
-                        
+                old_first = c_input_ids[i]
+                old_second = c_input_ids[j]
+
+                pdb.set_trace()
 
             b_input_ids = b_input_ids.to(device)
             b_input_mask = b_input_mask.to(device)
@@ -102,7 +108,7 @@ class Trainer():
                 l=sup_l
             )
 
-            if cfg.mixup:
+            if cfg.mixup == 'cls':
                 sup_label_a, sup_label_b = label_ids, label_ids[sup_idx]
                 label_ids = sup_l * sup_label_a + (1 - sup_l) * sup_label_b
 
