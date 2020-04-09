@@ -79,23 +79,34 @@ class Trainer():
                     j_count = int(b_num_tokens[j])
 
                     if i_count < j_count:
-                        first = b_input_ids[i][0:i_count-1]
-                        second = torch.tensor([1] * (j_count - i_count))
-                        third = c_input_ids[j][j_count-1:128]
+                        small = i
+                        big = j
+                        small_count = i_count
+                        big_count = j_count
+                    elif i_count > j_count:
+                        small = j
+                        big = i
+                        small_count = j_count
+                        big_count = i_count
+
+                    if i_count != j_count:
+                        first = b_input_ids[small][0:small_count-1]
+                        second = torch.tensor([1] * (big_count - small_count))
+                        third = c_input_ids[big][big_count-1:128]
                         combined = torch.cat((first, second, third), 0)
-                        b_input_ids[i] = combined
-                        b_input_mask[i] = b_input_mask[j]
+                        b_input_ids[small] = combined
+                        b_input_mask[small] = b_input_mask[big]
             
-            #for i in range(0, batch_size):
-            #    j = sup_idx[i]
+            for i in range(0, batch_size):
+                j = sup_idx[i]
 
-            #    new_first = b_input_ids[i]
-            #    new_second = c_input_ids[j]
+                new_first = b_input_ids[i]
+                new_second = c_input_ids[j]
 
-            #    old_first = c_input_ids[i]
-            #    old_second = c_input_ids[j]
+                old_first = c_input_ids[i]
+                old_second = c_input_ids[j]
 
-            #    pdb.set_trace()
+                pdb.set_trace()
 
             b_input_ids = b_input_ids.to(device)
             b_input_mask = b_input_mask.to(device)
