@@ -84,6 +84,7 @@ class Trainer():
                         third = c_input_ids[j][j_count-1:128]
                         combined = torch.cat((first, second, third), 0)
                         b_input_ids[i] = combined
+                        b_input_mask[i] = b_input_mask[j]
             
             for i in range(0, batch_size):
                 j = sup_idx[i]
@@ -93,8 +94,6 @@ class Trainer():
 
                 old_first = c_input_ids[i]
                 old_second = c_input_ids[j]
-
-                pdb.set_trace()
 
             b_input_ids = b_input_ids.to(device)
             b_input_mask = b_input_mask.to(device)
