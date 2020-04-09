@@ -83,11 +83,15 @@ class Trainer():
                         big = j
                         small_count = i_count
                         big_count = j_count
+                        small_ids = b_input_ids
+                        big_ids = c_input_ids
                     elif i_count > j_count:
                         small = j
                         big = i
                         small_count = j_count
                         big_count = i_count
+                        small_ids = c_input_ids
+                        big_ids = b_input_ids
 
                     if i_count != j_count:
                         first = b_input_ids[small][0:small_count-1]
@@ -95,7 +99,8 @@ class Trainer():
                         third = c_input_ids[big][big_count-1:128]
                         combined = torch.cat((first, second, third), 0)
                         b_input_ids[small] = combined
-                        b_input_mask[small] = b_input_mask[big]
+                        if i_count < j_count:
+                            b_input_mask[i] = b_input_mask[j]
             
             for i in range(0, batch_size):
                 j = sup_idx[i]
@@ -106,6 +111,7 @@ class Trainer():
                 old_first = c_input_ids[i]
                 old_second = c_input_ids[j]
 
+                new_mask_first = b_input_mask[i]
                 pdb.set_trace()
 
             b_input_ids = b_input_ids.to(device)
