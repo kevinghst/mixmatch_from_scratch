@@ -61,6 +61,8 @@ class Trainer():
             b_input_mask = batch[1].to(device)
             b_segment_ids = batch[2].to(device)
             b_labels = batch[3].to(device)
+            
+            batch_size = b_input_ids.size(0)
 
             model.zero_grad()        
 
@@ -74,10 +76,9 @@ class Trainer():
             #    output_h=True
             #)
 
-
             l = np.random.beta(cfg.alpha, cfg.alpha)
             sup_l = max(l, 1-l) if cfg.sup_mixup else 1
-            sup_idx = torch.randperm(sup_hidden.size(0))
+            sup_idx = torch.randperm(batch_size)
 
 
             sup_logits = model(
