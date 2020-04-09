@@ -121,13 +121,14 @@ class Trainer():
 
             sup_logits = model(
                 input_ids=b_input_ids,
+                c_input_ids=c_input_ids,
                 attention_mask=b_input_mask,
                 mixup=cfg.mixup,
                 shuffle_idx=sup_idx,
                 l=sup_l
             )
 
-            if cfg.mixup == 'cls':
+            if cfg.mixup:
                 sup_label_a, sup_label_b = label_ids, label_ids[sup_idx]
                 label_ids = sup_l * sup_label_a + (1 - sup_l) * sup_label_b
 
