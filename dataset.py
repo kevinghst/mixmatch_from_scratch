@@ -25,16 +25,18 @@ class DataSet():
             #   (5) Pad or truncate the sentence to `max_length`
             #   (6) Create attention masks for [PAD] tokens.
 
-            #tokens = self.tokenizer.tokenize(sent)
+            tokens = self.tokenizer.tokenize(sent)
 
             encoded_dict = self.tokenizer.encode_plus(
-                                sent,                      # Sentence to encode.
+                                tokens,                      # Sentence to encode.
                                 add_special_tokens = True, # Add '[CLS]' and '[SEP]'
                                 max_length = 128,           # Pad & truncate all sentences.
                                 pad_to_max_length = True,
                                 return_attention_mask = True,   # Construct attn. masks.
                                 return_tensors = 'pt',     # Return pytorch tensors.
+                                is_pretokenized = True
                         )
+            pdb.set_trace()
       
             input_ids.append(encoded_dict['input_ids'])
             attention_masks.append(encoded_dict['attention_mask'])
