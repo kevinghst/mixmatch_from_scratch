@@ -196,7 +196,6 @@ class BertModel(BertPreTrainedModel):
         sequence_output = encoder_outputs[0]
         pooled_output = self.pooler(sequence_output)
 
-        pdb.set_trace()
         if mixup == 'cls':
             cls_a, cls_b = pooled_output, pooled_output[shuffle_idx]
             pooled_output = l * cls_a + (1-l) * cls_b
