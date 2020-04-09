@@ -75,13 +75,18 @@ class Trainer():
             if cfg.mixup == 'word':
                 for i in range(0, batch_size):
                     j = sup_idx[i]
-                    if b_num_tokens[i] < b_num_tokens[j]:
+                    i_count = int(b_nums_token[i])
+                    j_count = int(b_nums_token[j])
+
+                    if i_count < j_count:
                         i_count = b_num_tokens[i]
                         j_count = b_num_tokens[j]
 
-                        pdb.set_trace()
-                        first = b_input_ids[i][0..i_count-1]
+                        first = b_input_ids[i][0:i_count-1]
+                        second = torch.tensor([1] * (j_count - i_count))
+                        third = c_input_ids[j_count-1:128]
 
+                        pdb.set_trace()
 
                         b_num_tokens[i] = temp
                     
