@@ -32,7 +32,7 @@ class BertEmbeddings(nn.Module):
             inputs_embeds=None, 
             mixup=None,
             l=1,
-            shuffle_idx=shuffle_idx
+            shuffle_idx=None
         ):
         if input_ids is not None:
             input_shape = input_ids.size()
