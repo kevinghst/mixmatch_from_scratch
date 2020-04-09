@@ -33,7 +33,6 @@ class DataSet():
             for i in range(first_padding, 129):
                 unused_token = '[unused' + str(i) + ']'
                 tokens.append(unused_token)
-            pdb.set_trace()
 
             encoded_dict = self.tokenizer.encode_plus(
                                 tokens,                      # Sentence to encode.
@@ -44,7 +43,7 @@ class DataSet():
                                 return_tensors = 'pt',     # Return pytorch tensors.
                                 is_pretokenized = True
                         )
-      
+            pdb.set_trace()
             input_ids.append(encoded_dict['input_ids'])
             attention_masks.append(encoded_dict['attention_mask'])
             segment_ids.append(encoded_dict['token_type_ids'])
