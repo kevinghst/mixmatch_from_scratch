@@ -27,6 +27,8 @@ class DataSet():
 
             tokens = self.tokenizer.tokenize(sent)
 
+            pdb.set_trace()
+
             encoded_dict = self.tokenizer.encode_plus(
                                 tokens,                      # Sentence to encode.
                                 add_special_tokens = True, # Add '[CLS]' and '[SEP]'
@@ -36,7 +38,6 @@ class DataSet():
                                 return_tensors = 'pt',     # Return pytorch tensors.
                                 is_pretokenized = True
                         )
-            pdb.set_trace()
       
             input_ids.append(encoded_dict['input_ids'])
             attention_masks.append(encoded_dict['attention_mask'])
