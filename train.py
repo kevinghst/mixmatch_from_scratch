@@ -75,8 +75,8 @@ class Trainer():
             if cfg.mixup == 'word':
                 for i in range(0, batch_size):
                     j = sup_idx[i]
-                    i_count = int(b_nums_token[i])
-                    j_count = int(b_nums_token[j])
+                    i_count = int(b_num_tokens[i])
+                    j_count = int(b_num_tokens[j])
 
                     if i_count < j_count:
                         i_count = b_num_tokens[i]
