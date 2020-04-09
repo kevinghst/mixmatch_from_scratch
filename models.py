@@ -52,6 +52,9 @@ class BertModel(BertPreTrainedModel):
         inputs_embeds=None,
         encoder_hidden_states=None,
         encoder_attention_mask=None,
+        mixup_cls=False,
+        shuffle_idx=None,
+        l=1
     ):
         r"""
     Return:
@@ -192,6 +195,10 @@ class BertModel(BertPreTrainedModel):
         sequence_output = encoder_outputs[0]
         pooled_output = self.pooler(sequence_output)
 
+        if mixup_cls:
+            cls_a, cls_b = pooled_ouput, pooled_output[shuffle_idx]
+            pooled_output = l * cls_a + (1-l) * cls_b
+
         outputs = (sequence_output, pooled_output,) + encoder_outputs[
             1:
         ]  # add hidden_states and attentions if they are here
@@ -220,7 +227,10 @@ class BertForSequenceClassificationCustom(BertPreTrainedModel):
         inputs_embeds=None,
         labels=None,
         output_h=False,
-        input_h=None
+        input_h=None,
+        mixup_cls=False,
+        shuffle_idx=None,
+        l=1
     ):
         if input_h is None:
             outputs = self.bert(
@@ -230,6 +240,9 @@ class BertForSequenceClassificationCustom(BertPreTrainedModel):
                 position_ids=position_ids,
                 head_mask=head_mask,
                 inputs_embeds=inputs_embeds,
+                mixup_cls=mixup_cls,
+                shuffle_idx=shuffle_idx,
+                l=l
             )
 
             pooled_output = outputs[1]
