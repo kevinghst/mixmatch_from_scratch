@@ -73,12 +73,10 @@ class Trainer():
             sup_l = np.random.beta(cfg.alpha, cfg.alpha)
             sup_idx = torch.randperm(batch_size)
 
-            pdb.set_trace()
-
             sup_logits = model(
                 input_ids=b_input_ids,
                 attention_mask=b_input_mask,
-                mixup_cls=cfg.mixup_cls,
+                mixup=cfg.mixup,
                 shuffle_idx=sup_idx,
                 l=sup_l
             )

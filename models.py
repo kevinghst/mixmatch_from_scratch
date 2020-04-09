@@ -52,7 +52,7 @@ class BertModel(BertPreTrainedModel):
         inputs_embeds=None,
         encoder_hidden_states=None,
         encoder_attention_mask=None,
-        mixup_cls=False,
+        mixup=None,
         shuffle_idx=None,
         l=1
     ):
@@ -195,7 +195,8 @@ class BertModel(BertPreTrainedModel):
         sequence_output = encoder_outputs[0]
         pooled_output = self.pooler(sequence_output)
 
-        if mixup_cls:
+        pdb.set_trace()
+        if mixup == 'cls':
             cls_a, cls_b = pooled_output, pooled_output[shuffle_idx]
             pooled_output = l * cls_a + (1-l) * cls_b
 
@@ -228,7 +229,7 @@ class BertForSequenceClassificationCustom(BertPreTrainedModel):
         labels=None,
         output_h=False,
         input_h=None,
-        mixup_cls=False,
+        mixup=None,
         shuffle_idx=None,
         l=1
     ):
@@ -240,7 +241,7 @@ class BertForSequenceClassificationCustom(BertPreTrainedModel):
                 position_ids=position_ids,
                 head_mask=head_mask,
                 inputs_embeds=inputs_embeds,
-                mixup_cls=mixup_cls,
+                mixup=mixup,
                 shuffle_idx=shuffle_idx,
                 l=l
             )
