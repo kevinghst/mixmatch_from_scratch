@@ -32,7 +32,7 @@ class DataSet():
 
             for i in range(first_padding, 129):
                 unused_token = '[unused0]'
-                tokens.append(unused_token)
+                #tokens.append(unused_token)
 
             encoded_dict = self.tokenizer.encode_plus(
                                 tokens,                      # Sentence to encode.
