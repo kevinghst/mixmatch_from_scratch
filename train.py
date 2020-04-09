@@ -95,6 +95,8 @@ class Trainer():
                 old_first = c_input_ids[i]
                 old_second = c_input_ids[j]
 
+                pdb.set_trace()
+
             b_input_ids = b_input_ids.to(device)
             b_input_mask = b_input_mask.to(device)
             b_segment_ids = b_segment_ids.to(device)
