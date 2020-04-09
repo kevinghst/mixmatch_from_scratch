@@ -2,10 +2,7 @@ from transformers import BertPreTrainedModel
 import torch.nn as nn
 from torch.nn import CrossEntropyLoss, MSELoss
 
-@add_start_docstrings(
-    "The bare Bert Model transformer outputting raw hidden-states without any specific head on top.",
-    BERT_START_DOCSTRING,
-)
+
 class BertModel(BertPreTrainedModel):
     """
     The model can behave as an encoder (with only self-attention) as well
@@ -43,7 +40,6 @@ class BertModel(BertPreTrainedModel):
         for layer, heads in heads_to_prune.items():
             self.encoder.layer[layer].attention.prune_heads(heads)
 
-    @add_start_docstrings_to_callable(BERT_INPUTS_DOCSTRING)
     def forward(
         self,
         input_ids=None,
