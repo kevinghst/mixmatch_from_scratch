@@ -76,15 +76,15 @@ class Trainer():
             #    output_h=True
             #)
 
-            l = np.random.beta(cfg.alpha, cfg.alpha)
-            sup_l = max(l, 1-l) if cfg.sup_mixup else 1
+            sup_l = np.random.beta(cfg.alpha, cfg.alpha)
+            #sup_l = max(l, 1-l) if cfg.sup_mixup else 1
             sup_idx = torch.randperm(batch_size)
 
 
             sup_logits = model(
                 input_ids=b_input_ids,
                 attention_mask=b_input_mask,
-                mixup_cls=True,
+                mixup_cls=cfg.sup_mixup,
                 shuffle_idx=sup_idx,
                 l=sup_l
             )

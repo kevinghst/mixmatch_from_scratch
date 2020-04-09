@@ -27,7 +27,7 @@ parser.add_argument('--do_lower_case', default=True, type=bool)
 parser.add_argument('--train_batch_size', default=32, type=int)
 parser.add_argument('--val_batch_size', default=32, type=int)
 
-# MixmMatch
+# MixMatch
 parser.add_argument('--sup_mixup', action='store_true')
 parser.add_argument('--alpha', default=0.75, type=float)
 
