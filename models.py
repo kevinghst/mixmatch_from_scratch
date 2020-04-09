@@ -2,6 +2,7 @@ from transformers import BertPreTrainedModel
 from transformers.modeling_bert import BertEmbeddings, BertEncoder, BertPooler
 import torch.nn as nn
 from torch.nn import CrossEntropyLoss, MSELoss
+import torch
 
 
 class BertModel(BertPreTrainedModel):
