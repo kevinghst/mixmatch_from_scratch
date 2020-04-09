@@ -26,7 +26,13 @@ class DataSet():
             #   (6) Create attention masks for [PAD] tokens.
 
             tokens = self.tokenizer.tokenize(sent)
+            paddings = 126 - len(tokens)
+            
+            first_padding = 128 - paddings + 1
 
+            for i in range(first_padding, 129):
+                unused_token = '[unused' + str(i) + ']'
+                tokens.append(unused_token)
             pdb.set_trace()
 
             encoded_dict = self.tokenizer.encode_plus(
