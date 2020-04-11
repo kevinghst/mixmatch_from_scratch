@@ -129,6 +129,7 @@ class Trainer():
             )
 
             if cfg.mixup:
+                pdb.set_trace()
                 sup_label_a, sup_label_b = label_ids, label_ids[sup_idx]
                 label_ids = sup_l * sup_label_a + (1 - sup_l) * sup_label_b
 

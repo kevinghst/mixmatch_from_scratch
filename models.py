@@ -50,6 +50,7 @@ class BertEmbeddings(nn.Module):
         if inputs_embeds is None:
             inputs_embeds = self.word_embeddings(input_ids)
             if mixup == 'word':
+                pdb.set_trace()
                 embeds_a, embeds_b = inputs_embeds, inputs_embeds[shuffle_idx]
                 inputs_embeds = l * embeds_a + (1-l) * embeds_b
 
@@ -262,6 +263,7 @@ class BertModel(BertPreTrainedModel):
         pooled_output = self.pooler(sequence_output)
 
         if mixup == 'cls':
+            pdb.set_trace()
             cls_a, cls_b = pooled_output, pooled_output[shuffle_idx]
             pooled_output = l * cls_a + (1-l) * cls_b
 
