@@ -68,6 +68,7 @@ class Trainer():
             label_ids = torch.zeros(sup_size, 2).scatter_(1, b_labels.view(-1,1), 1).cuda()
 
             sup_l = np.random.beta(cfg.alpha, cfg.alpha)
+            sup_l = max(sup_l, 1-sup_l)
             sup_idx = torch.randperm(batch_size)
 
             c_input_ids = b_input_ids.clone()
@@ -112,7 +113,6 @@ class Trainer():
             #    old_second = c_input_ids[j]
 
             #    new_mask_first = b_input_mask[i]
-            #    pdb.set_trace()
 
             b_input_ids = b_input_ids.to(device)
             b_input_mask = b_input_mask.to(device)
@@ -129,7 +129,6 @@ class Trainer():
             )
 
             if cfg.mixup:
-                pdb.set_trace()
                 sup_label_a, sup_label_b = label_ids, label_ids[sup_idx]
                 label_ids = sup_l * sup_label_a + (1 - sup_l) * sup_label_b
 
