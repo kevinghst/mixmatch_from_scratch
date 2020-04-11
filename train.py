@@ -288,3 +288,5 @@ class Trainer():
         print("Total training took {:} (h:mm:ss)".format(format_time(time.time()-total_t0)))
         print("Best Validation Accuracy: {0:.4f}".format(best_val_acc))
         print("Best Epoch: {}".format(best_epoch))
+        print("Best Training Loss: {}".format(best_train_loss))
+        print("Best Val Loss: {}".format(best_val_loss))
