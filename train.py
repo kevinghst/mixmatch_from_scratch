@@ -169,6 +169,8 @@ class Trainer():
 
         best_val_acc = 0
         best_epoch = 0
+        best_train_loss = None
+        best_val_loss = None
 
         for epoch_i in range(0, epochs):
             model = self.model
@@ -251,17 +253,20 @@ class Trainer():
             avg_val_accuracy = total_eval_accuracy / len(val_loader)
             print("  Accuracy: {0:.4f}".format(avg_val_accuracy))
 
-            # update best val accuracy
-            if avg_val_accuracy > best_val_acc:
-                best_val_acc = avg_val_accuracy
-                best_epoch = epoch_i
-
             # Calculate the average loss over all of the batches.
             avg_val_loss = total_eval_loss / len(val_loader)
     
             # Measure how long the validation run took.
             validation_time = format_time(time.time() - t0)
     
+            # update best val accuracy
+            if avg_val_accuracy > best_val_acc:
+                best_val_acc = avg_val_accuracy
+                best_epoch = epoch_i
+                best_train_loss = avg_train_loss
+                best_val_loss = avg_val_loss
+
+
             print("  Validation Loss: {0:.2f}".format(avg_val_loss))
             print("  Validation took: {:}".format(validation_time))
 
