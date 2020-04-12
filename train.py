@@ -77,7 +77,7 @@ class Trainer():
             max_len = int(max(b_num_tokens))
             max_mask_ones = torch.tensor([1] * max_len)
             max_mask_zeros = torch.tensor([0] * (128 - max_len))
-            sep_tensor = torch.tensor([128])
+            sep_tensor = torch.tensor([102])
             max_mask = torch.cat((max_mask_ones, max_mask_zeros), 0)
 
             for i in range(0, batch_size):
@@ -121,11 +121,11 @@ class Trainer():
                         if i_count < j_count:
                             b_input_mask[i] = b_input_mask[j]
             
-            for i in range(0, batch_size):
-                new_mask = b_input_mask[i]
-                new_ids = b_input_ids[i]
-                old_ids = c_input_ids[i]
-                pdb.set_trace()
+            #for i in range(0, batch_size):
+            #    new_mask = b_input_mask[i]
+            #    new_ids = b_input_ids[i]
+            #    old_ids = c_input_ids[i]
+            #    pdb.set_trace()
 
             b_input_ids = b_input_ids.to(device)
             b_input_mask = b_input_mask.to(device)
