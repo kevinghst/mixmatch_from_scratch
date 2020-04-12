@@ -30,13 +30,12 @@ class DataSet():
 
             # pad all tokens to the same length using UNS token
 
-            #paddings = 126 - len(tokens)
+            max_sent_length = 64
+            paddings = max_sent_length - 2 - len(tokens)
             
-            #first_padding = 128 - paddings + 1
-
-            #for i in range(first_padding, 129):
-            #    unused_token = '[UNK]'
-            #    tokens.append(unused_token)
+            for i in range(0, paddings):
+                unused_token = '[unused0]'
+                tokens.append(unused_token)
 
             encoded_dict = self.tokenizer.encode_plus(
                                 tokens,                      # Sentence to encode.
