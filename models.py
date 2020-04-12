@@ -53,6 +53,7 @@ class BertEmbeddings(nn.Module):
                 with torch.no_grad():
                     c_inputs_embeds = self.word_embeddings(c_input_ids)
                 embeds_a, embeds_b = inputs_embeds, c_inputs_embeds[shuffle_idx]
+                pdb.set_trace()
                 inputs_embeds = l * embeds_a + (1-l) * embeds_b
 
         position_embeddings = self.position_embeddings(position_ids)
