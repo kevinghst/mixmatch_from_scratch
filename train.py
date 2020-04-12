@@ -73,6 +73,25 @@ class Trainer():
 
             c_input_ids = b_input_ids.clone()
 
+            # pad all sequences to the maximum length in batch
+            pdb.set_trace()
+            max_len = int(max(b_num_tokens))
+            max_mask_ones = torch.tensor([1] * max_len)
+            max_mask_zeros = torch.tensor([0] * (128 - max_len))
+            sep_tensor = torch.tensor([128])
+            max_mask = torch.cat((max_mask_ones, max_mask_zeros), 0)
+
+            for i in range(0, batch_size):
+                current_len = int(b_num_tokens[i])
+                if current_len < max_len:
+                    first = b_input_ids[i][0:current_len-1]
+                    second = torch.tensor([1] * (max_len - current_len))
+                    third = torch.cat((sep_tensor, max_mask_zeros))
+                    combined = torch.cat((first, second, third), 0)
+                    b_input_ids[i] = combined
+                    b_input_mask[i] = max_mask
+
+
             if cfg.mixup == 'word':
                 for i in range(0, batch_size):
                     j = sup_idx[i]
