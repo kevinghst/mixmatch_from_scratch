@@ -27,6 +27,9 @@ class DataSet():
             #   (6) Create attention masks for [PAD] tokens.
 
             tokens = self.tokenizer.tokenize(sent)
+
+            # pad all tokens to the same length using UNS token
+
             #paddings = 126 - len(tokens)
             
             #first_padding = 128 - paddings + 1

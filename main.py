@@ -54,7 +54,7 @@ model_cfg = {
 	"p_drop_attn": 0.1,
 	"n_heads": 12,
 	"p_drop_hidden": 0.1,
-	"max_len": 512,
+	"max_len": 128,
 	"n_segments": 2,
 	"vocab_size": 30522
 }
