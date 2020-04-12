@@ -74,7 +74,6 @@ class Trainer():
             c_input_ids = b_input_ids.clone()
 
             # pad all sequences to the maximum length in batch
-            pdb.set_trace()
             max_len = int(max(b_num_tokens))
             max_mask_ones = torch.tensor([1] * max_len)
             max_mask_zeros = torch.tensor([0] * (128 - max_len))
@@ -122,16 +121,11 @@ class Trainer():
                         if i_count < j_count:
                             b_input_mask[i] = b_input_mask[j]
             
-            #for i in range(0, batch_size):
-            #    j = sup_idx[i]
-
-            #    new_first = b_input_ids[i]
-            #    new_second = c_input_ids[j]
-
-            #    old_first = c_input_ids[i]
-            #    old_second = c_input_ids[j]
-
-            #    new_mask_first = b_input_mask[i]
+            for i in range(0, batch_size):
+                new_mask = b_input_mask[i]
+                new_ids = b_input_ids[i]
+                old_ids = c_input_ids[i]
+                pdb.set_trace()
 
             b_input_ids = b_input_ids.to(device)
             b_input_mask = b_input_mask.to(device)
