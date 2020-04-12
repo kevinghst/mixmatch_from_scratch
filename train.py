@@ -236,6 +236,7 @@ class Trainer():
             for batch in val_loader:
                 
                 b_input_ids, b_input_mask, b_segment_ids, b_labels, b_num_tokens = batch
+                batch_size = b_input_ids.size(0)
 
                 # pad all sequences to the maximum length in batch
                 max_len = int(max(b_num_tokens))
