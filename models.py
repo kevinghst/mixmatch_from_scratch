@@ -49,10 +49,10 @@ class BertEmbeddings(nn.Module):
 
         if inputs_embeds is None:
             inputs_embeds = self.word_embeddings(input_ids)
-            #if mixup == 'word':
-            #    c_inputs_embeds = self.word_embeddings(c_input_ids)
-            #    embeds_a, embeds_b = inputs_embeds, c_inputs_embeds[shuffle_idx]
-            #    inputs_embeds = l * embeds_a + (1-l) * embeds_b
+            if mixup == 'word':
+                c_inputs_embeds = self.word_embeddings(c_input_ids)
+                embeds_a, embeds_b = inputs_embeds, c_inputs_embeds[shuffle_idx]
+                inputs_embeds = l * embeds_a + (1-l) * embeds_b
 
         position_embeddings = self.position_embeddings(position_ids)
         token_type_embeddings = self.token_type_embeddings(token_type_ids)
