@@ -234,12 +234,32 @@ class Trainer():
 
             # Evaluate data for one epoch
             for batch in val_loader:
-        
-                b_input_ids = batch[0].to(device)
-                b_input_mask = batch[1].to(device)
-                b_segment_ids = batch[2].to(device)
-                b_labels = batch[3].to(device)
-        
+                
+                b_input_ids, b_input_mask, b_segment_ids, b_labels, b_num_tokens = batch
+
+                # pad all sequences to the maximum length in batch
+                max_len = int(max(b_num_tokens))
+                max_mask_ones = torch.tensor([1] * max_len)
+                max_mask_zeros = torch.tensor([0] * (128 - max_len))
+                sep_tensor = torch.tensor([102])
+                max_mask = torch.cat((max_mask_ones, max_mask_zeros), 0)
+
+                for i in range(0, batch_size):
+                    current_len = int(b_num_tokens[i])
+                    if current_len < max_len:
+                        first = b_input_ids[i][0:current_len-1]
+                        second = torch.tensor([1] * (max_len - current_len))
+                        third = torch.cat((sep_tensor, max_mask_zeros))
+                        combined = torch.cat((first, second, third), 0)
+                        b_input_ids[i] = combined
+                        b_input_mask[i] = max_mask
+
+
+                b_input_ids = b_input_ids.to(device)
+                b_input_mask = b_input_mask.to(device)
+                b_segment_ids = b_segment_ids.to(device)
+                b_labels = b_labels.to(device)
+
                 with torch.no_grad():        
                     logits = model(
                         input_ids=b_input_ids,
