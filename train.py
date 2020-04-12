@@ -274,8 +274,8 @@ class Trainer():
             training_stats.append(
                 {
                     'epoch': epoch_i + 1,
-                    'Training Loss': avg_train_loss,
-                    'Valid. Loss': avg_val_loss,
+                    'Training Loss': avg_train_loss * 100,
+                    'Valid. Loss': avg_val_loss * 100,
                     'Valid. Accur.': avg_val_accuracy,
                     'Training Time': training_time,
                     'Validation Time': validation_time
