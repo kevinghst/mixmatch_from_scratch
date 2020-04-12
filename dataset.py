@@ -47,8 +47,6 @@ class DataSet():
                                 is_pretokenized = True
                         )
 
-            pdb.set_trace()
-
 
             input_ids.append(encoded_dict['input_ids'])
             attention_masks.append(encoded_dict['attention_mask'])
