@@ -30,7 +30,7 @@ class DataSet():
 
             # pad all tokens to the same length using UNS token
 
-            max_sent_length = 64
+            max_sent_length = 66
             paddings = max_sent_length - 2 - len(tokens)
             
             for i in range(0, paddings):
