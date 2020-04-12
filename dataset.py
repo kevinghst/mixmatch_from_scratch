@@ -30,12 +30,12 @@ class DataSet():
 
             # pad all tokens to the same length using UNS token
 
-            max_sent_length = 64
-            paddings = max_sent_length - 2 - len(tokens)
+            #max_sent_length = 64
+            #paddings = max_sent_length - 2 - len(tokens)
             
-            for i in range(0, paddings):
-                unused_token = '[unused0]'
-                tokens.append(unused_token)
+            #for i in range(0, paddings):
+            #    unused_token = '[unused0]'
+            #    tokens.append(unused_token)
 
             encoded_dict = self.tokenizer.encode_plus(
                                 tokens,                      # Sentence to encode.
@@ -47,7 +47,6 @@ class DataSet():
                                 is_pretokenized = True
                         )
 
-            pdb.set_trace()
 
             input_ids.append(encoded_dict['input_ids'])
             attention_masks.append(encoded_dict['attention_mask'])
