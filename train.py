@@ -165,7 +165,60 @@ class Trainer():
         # Calculate the average loss over all of the batches.
         avg_train_loss = total_train_loss / len(train_loader)    
         return avg_train_loss
+    
 
+    def validate(self):
+        model = self.model
+        device = self.device
+        val_loader = self.val_loader
+        cfg = self.cfg
+
+        # Put the model in evaluation mode--the dropout layers behave differently
+        # during evaluation.
+        model.eval()
+
+        # Tracking variables 
+        total_eval_accuracy = 0
+        total_eval_loss = 0
+        nb_eval_steps = 0
+
+        # Evaluate data for one epoch
+        for batch in val_loader:
+                
+            b_input_ids, b_input_mask, b_segment_ids, b_labels, b_num_tokens = batch
+            batch_size = b_input_ids.size(0)
+
+            # convert label_ids to hot vector
+            label_ids = torch.zeros(batch_size, self.num_labels).scatter_(1, b_labels.view(-1,1), 1).cuda()
+
+            b_input_ids = b_input_ids.to(device)
+            b_input_mask = b_input_mask.to(device)
+            b_segment_ids = b_segment_ids.to(device)
+            b_labels = b_labels.to(device)
+
+            with torch.no_grad():        
+                logits = model(
+                    input_ids=b_input_ids,
+                    attention_mask=b_input_mask
+                )
+                    
+                loss = -torch.sum(F.log_softmax(logits, dim=1) * label_ids, dim=1)
+                loss = torch.mean(loss)
+            # Accumulate the validation loss.
+            total_eval_loss += loss.item()
+
+            # Move logits and labels to CPU
+            logits = logits.detach().cpu().numpy()
+            label_ids = b_labels.to('cpu').numpy()
+
+            # Calculate the accuracy for this batch of test sentences, and
+            # accumulate it over all batches.
+            total_eval_accuracy += flat_accuracy(logits, label_ids)
+
+        avg_val_accuracy = total_eval_accuracy / len(val_loader)
+        avg_val_loss = total_eval_loss / len(val_loader)
+
+        return avg_val_accuracy, avg_val_loss
 
     def iterate(self, epochs):
         cfg = self.cfg
@@ -222,57 +275,12 @@ class Trainer():
             print("Running Validation...")
 
             t0 = time.time()
-
-            # Put the model in evaluation mode--the dropout layers behave differently
-            # during evaluation.
-            model.eval()
-
-            # Tracking variables 
-            total_eval_accuracy = 0
-            total_eval_loss = 0
-            nb_eval_steps = 0
-
-            # Evaluate data for one epoch
-            for batch in val_loader:
-                
-                b_input_ids, b_input_mask, b_segment_ids, b_labels, b_num_tokens = batch
-                batch_size = b_input_ids.size(0)
-
-                # convert label_ids to hot vector
-                label_ids = torch.zeros(batch_size, self.num_labels).scatter_(1, b_labels.view(-1,1), 1).cuda()
-
-                b_input_ids = b_input_ids.to(device)
-                b_input_mask = b_input_mask.to(device)
-                b_segment_ids = b_segment_ids.to(device)
-                b_labels = b_labels.to(device)
-
-                with torch.no_grad():        
-                    logits = model(
-                        input_ids=b_input_ids,
-                        attention_mask=b_input_mask
-                    )
-                    
-                    loss = -torch.sum(F.log_softmax(logits, dim=1) * label_ids, dim=1)
-                    loss = torch.mean(loss)
-                # Accumulate the validation loss.
-                total_eval_loss += loss.item()
-
-                # Move logits and labels to CPU
-                logits = logits.detach().cpu().numpy()
-                label_ids = b_labels.to('cpu').numpy()
-
-                # Calculate the accuracy for this batch of test sentences, and
-                # accumulate it over all batches.
-                total_eval_accuracy += flat_accuracy(logits, label_ids)
         
+            avg_val_accuracy, avg_val_loss = self.validate()
 
             # Report the final accuracy for this validation run.
-            avg_val_accuracy = total_eval_accuracy / len(val_loader)
             print("  Accuracy: {0:.4f}".format(avg_val_accuracy))
 
-            # Calculate the average loss over all of the batches.
-            avg_val_loss = total_eval_loss / len(val_loader)
-    
             # Measure how long the validation run took.
             validation_time = format_time(time.time() - t0)
     
