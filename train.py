@@ -181,6 +181,8 @@ class Trainer():
         total_eval_accuracy = 0
         total_eval_loss = 0
         nb_eval_steps = 0
+        total_prec1 = 0
+        total_prec5 = 0
 
         # Evaluate data for one epoch
         for batch in val_loader:
@@ -205,25 +207,24 @@ class Trainer():
             # Accumulate the validation loss.
             total_eval_loss += loss.item()
 
-
-            # Move logits and labels to CPU
-            logits = logits.detach().cpu().numpy()
-            label_ids = b_labels.to('cpu').numpy()
-
             # Calculate the accuracy for this batch of test sentences, and
             # accumulate it over all batches.
 
-            total_eval_accuracy += flat_accuracy(logits, label_ids)
+            if self.num_labels == 2:
+                logits = logits.detach().cpu().numpy()
+                b_labels = b_labels.to('cpu').numpy()
+                total_prec1 += bin_accuracy(logits, b_labels)
+            else:
+                prec1, prec5 = accuracy(logits, b_labels, topk(1,5))
+                total_prec1 += prec1
+                total_prec5 += prec5
 
+        avg_prec1 = total_prec1 / len(val_loader)
+        avg_prec5 = total_prec5 / len(val_loader)
 
-            
-
-
-
-        avg_val_accuracy = total_eval_accuracy / len(val_loader)
         avg_val_loss = total_eval_loss / len(val_loader)
-
-        return avg_val_accuracy, avg_val_loss
+        
+        return avg_prec1, avg_prec5, avg_val_loss
 
     def iterate(self, epochs):
         cfg = self.cfg
@@ -281,17 +282,17 @@ class Trainer():
 
             t0 = time.time()
         
-            avg_val_accuracy, avg_val_loss = self.validate()
+            avg_prec1, avg_prec5, avg_val_loss = self.validate()
 
             # Report the final accuracy for this validation run.
-            print("  Accuracy: {0:.4f}".format(avg_val_accuracy))
+            print("  Accuracy: {0:.4f}".format(avg_prec1))
 
             # Measure how long the validation run took.
             validation_time = format_time(time.time() - t0)
     
             # update best val accuracy
-            if avg_val_accuracy > best_val_acc:
-                best_val_acc = avg_val_accuracy
+            if avg_prec1 > best_val_acc:
+                best_val_acc = avg_prec1
                 best_epoch = epoch_i
                 best_train_loss = avg_train_loss
                 best_val_loss = avg_val_loss
@@ -306,7 +307,7 @@ class Trainer():
                     'epoch': epoch_i + 1,
                     'Training Loss': avg_train_loss * 100,
                     'Valid. Loss': avg_val_loss * 100,
-                    'Valid. Accur.': avg_val_accuracy,
+                    'Valid. Accur.': avg_prec1,
                     'Training Time': training_time,
                     'Validation Time': validation_time
                 }
