@@ -110,7 +110,6 @@ class DataSet():
         # Report the number of sentences.
         print('Number of training sentences: {:,}\n'.format(df_train.shape[0]))
         print('Number of dev sentences: {:,}\n'.format(df_dev.shape[0]))
-        print('Number of test sentences: {:,}\n'.format(df_test.shape[0]))
 
         # Display 10 random rows from the data.
         df_train.sample(10)
