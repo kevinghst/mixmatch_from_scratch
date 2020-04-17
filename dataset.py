@@ -124,6 +124,7 @@ class DataSet():
         input_ids_dev, attention_masks_dev, seg_ids_dev, label_ids_dev, num_tokens_dev = self.preprocess(sentences_dev, labels_dev)
 
         # Print sentence 0, now as a list of IDs.
+        pdb.set_trace()
         print('Original: ', sentences_train[0])
         print('Token IDs:', input_ids_train[0])
 
