@@ -37,6 +37,9 @@ class Trainer():
         torch.backends.cudnn.deterministic = True
 
     def train(self):
+        # Measure how long the training epoch takes.
+        t0 = time.time()
+
         model = self.model
         optimizer = self.optimizer
         device = self.device
@@ -163,11 +166,21 @@ class Trainer():
             scheduler.step()
 
         # Calculate the average loss over all of the batches.
-        avg_train_loss = total_train_loss / len(train_loader)    
-        return avg_train_loss
+        avg_train_loss = total_train_loss / len(train_loader)   
+        
+        # Measure how long this epoch took.
+        training_time = format_time(time.time() - t0)
+
+        print("")
+        print("  Average training loss: {0:.2f}".format(avg_train_loss))
+        print("  Training epcoh took: {:}".format(training_time))
+
+        return avg_train_loss, training_time
     
 
     def validate(self):
+        t0 = time.time()
+
         model = self.model
         device = self.device
         val_loader = self.val_loader
@@ -224,7 +237,18 @@ class Trainer():
 
         avg_val_loss = total_eval_loss / len(val_loader)
         
-        return avg_prec1, avg_prec5, avg_val_loss
+        # Report the final accuracy for this validation run.
+        print("  Top 1 Accuracy: {0:.4f}".format(avg_prec1))
+        print("  Top 5 Accuracy: {0:.4f}".format(avg_prec5))
+
+        # Measure how long the validation run took.
+        validation_time = format_time(time.time() - t0)
+
+        print("  Validation Loss: {0:.2f}".format(avg_val_loss))
+        print("  Validation took: {:}".format(validation_time))
+
+
+        return avg_prec1, avg_prec5, avg_val_loss, validation_time
 
     def iterate(self, epochs):
         cfg = self.cfg
@@ -259,17 +283,9 @@ class Trainer():
             print('======== Epoch {:} / {:} ========'.format(epoch_i + 1, epochs))
             print('Training...')
 
-            # Measure how long the training epoch takes.
-            t0 = time.time()
 
-            avg_train_loss = self.train()
+            avg_train_loss, training_time = self.train()
     
-            # Measure how long this epoch took.
-            training_time = format_time(time.time() - t0)
-
-            print("")
-            print("  Average training loss: {0:.2f}".format(avg_train_loss))
-            print("  Training epcoh took: {:}".format(training_time))
         
             # ========================================
             #               Validation
@@ -280,16 +296,9 @@ class Trainer():
             print("")
             print("Running Validation...")
 
-            t0 = time.time()
         
-            avg_prec1, avg_prec5, avg_val_loss = self.validate()
+            avg_prec1, avg_prec5, avg_val_loss, validation_time = self.validate()
 
-            # Report the final accuracy for this validation run.
-            print("  Top 1 Accuracy: {0:.4f}".format(avg_prec1))
-            print("  Top 5 Accuracy: {0:.4f}".format(avg_prec5))
-
-            # Measure how long the validation run took.
-            validation_time = format_time(time.time() - t0)
     
             # update best val accuracy
             if avg_prec1 > best_val_acc:
@@ -298,9 +307,6 @@ class Trainer():
                 best_train_loss = avg_train_loss
                 best_val_loss = avg_val_loss
 
-
-            print("  Validation Loss: {0:.2f}".format(avg_val_loss))
-            print("  Validation took: {:}".format(validation_time))
 
             # Record all statistics from this epoch.
             training_stats.append(
