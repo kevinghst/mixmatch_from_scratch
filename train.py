@@ -59,8 +59,6 @@ class Trainer():
 
             b_input_ids, b_input_mask, b_segment_ids, b_labels, b_num_tokens = batch
             
-            pdb.set_trace()
-
             batch_size = b_input_ids.size(0)
 
             model.zero_grad()        
