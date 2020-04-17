@@ -193,6 +193,7 @@ class Trainer():
             b_segment_ids = b_segment_ids.to(device)
             b_labels = b_labels.to(device)
 
+
             with torch.no_grad():        
                 logits = model(
                     input_ids=b_input_ids,
@@ -201,9 +202,11 @@ class Trainer():
                     
                 loss_fct = CrossEntropyLoss()
                 loss = loss_fct(logits.view(-1, cfg.num_labels), b_labels.view(-1))
-                pdb.set_trace()
             # Accumulate the validation loss.
             total_eval_loss += loss.item()
+
+            pdb.set_trace()
+
 
             # Move logits and labels to CPU
             logits = logits.detach().cpu().numpy()
