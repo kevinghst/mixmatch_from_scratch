@@ -201,7 +201,7 @@ class Trainer():
                 )
                     
                 loss_fct = CrossEntropyLoss()
-                loss = loss_fct(logits.view(-1, cfg.num_labels), b_labels.view(-1))
+                loss = loss_fct(logits, b_labels)
             # Accumulate the validation loss.
             total_eval_loss += loss.item()
 
@@ -213,8 +213,7 @@ class Trainer():
             # Calculate the accuracy for this batch of test sentences, and
             # accumulate it over all batches.
 
-            if self.num_labels == 2:
-                total_eval_accuracy += flat_accuracy(logits, b_labels)
+            total_eval_accuracy += flat_accuracy(logits, label_ids)
 
 
             
