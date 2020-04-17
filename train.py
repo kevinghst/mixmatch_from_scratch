@@ -16,7 +16,7 @@ class Trainer():
     def __init__(
             self, 
             model=None, optimizer=None, device=None, scheduler=None,
-            train_loader=None, val_loader=None, cfg=None
+            train_loader=None, val_loader=None, cfg=None, num_labels=None
         ):
         self.model = model
         self.optimizer = optimizer
@@ -25,6 +25,7 @@ class Trainer():
         self.train_loader = train_loader
         self.val_loader = val_loader
         self.cfg = cfg
+        self.num_labels = num_labels
 
     def seed_torch(self, seed):
         random.seed(seed)
@@ -64,8 +65,7 @@ class Trainer():
             model.zero_grad()        
 
             # convert label_ids to hot vector
-            sup_size = b_input_ids.size(0)
-            label_ids = torch.zeros(sup_size, 2).scatter_(1, b_labels.view(-1,1), 1).cuda()
+            label_ids = torch.zeros(batch_size, self.num_labels).scatter_(1, b_labels.view(-1,1), 1).cuda()
 
             sup_l = np.random.beta(cfg.alpha, cfg.alpha)
             sup_l = max(sup_l, 1-sup_l)
@@ -238,23 +238,8 @@ class Trainer():
                 b_input_ids, b_input_mask, b_segment_ids, b_labels, b_num_tokens = batch
                 batch_size = b_input_ids.size(0)
 
-                # pad all sequences to the maximum length in batch
-                #max_len = int(max(b_num_tokens))
-                #max_mask_ones = torch.tensor([1] * max_len)
-                #max_mask_zeros = torch.tensor([0] * (128 - max_len))
-                #sep_tensor = torch.tensor([102])
-                #max_mask = torch.cat((max_mask_ones, max_mask_zeros), 0)
-
-                #for i in range(0, batch_size):
-                #    current_len = int(b_num_tokens[i])
-                #    if current_len < max_len:
-                #        first = b_input_ids[i][0:current_len-1]
-                #        second = torch.tensor([1] * (max_len - current_len))
-                #        third = torch.cat((sep_tensor, max_mask_zeros))
-                #        combined = torch.cat((first, second, third), 0)
-                #        b_input_ids[i] = combined
-                #        b_input_mask[i] = max_mask
-
+                # convert label_ids to hot vector
+                label_ids = torch.zeros(batch_size, self.num_labels).scatter_(1, b_labels.view(-1,1), 1).cuda()
 
                 b_input_ids = b_input_ids.to(device)
                 b_input_mask = b_input_mask.to(device)
@@ -266,11 +251,9 @@ class Trainer():
                         input_ids=b_input_ids,
                         attention_mask=b_input_mask
                     )
-
                     
-                    loss_fct = CrossEntropyLoss()
-                    loss = loss_fct(logits.view(-1, cfg.num_labels), b_labels.view(-1))
-
+                    loss = -torch.sum(F.log_softmax(logits, dim=1) * label_ids, dim=1)
+                    loss = torch.mean(loss)
                 # Accumulate the validation loss.
                 total_eval_loss += loss.item()
 

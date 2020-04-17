@@ -116,8 +116,6 @@ model = BertForSequenceClassificationCustom.from_pretrained(
     output_hidden_states = False, # Whether the model returns all hidden-states.
 )
 
-#model = Classifier(model_cfg, cfg.num_labels)
-
 # Tell pytorch to run this model on the GPU.
 model.cuda()
 
@@ -154,7 +152,8 @@ trainer = Trainer(
     scheduler=scheduler,
     train_loader=train_dataloader,
     val_loader=validation_dataloader,
-    cfg=cfg
+    cfg=cfg,
+    num_labels=NUM_LABELS[cfg.task]
 )
 
 trainer.iterate(cfg.epochs)
