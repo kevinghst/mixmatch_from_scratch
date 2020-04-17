@@ -123,9 +123,9 @@ class DataSet():
         input_ids_train, attention_masks_train, seg_ids_train, label_ids_train, num_tokens_train = self.preprocess(sentences_train, labels_train)
         input_ids_dev, attention_masks_dev, seg_ids_dev, label_ids_dev, num_tokens_dev = self.preprocess(sentences_dev, labels_dev)
 
-        # Print sentence 0, now as a list of IDs.
-        print('Original: ', sentences_train[0])
-        print('Token IDs:', input_ids_train[0])
+        # Print sentence 1, now as a list of IDs.
+        print('Original: ', sentences_train[1])
+        print('Token IDs:', input_ids_train[1])
 
         # Combine the training inputs into a TensorDataset.
         train_dataset = TensorDataset(input_ids_train, attention_masks_train, seg_ids_train, label_ids_train, num_tokens_train)
