@@ -4,6 +4,12 @@ from torch.utils.data import TensorDataset, random_split
 import torch
 import pdb
 
+NUM_CLASSES = {
+    "SST": 2,
+    "dbpedia": 10
+}
+
+
 class DataSet():
     def __init__(self, cfg):
         self.cfg = cfg
@@ -61,6 +67,20 @@ class DataSet():
 
         return input_ids, attention_masks, segment_ids, labels, num_tokens
 
+    def sample_dataset(self, df, total):
+        if total <= 0:
+            return df
+        
+        num_classes = NUM_CLASSES[self.cfg.task]
+        per_class = int(total / num_classes)
+        min_label = df['label'].min()
+        df_sample = df[df['label'] == min_label - 1]
+
+        for i in range(min_label, min_label + num_classes):
+            df_sub = df[df['label'] == i].sample(per_class, random_state=self.cfg.data_seed)
+            df_sample = pd.concat([df_sample, df_sub])
+
+        return df_sample
 
     def get_dataset(self):
         # Load the dataset into a pandas dataframe.
@@ -71,9 +91,15 @@ class DataSet():
              
             df_train['label'] = df_train['label'].astype(int)
             df_dev['label'] = df_dev['label'].astype(int)
-         
-        if self.cfg.train_cap > 0:
-            df_train = df_train.sample(self.cfg.train_cap, random_state=self.cfg.data_seed)
+        elif self.cfg.task == "dbpedia":
+            df_train = pd.read_csv("./dbpedia/train.csv", header=0).iloc[1:]
+            df_dev = pd.read_csv("./dbpedia/test.csv", header=0).iloc[1:]
+
+        pdb.set_trace()
+        df_train = self.sample_dataset(df_train, self.cfg.train_cap)
+        df_dev = self.sample_dataset(df_dev, self.cfg.dev_cap)
+
+        pdb.set_trace()
 
         # Report the number of sentences.
         print('Number of training sentences: {:,}\n'.format(df_train.shape[0]))
