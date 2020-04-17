@@ -285,7 +285,8 @@ class Trainer():
             avg_prec1, avg_prec5, avg_val_loss = self.validate()
 
             # Report the final accuracy for this validation run.
-            print("  Accuracy: {0:.4f}".format(avg_prec1))
+            print("  Top 1 Accuracy: {0:.4f}".format(avg_prec1))
+            print("  Top 5 Accuracy: {0:.4f}".format(avg_prec5))
 
             # Measure how long the validation run took.
             validation_time = format_time(time.time() - t0)
@@ -307,7 +308,8 @@ class Trainer():
                     'epoch': epoch_i + 1,
                     'Training Loss': avg_train_loss * 100,
                     'Valid. Loss': avg_val_loss * 100,
-                    'Valid. Accur.': avg_prec1,
+                    'Valid. Accur_top1.': avg_prec1,
+                    'Valid. Accur_top5.': avg_prec5,
                     'Training Time': training_time,
                     'Validation Time': validation_time
                 }
