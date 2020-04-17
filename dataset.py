@@ -9,6 +9,11 @@ NUM_CLASSES = {
     "dbpedia": 10
 }
 
+MAX_LENGTHS = {
+    "SST": 128,
+    "dbpedia": 256
+}
+
 
 class DataSet():
     def __init__(self, cfg):
@@ -31,8 +36,12 @@ class DataSet():
             #   (4) Map tokens to their IDs.
             #   (5) Pad or truncate the sentence to `max_length`
             #   (6) Create attention masks for [PAD] tokens.
+            max_len = MAX_LENGTHS[self.cfg.task]
 
             tokens = self.tokenizer.tokenize(sent)
+            if len(tokens) > max_len - 2:
+                tokens = tokens[0:max_len-2]
+                pdb.set_trace()
 
             # pad all tokens to the same length using UNS token
 
@@ -46,7 +55,7 @@ class DataSet():
             encoded_dict = self.tokenizer.encode_plus(
                                 tokens,                      # Sentence to encode.
                                 add_special_tokens = True, # Add '[CLS]' and '[SEP]'
-                                max_length = 128,           # Pad & truncate all sentences.
+                                max_length = max_len,           # Pad & truncate all sentences.
                                 pad_to_max_length = True,
                                 return_attention_mask = True,   # Construct attn. masks.
                                 return_tensors = 'pt',     # Return pytorch tensors.
@@ -95,10 +104,8 @@ class DataSet():
             df_train = pd.read_csv("./dbpedia/train.csv", header=None, names=['label', 'title', 'sentence']).iloc[1:]
             df_dev = pd.read_csv("./dbpedia/test.csv", header=None, names=['label', 'title', 'sentence']).iloc[1:]
 
-        pdb.set_trace()
         df_train = self.sample_dataset(df_train, self.cfg.train_cap)
         df_dev = self.sample_dataset(df_dev, self.cfg.dev_cap)
-        pdb.set_trace()
 
         # Report the number of sentences.
         print('Number of training sentences: {:,}\n'.format(df_train.shape[0]))

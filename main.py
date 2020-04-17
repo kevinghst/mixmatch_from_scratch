@@ -48,6 +48,11 @@ class AttributeDict(dict):
     __getattr__ = dict.__getitem__
     __setattr__ = dict.__setitem__
 
+MAX_LENGTHS = {
+    "SST": 128,
+    "dbpedia": 256
+}
+
 model_cfg = {
 	"dim": 768,
 	"dim_ff": 3072,
@@ -55,7 +60,7 @@ model_cfg = {
 	"p_drop_attn": 0.1,
 	"n_heads": 12,
 	"p_drop_hidden": 0.1,
-	"max_len": 128,
+	"max_len": MAX_LENGTHS[cfg.task],
 	"n_segments": 2,
 	"vocab_size": 30522
 }
