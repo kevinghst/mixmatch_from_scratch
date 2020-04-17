@@ -188,9 +188,6 @@ class Trainer():
             b_input_ids, b_input_mask, b_segment_ids, b_labels, b_num_tokens = batch
             batch_size = b_input_ids.size(0)
 
-            # convert label_ids to hot vector
-            label_ids = torch.zeros(batch_size, self.num_labels).scatter_(1, b_labels.view(-1,1), 1).cuda()
-
             b_input_ids = b_input_ids.to(device)
             b_input_mask = b_input_mask.to(device)
             b_segment_ids = b_segment_ids.to(device)
@@ -202,8 +199,9 @@ class Trainer():
                     attention_mask=b_input_mask
                 )
                     
-                loss = -torch.sum(F.log_softmax(logits, dim=1) * label_ids, dim=1)
-                loss = torch.mean(loss)
+                loss_fct = CrossEntropyLoss()
+                loss = loss_fct(logits.view(-1, cfg.num_labels), b_labels.view(-1))
+                pdb.set_trace()
             # Accumulate the validation loss.
             total_eval_loss += loss.item()
 
@@ -213,7 +211,15 @@ class Trainer():
 
             # Calculate the accuracy for this batch of test sentences, and
             # accumulate it over all batches.
-            total_eval_accuracy += flat_accuracy(logits, label_ids)
+
+            if self.num_labels == 2:
+                total_eval_accuracy += flat_accuracy(logits, label_ids)
+            else:
+                prec1, prec5 = accuracy(outputs, targets, topk=(1, 5))
+
+            
+
+
 
         avg_val_accuracy = total_eval_accuracy / len(val_loader)
         avg_val_loss = total_eval_loss / len(val_loader)
