@@ -228,7 +228,7 @@ class Trainer():
                 b_labels = b_labels.to('cpu').numpy()
                 total_prec1 += bin_accuracy(logits, b_labels)
             else:
-                prec1, prec5 = accuracy(logits, b_labels, topk(1,5))
+                prec1, prec5 = multi_accuracy(logits, b_labels, topk(1,5))
                 total_prec1 += prec1
                 total_prec5 += prec5
 
