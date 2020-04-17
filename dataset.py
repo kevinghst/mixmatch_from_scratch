@@ -92,11 +92,13 @@ class DataSet():
             df_train['label'] = df_train['label'].astype(int)
             df_dev['label'] = df_dev['label'].astype(int)
         elif self.cfg.task == "dbpedia":
-            df_train = pd.read_csv("./dbpedia/train.csv", header=0).iloc[1:]
-            df_dev = pd.read_csv("./dbpedia/test.csv", header=0).iloc[1:]
+            df_train = pd.read_csv("./dbpedia/train.csv", header=None, names=['label', 'title', 'sentence']).iloc[1:]
+            df_dev = pd.read_csv("./dbpedia/test.csv", header=None, names=['label', 'title', 'sentence']).iloc[1:]
 
+        pdb.set_trace()
         df_train = self.sample_dataset(df_train, self.cfg.train_cap)
         df_dev = self.sample_dataset(df_dev, self.cfg.dev_cap)
+        pdb.set_trace()
 
         # Report the number of sentences.
         print('Number of training sentences: {:,}\n'.format(df_train.shape[0]))
