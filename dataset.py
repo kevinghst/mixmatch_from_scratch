@@ -41,7 +41,6 @@ class DataSet():
             tokens = self.tokenizer.tokenize(sent)
             if len(tokens) > max_len - 2:
                 tokens = tokens[0:max_len-2]
-                pdb.set_trace()
 
             # pad all tokens to the same length using UNS token
 
@@ -131,5 +130,5 @@ class DataSet():
         # Combine the training inputs into a TensorDataset.
         train_dataset = TensorDataset(input_ids_train, attention_masks_train, seg_ids_train, label_ids_train, num_tokens_train)
         val_dataset = TensorDataset(input_ids_dev, attention_masks_dev, seg_ids_dev, label_ids_dev, num_tokens_dev)
-
+        pdb.set_trace()
         return train_dataset, val_dataset
