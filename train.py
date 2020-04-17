@@ -205,8 +205,6 @@ class Trainer():
             # Accumulate the validation loss.
             total_eval_loss += loss.item()
 
-            pdb.set_trace()
-
 
             # Move logits and labels to CPU
             logits = logits.detach().cpu().numpy()
@@ -216,9 +214,8 @@ class Trainer():
             # accumulate it over all batches.
 
             if self.num_labels == 2:
-                total_eval_accuracy += flat_accuracy(logits, label_ids)
-            else:
-                prec1, prec5 = accuracy(outputs, targets, topk=(1, 5))
+                total_eval_accuracy += flat_accuracy(logits, b_labels)
+
 
             
 
