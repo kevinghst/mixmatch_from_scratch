@@ -144,7 +144,7 @@ class DataSet():
         print('Number of dev sentences: {:,}\n'.format(df_dev.shape[0]))
         
         if 'input_ids' in df_dev:
-            input_ids_dev, attention_masks_dev, seg_ids_dev, label_ids_dev, num_tokens_dev = self.retrieve_tensor(df_dev, 'sup')
+            input_ids_dev, attention_masks_dev, seg_ids_dev, label_ids_dev, num_tokens_dev = self.retrieve_tensors(df_dev, 'sup')
         else:
             input_ids_dev, attention_masks_dev, seg_ids_dev, label_ids_dev, num_tokens_dev = self.preprocess(df_dev)
 
