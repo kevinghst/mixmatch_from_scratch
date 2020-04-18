@@ -29,7 +29,7 @@ parser.add_argument('--val_batch_size', default=32, type=int)
 
 # MixMatch
 parser.add_argument('--mixup', choices=['cls', 'word'])
-parser.add_argument('--alpha', default=0.75, type=float)
+parser.add_argument('--alpha', default=1, type=float)
 
 parser.add_argument('--data_parallel', default=True, type=bool)
 
