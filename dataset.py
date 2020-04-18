@@ -126,8 +126,6 @@ class DataSet():
 
         tensors.append(torch.tensor(num_tokens))
 
-        pdb.set_trace()
-
         return tensors
 
     def get_dataset(self):
@@ -152,12 +150,14 @@ class DataSet():
         df_train = self.sample_dataset(df_train, self.cfg.train_cap)
         print('Number of training sentences: {:,}\n'.format(df_train.shape[0]))
         input_ids_train, attention_masks_train, seg_ids_train, label_ids_train, num_tokens_train = self.preprocess(df_train)
+        pdb.set_trace()
 
         df_dev = self.sample_dataset(df_dev, self.cfg.dev_cap)
         print('Number of dev sentences: {:,}\n'.format(df_dev.shape[0]))
 
         if 'input_ids' in df_dev:
             input_ids_dev, attention_masks_dev, seg_ids_dev, label_ids_dev, num_tokens_dev = self.retrieve_tensors(df_dev, 'sup')
+            pdb.set_trace()
         else:
             input_ids_dev, attention_masks_dev, seg_ids_dev, label_ids_dev, num_tokens_dev = self.preprocess(df_dev)
 
