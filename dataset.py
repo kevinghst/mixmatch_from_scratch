@@ -48,7 +48,6 @@ class DataSet():
             tokens = self.tokenizer.tokenize(sent)
             if len(tokens) > max_len - 2:
                 tokens = tokens[-126:]
-                pdb.set_trace()
 
             # pad all tokens to the same length using UNS token
 
@@ -136,7 +135,6 @@ class DataSet():
 
             real_train_tensors = self.transform_to_tensor(real_train_data, 'unsup')
 
-            end = "end"
 
     def get_dataset(self):
         # Load the dataset into a pandas dataframe.
@@ -152,6 +150,10 @@ class DataSet():
         elif self.cfg.task == "imdb":
             df_train = pd.read_csv("./imdb/train.csv", header=None, names=['sentence', 'label']).iloc[1:]
             
+            f_dev = open("./imdb/imdb_sup_test.txt", 'r', encoding='utf-8')
+            dev_data = pd.read_csv(f_dev, sep='\t')
+            pdb.set_trace()
+            end = "end"
 
         if isinstance(df_train, pd.DataFrame):
             df_train = self.sample_dataset(df_train, self.cfg.train_cap)
