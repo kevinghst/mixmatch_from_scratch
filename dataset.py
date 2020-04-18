@@ -86,7 +86,6 @@ class DataSet():
         for i in range(0, total % num_classes):
             class_pop[i] += 1
 
-        pdb.set_trace()
         min_label = df['label'].min()
         df_sample = df[df['label'] == min_label - 1]
 
@@ -96,7 +95,7 @@ class DataSet():
             if i == num_classes:
                 df_sub['label'] = 0
             df_sample = pd.concat([df_sample, df_sub])
-        pdb.set_trace()
+
         return df_sample
 
     def get_dataset(self):
