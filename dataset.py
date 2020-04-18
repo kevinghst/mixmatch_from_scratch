@@ -81,6 +81,11 @@ class DataSet():
         
         num_classes = NUM_CLASSES[self.cfg.task]
         per_class = int(total / num_classes)
+
+        class_populations = [per_class] * num_classes
+        class_populations.append(total % num_classes)
+        pdb.set_trace()
+
         min_label = df['label'].min()
         df_sample = df[df['label'] == min_label - 1]
 
