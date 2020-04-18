@@ -4,14 +4,16 @@ from torch.utils.data import TensorDataset, random_split
 import torch
 import pdb
 
-NUM_CLASSES = {
-    "SST": 2,
-    "dbpedia": 10
-}
-
 MAX_LENGTHS = {
     "SST": 128,
-    "dbpedia": 256
+    "dbpedia": 256,
+    "imdb": 128
+}
+
+NUM_LABELS = {
+    "SST": 2,
+    "dbpedia": 10,
+    "imdb": 2
 }
 
 
@@ -79,7 +81,7 @@ class DataSet():
         if total <= 0:
             return df
         
-        num_classes = NUM_CLASSES[self.cfg.task]
+        num_classes = NUM_LABELS[self.cfg.task]
         per_class = int(total / num_classes)
 
         class_pop = [per_class] * num_classes

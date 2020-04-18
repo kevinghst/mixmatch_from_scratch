@@ -50,12 +50,14 @@ class AttributeDict(dict):
 
 MAX_LENGTHS = {
     "SST": 128,
-    "dbpedia": 256
+    "dbpedia": 256,
+    "imdb": 128
 }
 
 NUM_LABELS = {
     "SST": 2,
-    "dbpedia": 10
+    "dbpedia": 10,
+    "imdb": 2
 }
 
 model_cfg = {
