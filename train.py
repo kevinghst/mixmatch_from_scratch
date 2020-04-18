@@ -147,7 +147,7 @@ class Trainer():
             if cfg.mixup:
                 sup_label_a, sup_label_b = label_ids, label_ids[sup_idx]
                 label_ids = sup_l * sup_label_a + (1 - sup_l) * sup_label_b
-
+            pdb.set_trace()
             loss = -torch.sum(F.log_softmax(sup_logits, dim=1) * label_ids, dim=1)
             loss = torch.mean(loss)
 
