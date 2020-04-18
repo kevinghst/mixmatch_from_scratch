@@ -103,6 +103,9 @@ class DataSet():
                 df_sub['label'] = 0
             df_sample = pd.concat([df_sample, df_sub])
 
+        new_index = range(df_sample.shape[0])
+        new_index = pd.Series(new_index)
+        df_sample.set_index([new_index], inplace=True)
         return df_sample
 
     def retrieve_tensors(self, data, d_type):
@@ -111,10 +114,10 @@ class DataSet():
                              'aug_input_ids', 'aug_input_type_ids', 'aug_input_mask']
             tensors = [torch.tensor(data[c].apply(lambda x: ast.literal_eval(x)), dtype=torch.long) for c in input_columns]
         else:
-            input_columns = ['input_ids', 'input_type_ids', 'input_mask', 'label']
-            tensors = [torch.tensor(data[c].apply(lambda x: ast.literal_eval(x)), dtype=torch.long) for c in input_columns[:-1]]
+            input_columns = ['input_ids', 'input_mask', 'input_type_ids', 'label']
+            tensors = [torch.tensor(data[c].apply(lambda x: ast.literal_eval(x)), dtype=torch.long)    \
+                                                                            for c in input_columns[:-1]]
             tensors.append(torch.tensor(data[input_columns[-1]], dtype=torch.long))
-            pdb.set_trace()
 
         return tensors
 
@@ -136,30 +139,17 @@ class DataSet():
             df_dev = pd.read_csv(f_dev, sep='\t')
             df_dev.rename(columns={"label_ids": "label"}, inplace=True)
 
-            pdb.set_trace()
-
 
         df_train = self.sample_dataset(df_train, self.cfg.train_cap)
         print('Number of training sentences: {:,}\n'.format(df_train.shape[0]))
         input_ids_train, attention_masks_train, seg_ids_train, label_ids_train, num_tokens_train = self.preprocess(df_train)
 
         df_dev = self.sample_dataset(df_dev, self.cfg.dev_cap)
-
-        new_index = range(df_dev.shape[0])
-        new_index = pd.Series(new_index)
-        df_dev.set_index([new_index], inplace=True)
-        pdb.set_trace()
-
-        input_columns = ['input_ids', 'input_type_ids', 'input_mask', 'label']
-        tensors = [torch.tensor(df_dev[c].apply(lambda x: ast.literal_eval(x)), dtype=torch.long)    \
-                                                                        for c in input_columns[:-1]]
-        tensors.append(torch.tensor(df_dev[input_columns[-1]], dtype=torch.long))
-
-        pdb.set_trace()
         print('Number of dev sentences: {:,}\n'.format(df_dev.shape[0]))
-        
+
         if 'input_ids' in df_dev:
             tensors = self.retrieve_tensors(df_dev, 'sup')
+            pdb.set_trace()
         else:
             input_ids_dev, attention_masks_dev, seg_ids_dev, label_ids_dev, num_tokens_dev = self.preprocess(df_dev)
 
