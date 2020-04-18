@@ -2,6 +2,8 @@ import pandas as pd
 from transformers import BertTokenizer
 from torch.utils.data import TensorDataset, random_split
 import torch
+import ast
+
 import pdb
 
 MAX_LENGTHS = {
@@ -100,17 +102,35 @@ class DataSet():
 
         return df_sample
 
+    def transform_to_tensor(self, data, d_type):
+        if d_type == 'unsup':
+            input_columns = ['ori_input_ids', 'ori_input_type_ids', 'ori_input_mask',
+                             'aug_input_ids', 'aug_input_type_ids', 'aug_input_mask']
+            tensors = [torch.tensor(data[c].apply(lambda x: ast.literal_eval(x)), dtype=torch.long)    \
+                                                                    for c in input_columns]
+        else:
+            input_columns = ['input_ids', 'input_type_ids', 'input_mask', 'label_ids']
+            tensors = [torch.tensor(data[c].apply(lambda x: ast.literal_eval(x)), dtype=torch.long)    \
+                                                                            for c in input_columns[:-1]]
+            tensors.append(torch.tensor(data[input_columns[-1]], dtype=torch.long))
+
+        return tensors
+
     def get_dataset_prepro(self):
         if self.cfg.task == "imdb":
-            unsup_file = "./imdb/imdb_unsup_train.txt"
+            train_file = "./imdb/imdb_unsup_train.txt"
             dev_file = "./imdb/imdb_sup_test.txt"
 
-            f_unsup = open(unsup_file, 'r', encoding='utf-8')
-            unsup_data = pd.read_csv(f_unsup, sep='\t')
+            f_train = open(train_file, 'r', encoding='utf-8')
+            train_data = pd.read_csv(f_train, sep='\t')
+            # only use the unsup reviews from the original IMDB dataset
+            unsup_data = train_data.tail(44972)
+            real_train_data = train_data.head(25000)
 
             f_dev = open(dev_file, 'r', encoding='utf-8')
             dev_data = pd.read_csv(f_dev, sep='\t')
 
+            real_train_tensors = self.transform_to_tensor(real_train_data, 'unsup')
             pdb.set_trace()
 
             end = "end"
