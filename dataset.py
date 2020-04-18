@@ -119,6 +119,12 @@ class DataSet():
                                                                             for c in input_columns[:-1]]
             tensors.append(torch.tensor(data[input_columns[-1]], dtype=torch.long))
 
+        num_tokens = []
+        for inp in tensors[0]:
+            num = 1
+            pdb.set_trace()
+            num_tokens.append(num)
+
         return tensors
 
     def get_dataset(self):
@@ -148,8 +154,7 @@ class DataSet():
         print('Number of dev sentences: {:,}\n'.format(df_dev.shape[0]))
 
         if 'input_ids' in df_dev:
-            tensors = self.retrieve_tensors(df_dev, 'sup')
-            pdb.set_trace()
+            input_ids_dev, attention_masks_dev, seg_ids_dev, label_ids_dev, num_tokens_dev = self.retrieve_tensors(df_dev, 'sup')
         else:
             input_ids_dev, attention_masks_dev, seg_ids_dev, label_ids_dev, num_tokens_dev = self.preprocess(df_dev)
 
