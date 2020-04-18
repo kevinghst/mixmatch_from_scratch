@@ -151,8 +151,7 @@ class DataSet():
             
             f_dev = open("./imdb/imdb_sup_test.txt", 'r', encoding='utf-8')
             dev_data = pd.read_csv(f_dev, sep='\t')
-
-            dev_data_t = pd.read_csv(f_dev, sep='\t', header=None, names=['input_ids', 'input_type_ids', 'input_mask', 'label'])
+            dev_data.rename(columns={"label_ids": "label"})
 
             pdb.set_trace()
             end = "end"
