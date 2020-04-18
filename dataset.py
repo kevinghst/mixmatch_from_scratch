@@ -105,7 +105,7 @@ class DataSet():
 
         return df_sample
 
-    def retrieve_tensors(self, df, d_type):
+    def retrieve_tensors(self, data, d_type):
         if d_type == 'unsup':
             input_columns = ['ori_input_ids', 'ori_input_type_ids', 'ori_input_mask',
                              'aug_input_ids', 'aug_input_type_ids', 'aug_input_mask']
