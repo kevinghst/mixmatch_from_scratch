@@ -48,7 +48,6 @@ if not path.exists('./SST-2'):
     with zipfile.ZipFile(data_file) as zip_ref:
         zip_ref.extractall(data_dir)
     os.remove(data_file)
-    print("\tCompleted!")
 
 # Download DBPedia
 
@@ -65,3 +64,8 @@ if not path.exists("./dbpedia"):
 	os.remove(data_file)
 
 	os.rename('./dbpedia_csv', './dbpedia')
+
+# Process IMDB
+if not path.exists('./imdb'):
+    with zipfile.ZipFile("imdb.zip") as zip_ref:
+        zip_ref.extractall(data_dir)
