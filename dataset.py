@@ -121,9 +121,12 @@ class DataSet():
 
         num_tokens = []
         for inp in tensors[0]:
-            num = 1
-            pdb.set_trace()
-            num_tokens.append(num)
+            num = (inp==0).sum()
+            num_tokens.append(num.item())
+
+        tensors.append(torch.tensor(num_tokens))
+
+        pdb.set_trace()
 
         return tensors
 
