@@ -105,35 +105,18 @@ class DataSet():
 
         return df_sample
 
-    def transform_to_tensor(self, data, d_type):
+    def retrieve_tensors(self, df, d_type):
         if d_type == 'unsup':
             input_columns = ['ori_input_ids', 'ori_input_type_ids', 'ori_input_mask',
                              'aug_input_ids', 'aug_input_type_ids', 'aug_input_mask']
-            tensors = [torch.tensor(data[c].apply(lambda x: ast.literal_eval(x)), dtype=torch.long)    \
-                                                                    for c in input_columns]
+            tensors = [torch.tensor(data[c].apply(lambda x: ast.literal_eval(x)), dtype=torch.long) for c in input_columns]
         else:
-            input_columns = ['input_ids', 'input_type_ids', 'input_mask', 'label_ids']
-            tensors = [torch.tensor(data[c].apply(lambda x: ast.literal_eval(x)), dtype=torch.long)    \
-                                                                            for c in input_columns[:-1]]
+            input_columns = ['input_ids', 'input_type_ids', 'input_mask', 'label']
+            tensors = [torch.tensor(data[c].apply(lambda x: ast.literal_eval(x)), dtype=torch.long) for c in input_columns[:-1]]
             tensors.append(torch.tensor(data[input_columns[-1]], dtype=torch.long))
 
+        pdb.set_trace()
         return tensors
-
-    def get_dataset_prepro(self):
-        if self.cfg.task == "imdb":
-            train_file = "./imdb/imdb_unsup_train.txt"
-            dev_file = "./imdb/imdb_sup_test.txt"
-
-            f_train = open(train_file, 'r', encoding='utf-8')
-            train_data = pd.read_csv(f_train, sep='\t')
-            # only use the unsup reviews from the original IMDB dataset
-            unsup_data = train_data.tail(44972)
-            real_train_data = train_data.head(25000)
-
-            f_dev = open(dev_file, 'r', encoding='utf-8')
-            dev_data = pd.read_csv(f_dev, sep='\t')
-
-            real_train_tensors = self.transform_to_tensor(real_train_data, 'unsup')
 
     def get_dataset(self):
         # Load the dataset into a pandas dataframe.
@@ -158,9 +141,12 @@ class DataSet():
         input_ids_train, attention_masks_train, seg_ids_train, label_ids_train, num_tokens_train = self.preprocess(df_train)
 
         df_dev = self.sample_dataset(df_dev, self.cfg.dev_cap)
-        pdb.set_trace()
         print('Number of dev sentences: {:,}\n'.format(df_dev.shape[0]))
-        input_ids_dev, attention_masks_dev, seg_ids_dev, label_ids_dev, num_tokens_dev = self.preprocess(df_dev)
+        
+        if 'input_ids' in df_dev:
+            input_ids_dev, attention_masks_dev, seg_ids_dev, label_ids_dev, num_tokens_dev = self.retrieve_tensor(df_dev, 'sup')
+        else:
+            input_ids_dev, attention_masks_dev, seg_ids_dev, label_ids_dev, num_tokens_dev = self.preprocess(df_dev)
 
 
 
