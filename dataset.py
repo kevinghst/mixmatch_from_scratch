@@ -150,8 +150,8 @@ class DataSet():
             df_train = pd.read_csv("./imdb/train.csv", header=None, names=['sentence', 'label']).iloc[1:]
             
             f_dev = open("./imdb/imdb_sup_test.txt", 'r', encoding='utf-8')
-            dev_data = pd.read_csv(f_dev, sep='\t')
-            dev_data.rename(columns={"label_ids": "label"}, inplace=True)
+            df_dev = pd.read_csv(f_dev, sep='\t')
+            df_dev.rename(columns={"label_ids": "label"}, inplace=True)
 
         df_train = self.sample_dataset(df_train, self.cfg.train_cap)
         print('Number of training sentences: {:,}\n'.format(df_train.shape[0]))
