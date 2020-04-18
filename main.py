@@ -89,7 +89,11 @@ else:
     device = torch.device("cpu")
 
 dataset = DataSet(cfg)
-train_dataset, val_dataset = dataset.get_dataset()
+
+if cfg.task == "imdb":
+    train_dataset, val_dataset = dataset.get_dataset_prepro()
+else:
+    train_dataset, val_dataset = dataset.get_dataset()
 
 
 # Create the DataLoaders for our training and validation sets.

@@ -98,6 +98,21 @@ class DataSet():
 
         return df_sample
 
+    def get_dataset_prepro(self):
+        if self.cfg.task == "imdb":
+            unsup_file = "./imdb/imdb_unsup_train.txt"
+            dev_file = "./imdb/imdb_sup_test.txt"
+
+            f_unsup = open(unsup_file, 'r', encoding='utf-8')
+            unsup_data = pd.read_csv(f, sep='\t')
+
+            f_dev = open(dev_file, 'r', encoding='utf-8')
+            dev_data = pd.read_csv(f, sep='\t')
+
+            pdb.set_trace()
+
+            end = "end"
+
     def get_dataset(self):
         # Load the dataset into a pandas dataframe.
         if self.cfg.task == "SST":
