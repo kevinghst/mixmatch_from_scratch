@@ -136,9 +136,9 @@ class DataSet():
             df_dev = pd.read_csv(f_dev, sep='\t')
 
             input_columns = ['input_ids', 'input_type_ids', 'input_mask', 'label_ids']
-            tensors = [torch.tensor(data[c].apply(lambda x: ast.literal_eval(x)), dtype=torch.long)    \
+            tensors = [torch.tensor(df_dev[c].apply(lambda x: ast.literal_eval(x)), dtype=torch.long)    \
                                                                             for c in input_columns[:-1]]
-            tensors.append(torch.tensor(data[input_columns[-1]], dtype=torch.long))
+            tensors.append(torch.tensor(df_dev[input_columns[-1]], dtype=torch.long))
 
             pdb.set_trace()
 
