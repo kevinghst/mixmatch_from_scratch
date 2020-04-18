@@ -47,7 +47,7 @@ class DataSet():
 
             tokens = self.tokenizer.tokenize(sent)
             if len(tokens) > max_len - 2:
-                tokens = tokens[0:max_len-2]
+                tokens = tokens[-126:]
 
             # pad all tokens to the same length using UNS token
 
@@ -149,14 +149,15 @@ class DataSet():
             df_train = pd.read_csv("./dbpedia/train.csv", header=None, names=['label', 'title', 'sentence']).iloc[1:]
             df_dev = pd.read_csv("./dbpedia/test.csv", header=None, names=['label', 'title', 'sentence']).iloc[1:]
         elif self.cfg.task == "imdb":
-            df_train = pd.read_csv("./imdb/train.csv")
-            df_dev = get_tensors("dev")
+            df_train = pd.read_csv("./imdb/train.csv", header=None, names=['sentence', 'label']).iloc[1:]
+            
 
         if isinstance(df_train, pd.DataFrame):
+            pdb.set_trace()
             df_train = self.sample_dataset(df_train, self.cfg.train_cap)
             print('Number of training sentences: {:,}\n'.format(df_train.shape[0]))
             input_ids_train, attention_masks_train, seg_ids_train, label_ids_train, num_tokens_train = self.preprocess(df_train)
-
+        pdb.set_trace()
 
         if isinstance(df_dev, pd.DataFrame):
             df_dev = self.sample_dataset(df_dev, self.cfg.dev_cap)
