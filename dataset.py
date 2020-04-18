@@ -24,8 +24,11 @@ class DataSet():
         self.cfg = cfg
         self.tokenizer = BertTokenizer.from_pretrained('bert-base-uncased', do_lower_case=True)
 
-    def preprocess(self, sentences, labels):
-         # Tokenize all of the sentences and map the tokens to thier word IDs.
+    def preprocess(self, df):
+        sentences = df.sentence.values[1:]
+        labels = df.label.values[1:]
+
+        # Tokenize all of the sentences and map the tokens to thier word IDs. 
         input_ids = []
         attention_masks = []
         segment_ids = []
@@ -131,7 +134,6 @@ class DataSet():
             dev_data = pd.read_csv(f_dev, sep='\t')
 
             real_train_tensors = self.transform_to_tensor(real_train_data, 'unsup')
-            pdb.set_trace()
 
             end = "end"
 
@@ -140,37 +142,30 @@ class DataSet():
         if self.cfg.task == "SST":
             df_train = pd.read_csv("./SST-2/train.tsv", delimiter='\t', header=None, names=['sentence', 'label']).iloc[1:]
             df_dev = pd.read_csv("./SST-2/dev.tsv", delimiter='\t', header=None, names=['sentence', 'label']).iloc[1:]
-            df_test = pd.read_csv("./SST-2/test.tsv", delimiter='\t', header=None, names=['idx', 'sentence']).iloc[1:]
              
             df_train['label'] = df_train['label'].astype(int)
             df_dev['label'] = df_dev['label'].astype(int)
         elif self.cfg.task == "dbpedia":
             df_train = pd.read_csv("./dbpedia/train.csv", header=None, names=['label', 'title', 'sentence']).iloc[1:]
             df_dev = pd.read_csv("./dbpedia/test.csv", header=None, names=['label', 'title', 'sentence']).iloc[1:]
+        elif self.cfg.task == "imdb":
+            df_train = pd.read_csv("./imdb/train.csv")
+            df_dev = get_tensors("dev")
 
-        df_train = self.sample_dataset(df_train, self.cfg.train_cap)
-        df_dev = self.sample_dataset(df_dev, self.cfg.dev_cap)
+        if isinstance(df_train, pd.DataFrame):
+            df_train = self.sample_dataset(df_train, self.cfg.train_cap)
+            print('Number of training sentences: {:,}\n'.format(df_train.shape[0]))
+            input_ids_train, attention_masks_train, seg_ids_train, label_ids_train, num_tokens_train = self.preprocess(df_train)
 
-        # Report the number of sentences.
-        print('Number of training sentences: {:,}\n'.format(df_train.shape[0]))
-        print('Number of dev sentences: {:,}\n'.format(df_dev.shape[0]))
 
-        # Display 10 random rows from the data.
-        df_train.sample(10)
+        if isinstance(df_dev, pd.DataFrame):
+            df_dev = self.sample_dataset(df_dev, self.cfg.dev_cap)
+            print('Number of dev sentences: {:,}\n'.format(df_dev.shape[0]))
+            input_ids_dev, attention_masks_dev, seg_ids_dev, label_ids_dev, num_tokens_dev = self.preprocess(df_dev)
+        else:
+            pdb.set_trace()
+            end = "end"
 
-        # Get the lists of sentences and their labels.
-        sentences_train = df_train.sentence.values[1:]
-        labels_train = df_train.label.values[1:]
-
-        sentences_dev = df_dev.sentence.values[1:]
-        labels_dev = df_dev.label.values[1:]
-
-        input_ids_train, attention_masks_train, seg_ids_train, label_ids_train, num_tokens_train = self.preprocess(sentences_train, labels_train)
-        input_ids_dev, attention_masks_dev, seg_ids_dev, label_ids_dev, num_tokens_dev = self.preprocess(sentences_dev, labels_dev)
-
-        # Print sentence 1, now as a list of IDs.
-        print('Original: ', sentences_train[1])
-        print('Token IDs:', input_ids_train[1])
 
         # Combine the training inputs into a TensorDataset.
         train_dataset = TensorDataset(input_ids_train, attention_masks_train, seg_ids_train, label_ids_train, num_tokens_train)
