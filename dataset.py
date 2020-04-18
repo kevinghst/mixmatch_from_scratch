@@ -134,15 +134,14 @@ class DataSet():
             
             f_dev = open("./imdb/imdb_sup_test.txt", 'r', encoding='utf-8')
             df_dev = pd.read_csv(f_dev, sep='\t')
+            df_dev.rename(columns={"label_ids": "label"}, inplace=True)
 
-            input_columns = ['input_ids', 'input_type_ids', 'input_mask', 'label_ids']
+            input_columns = ['input_ids', 'input_type_ids', 'input_mask', 'label']
             tensors = [torch.tensor(df_dev[c].apply(lambda x: ast.literal_eval(x)), dtype=torch.long)    \
                                                                             for c in input_columns[:-1]]
             tensors.append(torch.tensor(df_dev[input_columns[-1]], dtype=torch.long))
 
             pdb.set_trace()
-
-            df_dev.rename(columns={"label_ids": "label"}, inplace=True)
 
 
         df_train = self.sample_dataset(df_train, self.cfg.train_cap)
