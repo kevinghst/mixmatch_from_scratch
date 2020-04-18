@@ -144,6 +144,10 @@ class DataSet():
         input_ids_train, attention_masks_train, seg_ids_train, label_ids_train, num_tokens_train = self.preprocess(df_train)
 
         df_dev = self.sample_dataset(df_dev, self.cfg.dev_cap)
+
+        new_index = range(df_dev.shape[0])
+        new_index = pd.Series(new_index)
+        df_dev.set_index([new_index], inplace=True)
         pdb.set_trace()
 
         input_columns = ['input_ids', 'input_type_ids', 'input_mask', 'label']
@@ -151,7 +155,7 @@ class DataSet():
                                                                         for c in input_columns[:-1]]
         tensors.append(torch.tensor(df_dev[input_columns[-1]], dtype=torch.long))
 
-
+        pdb.set_trace()
         print('Number of dev sentences: {:,}\n'.format(df_dev.shape[0]))
         
         if 'input_ids' in df_dev:
