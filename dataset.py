@@ -83,19 +83,20 @@ class DataSet():
         per_class = int(total / num_classes)
 
         class_pop = [per_class] * num_classes
-        class_pop.append(total % num_classes)
+        for i in range(0, total % num_classes):
+            class_pop[i] += 1
 
+        pdb.set_trace()
         min_label = df['label'].min()
         df_sample = df[df['label'] == min_label - 1]
 
         for i in range(min_label, min_label + num_classes):
-            pdb.set_trace()
             sample_number = class_pop.pop(0)
             df_sub = df[df['label'] == i].sample(sample_number, random_state=self.cfg.data_seed)
             if i == num_classes:
                 df_sub['label'] = 0
             df_sample = pd.concat([df_sample, df_sub])
-
+        pdb.set_trace()
         return df_sample
 
     def get_dataset(self):
