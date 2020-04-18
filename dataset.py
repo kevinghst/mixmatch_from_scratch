@@ -25,8 +25,8 @@ class DataSet():
         self.tokenizer = BertTokenizer.from_pretrained('bert-base-uncased', do_lower_case=True)
 
     def preprocess(self, df):
-        sentences = df.sentence.values[1:]
-        labels = df.label.values[1:]
+        sentences = df.sentence.values
+        labels = df.label.values
 
         # Tokenize all of the sentences and map the tokens to thier word IDs. 
         input_ids = []
@@ -154,7 +154,6 @@ class DataSet():
 
         if isinstance(df_train, pd.DataFrame):
             df_train = self.sample_dataset(df_train, self.cfg.train_cap)
-            pdb.set_trace()
             print('Number of training sentences: {:,}\n'.format(df_train.shape[0]))
             input_ids_train, attention_masks_train, seg_ids_train, label_ids_train, num_tokens_train = self.preprocess(df_train)
         pdb.set_trace()
