@@ -135,7 +135,6 @@ class DataSet():
 
             real_train_tensors = self.transform_to_tensor(real_train_data, 'unsup')
 
-
     def get_dataset(self):
         # Load the dataset into a pandas dataframe.
         if self.cfg.task == "SST":
@@ -152,6 +151,9 @@ class DataSet():
             
             f_dev = open("./imdb/imdb_sup_test.txt", 'r', encoding='utf-8')
             dev_data = pd.read_csv(f_dev, sep='\t')
+
+            dev_data_t = pd.read_csv(f_dev, sep='\t', header=None, names=['input_ids', 'input_type_ids', 'input_mask', 'label'])
+
             pdb.set_trace()
             end = "end"
 
