@@ -153,8 +153,8 @@ class DataSet():
             
 
         if isinstance(df_train, pd.DataFrame):
-            pdb.set_trace()
             df_train = self.sample_dataset(df_train, self.cfg.train_cap)
+            pdb.set_trace()
             print('Number of training sentences: {:,}\n'.format(df_train.shape[0]))
             input_ids_train, attention_masks_train, seg_ids_train, label_ids_train, num_tokens_train = self.preprocess(df_train)
         pdb.set_trace()
