@@ -106,10 +106,10 @@ class DataSet():
             dev_file = "./imdb/imdb_sup_test.txt"
 
             f_unsup = open(unsup_file, 'r', encoding='utf-8')
-            unsup_data = pd.read_csv(f, sep='\t')
+            unsup_data = pd.read_csv(f_unsup, sep='\t')
 
             f_dev = open(dev_file, 'r', encoding='utf-8')
-            dev_data = pd.read_csv(f, sep='\t')
+            dev_data = pd.read_csv(f_dev, sep='\t')
 
             pdb.set_trace()
 
