@@ -151,24 +151,17 @@ class DataSet():
             
             f_dev = open("./imdb/imdb_sup_test.txt", 'r', encoding='utf-8')
             dev_data = pd.read_csv(f_dev, sep='\t')
-            dev_data.rename(columns={"label_ids": "label"})
+            dev_data.rename(columns={"label_ids": "label"}, inplace=True)
 
-            pdb.set_trace()
-            end = "end"
+        df_train = self.sample_dataset(df_train, self.cfg.train_cap)
+        print('Number of training sentences: {:,}\n'.format(df_train.shape[0]))
+        input_ids_train, attention_masks_train, seg_ids_train, label_ids_train, num_tokens_train = self.preprocess(df_train)
 
-        if isinstance(df_train, pd.DataFrame):
-            df_train = self.sample_dataset(df_train, self.cfg.train_cap)
-            print('Number of training sentences: {:,}\n'.format(df_train.shape[0]))
-            input_ids_train, attention_masks_train, seg_ids_train, label_ids_train, num_tokens_train = self.preprocess(df_train)
-            
+        df_dev = self.sample_dataset(df_dev, self.cfg.dev_cap)
+        pdb.set_trace()
+        print('Number of dev sentences: {:,}\n'.format(df_dev.shape[0]))
+        input_ids_dev, attention_masks_dev, seg_ids_dev, label_ids_dev, num_tokens_dev = self.preprocess(df_dev)
 
-        if isinstance(df_dev, pd.DataFrame):
-            df_dev = self.sample_dataset(df_dev, self.cfg.dev_cap)
-            print('Number of dev sentences: {:,}\n'.format(df_dev.shape[0]))
-            input_ids_dev, attention_masks_dev, seg_ids_dev, label_ids_dev, num_tokens_dev = self.preprocess(df_dev)
-        else:
-            pdb.set_trace()
-            end = "end"
 
 
         # Combine the training inputs into a TensorDataset.
