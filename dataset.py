@@ -140,11 +140,12 @@ class DataSet():
             df_train = pd.read_csv("./dbpedia/train.csv", header=None, names=['label', 'title', 'sentence']).iloc[1:]
             df_dev = pd.read_csv("./dbpedia/test.csv", header=None, names=['label', 'title', 'sentence']).iloc[1:]
         elif self.cfg.task == "imdb":
-            df_train = pd.read_csv("./imdb/train.csv", header=None, names=['sentence', 'label']).iloc[1:]
-            
-            f_dev = open("./imdb/imdb_sup_test.txt", 'r', encoding='utf-8')
-            df_dev = pd.read_csv(f_dev, sep='\t')
-            df_dev.rename(columns={"label_ids": "label"}, inplace=True)
+            df_train = pd.read_csv("./imdb/sup_train.csv", header=None, names=['sentence', 'label']).iloc[1:]
+            df_dev = pd.read_csv("./imdb/sup_dev.csv", header=None, names=['sentence', 'label']).iloc[1:]
+
+            #f_dev = open("./imdb/imdb_sup_test.txt", 'r', encoding='utf-8')
+            #df_dev = pd.read_csv(f_dev, sep='\t')
+            #df_dev.rename(columns={"label_ids": "label"}, inplace=True)
 
 
         df_train = self.sample_dataset(df_train, self.cfg.train_cap)
