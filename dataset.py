@@ -161,7 +161,7 @@ class DataSet():
         else:
             input_ids_dev, attention_masks_dev, seg_ids_dev, label_ids_dev, num_tokens_dev = self.preprocess(df_dev)
 
-
+        pdb.set_trace()
         # Combine the training inputs into a TensorDataset.
         train_dataset = TensorDataset(input_ids_train, attention_masks_train, seg_ids_train, label_ids_train, num_tokens_train)
         val_dataset = TensorDataset(input_ids_dev, attention_masks_dev, seg_ids_dev, label_ids_dev, num_tokens_dev)
