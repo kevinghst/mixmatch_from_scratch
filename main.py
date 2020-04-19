@@ -42,6 +42,9 @@ parser.add_argument('--dev_cap', default=-1, type=int)
 
 parser.add_argument('--epochs', default=3, type=int)
 
+# Debugging
+parser.add_argument('--use_prepro', action='store_true')
+
 cfg, unknown = parser.parse_known_args()
 
 class AttributeDict(dict): 
