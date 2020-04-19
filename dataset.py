@@ -146,7 +146,7 @@ class DataSet():
                 df_dev = pd.read_csv(f_dev, sep='\t')
                 df_dev.rename(columns={"label_ids": "label"}, inplace=True)
             else:
-                df_dev = pd.read_csv("./imdb/sup_dev.csv", header=None, names=['sentence', 'label']).iloc[1:]
+                df_dev = pd.read_csv("./imdb/sup_dev.csv", header=None, names=['sentence', 'label'])
 
 
         df_train = self.sample_dataset(df_train, self.cfg.train_cap)
