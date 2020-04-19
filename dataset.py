@@ -153,7 +153,7 @@ class DataSet():
         print('Number of training sentences: {:,}\n'.format(df_train.shape[0]))
         input_ids_train, attention_masks_train, seg_ids_train, label_ids_train, num_tokens_train = self.preprocess(df_train)
 
-        df_dev = self.sample_dataset(df_dev, self.cfg.dev_cap).head(100)
+        df_dev = self.sample_dataset(df_dev, self.cfg.dev_cap)
         print('Number of dev sentences: {:,}\n'.format(df_dev.shape[0]))
 
 
