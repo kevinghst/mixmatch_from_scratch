@@ -119,12 +119,12 @@ class DataSet():
                                                                             for c in input_columns[:-1]]
             tensors.append(torch.tensor(data[input_columns[-1]], dtype=torch.long))
 
-        num_tokens = []
-        for inp in tensors[0]:
-            num = (inp!=0).sum()
-            num_tokens.append(num.item())
+            num_tokens = []
+            for inp in tensors[0]:
+                num = (inp!=0).sum()
+                num_tokens.append(num.item())
 
-        tensors.append(torch.tensor(num_tokens))
+            tensors.append(torch.tensor(num_tokens))
 
         return tensors
 
