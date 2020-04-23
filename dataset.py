@@ -43,11 +43,13 @@ class DataSet():
             #   (4) Map tokens to their IDs.
             #   (5) Pad or truncate the sentence to `max_length`
             #   (6) Create attention masks for [PAD] tokens.
-            max_len = MAX_LENGTHS[self.cfg.task]
+           
+            #max_len = MAX_LENGTHS[self.cfg.task]
+            max_len = 512
 
             tokens = self.tokenizer.tokenize(sent)
             if len(tokens) > max_len - 2:
-                tokens = tokens[-126:]
+                tokens = tokens[-(max_len - 2):]
 
             # pad all tokens to the same length using UNS token
 
@@ -73,6 +75,8 @@ class DataSet():
             attention_masks.append(encoded_dict['attention_mask'])
             segment_ids.append(encoded_dict['token_type_ids'])
             num_tokens.append(len(tokens) + 2)
+
+            pdb.set_trace()
 
         input_ids = torch.cat(input_ids, dim=0)
         attention_masks = torch.cat(attention_masks, dim=0)
