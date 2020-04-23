@@ -43,8 +43,7 @@ class DataSet():
             #   (5) Pad or truncate the sentence to `max_length`
             #   (6) Create attention masks for [PAD] tokens.
            
-            #max_len = MAX_LENGTHS[self.cfg.task]
-            max_len = 512
+            max_len = MAX_LENGTHS[self.cfg.task]
 
             tokens = self.tokenizer.tokenize(sent)
             if len(tokens) > max_len - 2:
