@@ -157,8 +157,10 @@ class DataSet():
                 if self.cfg.mixmatch:
                     f_unsup = open("./imdb/imdb_unsup_train.txt", 'r', encoding='utf-8')
                     df_unsup = pd.read_csv(f_unsup, sep='\t')
-                    #sup_data = 25000
-                    #df_unsup = df_unsup.iloc[sup_data:]
+                    sup_data = 25000
+                    pdb.set_trace()
+                    df_unsup = df_unsup.iloc[sup_data:]
+                    pdb.set_trace()
             else:
                 df_dev = pd.read_csv("./imdb/sup_dev.csv", header=None, names=['sentence', 'label'])
 
@@ -188,5 +190,4 @@ class DataSet():
             unsup_dataset = TensorDataset(ori_input_ids, ori_input_mask, ori_seg_ids, aug_input_ids, ori_input_mask, ori_seg_ids)
 
 
-        pdb.set_trace()
         return train_dataset, val_dataset, unsup_dataset
