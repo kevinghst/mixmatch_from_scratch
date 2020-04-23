@@ -131,7 +131,7 @@ class DataSet():
     def swap_binary_label(self, df):
         df['label'].replace(0, "1", inplace=True)
         df['label'].replace(1, 0, inplace=True)
-        df['label'].replace("1", 1, inpalce=True)
+        df['label'].replace("1", 1, inplace=True)
 
     def get_dataset(self):
         # Load the dataset into a pandas dataframe.
