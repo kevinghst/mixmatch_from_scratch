@@ -150,9 +150,7 @@ class DataSet():
                 f_dev = open("./imdb/imdb_sup_test.txt", 'r', encoding='utf-8')
                 df_dev = pd.read_csv(f_dev, sep='\t')
                 df_dev.rename(columns={"label_ids": "label"}, inplace=True)
-                pdb.set_trace()
                 self.swap_binary_label(df_dev)
-                pdb.set_trace()
             else:
                 df_dev = pd.read_csv("./imdb/sup_dev.csv", header=None, names=['sentence', 'label'])
 
