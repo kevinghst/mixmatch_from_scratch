@@ -103,9 +103,7 @@ class DataSet():
                 df_sub['label'] = 0
             df_sample = pd.concat([df_sample, df_sub])
 
-        new_index = range(df_sample.shape[0])
-        new_index = pd.Series(new_index)
-        df_sample.set_index([new_index], inplace=True)
+        self.reindex(df_sample)
         return df_sample
 
     def retrieve_tensors(self, data, d_type):
@@ -133,6 +131,11 @@ class DataSet():
         df['label'].replace(1, 0, inplace=True)
         df['label'].replace("1", 1, inplace=True)
 
+    def reindex(self, df):
+        new_index = range(df.shape[0])
+        new_index = pd.Series(new_index)
+        df.set_index([new_index], inplace=True)
+
     def get_dataset(self):
         # Load the dataset into a pandas dataframe.
         df_unsup = None
@@ -158,9 +161,8 @@ class DataSet():
                     f_unsup = open("./imdb/imdb_unsup_train.txt", 'r', encoding='utf-8')
                     df_unsup = pd.read_csv(f_unsup, sep='\t')
                     sup_data = 25000
-                    pdb.set_trace()
                     df_unsup = df_unsup.iloc[sup_data:]
-                    pdb.set_trace()
+                    self.reindex(df_unsup)
             else:
                 df_dev = pd.read_csv("./imdb/sup_dev.csv", header=None, names=['sentence', 'label'])
 
@@ -188,6 +190,6 @@ class DataSet():
         unsup_dataset = None
         if self.cfg.mixmatch:
             unsup_dataset = TensorDataset(ori_input_ids, ori_input_mask, ori_seg_ids, aug_input_ids, ori_input_mask, ori_seg_ids)
-
+        pdb.set_trace()
 
         return train_dataset, val_dataset, unsup_dataset
