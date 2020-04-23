@@ -30,6 +30,7 @@ parser.add_argument('--val_batch_size', default=32, type=int)
 # MixMatch
 parser.add_argument('--mixup', choices=['cls', 'word'])
 parser.add_argument('--alpha', default=1, type=float)
+parser.add_argument('--mixmatch', action='store_true')
 
 parser.add_argument('--data_parallel', default=True, type=bool)
 
@@ -42,7 +43,6 @@ parser.add_argument('--dev_cap', default=-1, type=int)
 
 parser.add_argument('--epochs', default=3, type=int)
 
-# Debugging
 parser.add_argument('--use_prepro', action='store_true')
 
 cfg, unknown = parser.parse_known_args()
@@ -96,7 +96,7 @@ else:
 dataset = DataSet(cfg)
 
 
-train_dataset, val_dataset = dataset.get_dataset()
+train_dataset, val_dataset, unlabeled_dataset = dataset.get_dataset()
 
 
 # Create the DataLoaders for our training and validation sets.

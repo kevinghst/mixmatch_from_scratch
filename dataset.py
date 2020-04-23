@@ -151,8 +151,14 @@ class DataSet():
                 df_dev = pd.read_csv(f_dev, sep='\t')
                 df_dev.rename(columns={"label_ids": "label"}, inplace=True)
                 self.swap_binary_label(df_dev)
+
+                if self.cfg.mixmatch:
+                    f_dev = open("./imdb/imdb_unsup_train.txt", 'r', encoding='utf-8')
+                    df_dev = pd.read_csv(f_dev, sep='\t')
+                    pdb.set_trace()
             else:
                 df_dev = pd.read_csv("./imdb/sup_dev.csv", header=None, names=['sentence', 'label'])
+
 
 
         df_train = self.sample_dataset(df_train, self.cfg.train_cap)
@@ -171,4 +177,4 @@ class DataSet():
         # Combine the training inputs into a TensorDataset.
         train_dataset = TensorDataset(input_ids_train, attention_masks_train, seg_ids_train, label_ids_train, num_tokens_train)
         val_dataset = TensorDataset(input_ids_dev, attention_masks_dev, seg_ids_dev, label_ids_dev, num_tokens_dev)
-        return train_dataset, val_dataset
+        return train_dataset, val_dataset, None
