@@ -157,8 +157,8 @@ class DataSet():
                 if self.cfg.mixmatch:
                     f_unsup = open("./imdb/imdb_unsup_train.txt", 'r', encoding='utf-8')
                     df_unsup = pd.read_csv(f_unsup, sep='\t')
-                    sup_data = 25000
-                    df_unsup = df_unsup.iloc[sup_data:]
+                    #sup_data = 25000
+                    #df_unsup = df_unsup.iloc[sup_data:]
             else:
                 df_dev = pd.read_csv("./imdb/sup_dev.csv", header=None, names=['sentence', 'label'])
 
