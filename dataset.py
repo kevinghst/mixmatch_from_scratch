@@ -33,7 +33,6 @@ class DataSet():
         attention_masks = []
         segment_ids = []
         num_tokens = []
-        pdb.set_trace()
         # For every sentence...
         for sent in sentences:
             # `encode_plus` will:
@@ -75,7 +74,7 @@ class DataSet():
             attention_masks.append(encoded_dict['attention_mask'])
             segment_ids.append(encoded_dict['token_type_ids'])
             num_tokens.append(len(tokens) + 2)
-
+        pdb.set_trace()
         input_ids = torch.cat(input_ids, dim=0)
         attention_masks = torch.cat(attention_masks, dim=0)
         segment_ids = torch.cat(segment_ids, dim=0)
