@@ -128,6 +128,11 @@ class DataSet():
 
         return tensors
 
+    def swap_binary_label(self, df):
+        df['label'].replace(0, "1", inplace=True)
+        df['label'].replace(1, 0, inplace=True)
+        df['label'].replace("1", 1, inpalce=True)
+
     def get_dataset(self):
         # Load the dataset into a pandas dataframe.
         if self.cfg.task == "SST":
@@ -145,6 +150,9 @@ class DataSet():
                 f_dev = open("./imdb/imdb_sup_test.txt", 'r', encoding='utf-8')
                 df_dev = pd.read_csv(f_dev, sep='\t')
                 df_dev.rename(columns={"label_ids": "label"}, inplace=True)
+                pdb.set_trace()
+                self.swap_binary_label(df_dev)
+                pdb.set_trace()
             else:
                 df_dev = pd.read_csv("./imdb/sup_dev.csv", header=None, names=['sentence', 'label'])
 
@@ -161,7 +169,7 @@ class DataSet():
             input_ids_dev, attention_masks_dev, seg_ids_dev, label_ids_dev, num_tokens_dev = self.retrieve_tensors(df_dev, 'sup')
         else:
             input_ids_dev, attention_masks_dev, seg_ids_dev, label_ids_dev, num_tokens_dev = self.preprocess(df_dev)
-        pdb.set_trace()
+
         # Combine the training inputs into a TensorDataset.
         train_dataset = TensorDataset(input_ids_train, attention_masks_train, seg_ids_train, label_ids_train, num_tokens_train)
         val_dataset = TensorDataset(input_ids_dev, attention_masks_dev, seg_ids_dev, label_ids_dev, num_tokens_dev)
