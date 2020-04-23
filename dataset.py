@@ -110,8 +110,8 @@ class DataSet():
 
     def retrieve_tensors(self, data, d_type):
         if d_type == 'unsup':
-            input_columns = ['ori_input_ids', 'ori_input_type_ids', 'ori_input_mask',
-                             'aug_input_ids', 'aug_input_type_ids', 'aug_input_mask']
+            input_columns = ['ori_input_ids', 'ori_input_mask', 'ori_input_type_ids',
+                             'aug_input_ids', 'aug_input_mask', 'aug_input_type_ids']
             tensors = [torch.tensor(data[c].apply(lambda x: ast.literal_eval(x)), dtype=torch.long) for c in input_columns]
         else:
             input_columns = ['input_ids', 'input_mask', 'input_type_ids', 'label']
@@ -135,6 +135,8 @@ class DataSet():
 
     def get_dataset(self):
         # Load the dataset into a pandas dataframe.
+        df_unsup = None
+
         if self.cfg.task == "SST":
             df_train = pd.read_csv("./SST-2/train.tsv", delimiter='\t', header=None, names=['sentence', 'label']).iloc[1:]
             df_dev = pd.read_csv("./SST-2/dev.tsv", delimiter='\t', header=None, names=['sentence', 'label']).iloc[1:]
@@ -153,9 +155,8 @@ class DataSet():
                 self.swap_binary_label(df_dev)
 
                 if self.cfg.mixmatch:
-                    f_dev = open("./imdb/imdb_unsup_train.txt", 'r', encoding='utf-8')
-                    df_dev = pd.read_csv(f_dev, sep='\t')
-                    pdb.set_trace()
+                    f_unsup = open("./imdb/imdb_unsup_train.txt", 'r', encoding='utf-8')
+                    df_unsup = pd.read_csv(f_unsup, sep='\t')
             else:
                 df_dev = pd.read_csv("./imdb/sup_dev.csv", header=None, names=['sentence', 'label'])
 
@@ -171,10 +172,19 @@ class DataSet():
 
         if 'input_ids' in df_dev:
             input_ids_dev, attention_masks_dev, seg_ids_dev, label_ids_dev, num_tokens_dev = self.retrieve_tensors(df_dev, 'sup')
+            if self.cfg.mixmatch:
+                ori_input_ids, ori_input_mask, ori_seg_ids, aug_input_ids, ori_input_mask, ori_seg_ids = self.retrieve_tensors(df_unsup, 'unsup')
         else:
             input_ids_dev, attention_masks_dev, seg_ids_dev, label_ids_dev, num_tokens_dev = self.preprocess(df_dev)
 
         # Combine the training inputs into a TensorDataset.
         train_dataset = TensorDataset(input_ids_train, attention_masks_train, seg_ids_train, label_ids_train, num_tokens_train)
         val_dataset = TensorDataset(input_ids_dev, attention_masks_dev, seg_ids_dev, label_ids_dev, num_tokens_dev)
-        return train_dataset, val_dataset, None
+
+        unsup_dataset = None
+        if self.cfg.mixmatch:
+            unsup_dataset = TensorDataset(ori_input_ids, ori_input_mask, ori_seg_ids, aug_input_ids, ori_input_mask, ori_seg_ids)
+
+
+        pdb.set_trace()
+        return train_dataset, val_dataset, unsup_dataset
