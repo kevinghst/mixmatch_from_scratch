@@ -61,7 +61,7 @@ class Trainer():
                 labeled_train_iter = iter(train_loader)
                 sup_ids, sup_mask, sup_seg, sup_labels, sup_num_tokens = labeled_train_iter.next()
 
-            ori_ids, ori_mask, ori_seg, aug_ids, ori_mask, ori_seg = batch
+            ori_ids, ori_mask, ori_seg, aug_ids, aug_mask, aug_seg = batch
 
             batch_size = sup_ids.size(0)
 
