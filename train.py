@@ -84,8 +84,6 @@ class Trainer():
             batch_size = sup_ids.size(0)
 
             model.zero_grad()
-
-            pdb.set_trace()
             
             #convert label_ids to hot vector
             sup_labels = torch.zeros(batch_size, self.num_labels).scatter_(1, sup_labels.view(-1,1), 1).cuda()
@@ -114,7 +112,8 @@ class Trainer():
                 epoch + step/len(unsup_loader)
             )
 
-            loss = Lx + w * Lu
+            #loss = Lx + w * Lu
+            loss = Lx
 
             total_train_loss += loss.item()
 
