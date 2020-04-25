@@ -115,7 +115,8 @@ class Trainer():
                 epoch + step/len(unsup_loader)
             )
 
-            loss = Lx + w * Lu
+            #loss = Lx + w * Lu
+            loss = Lx
 
             total_train_loss += loss.item()
             total_sup_loss += Lx.item()
