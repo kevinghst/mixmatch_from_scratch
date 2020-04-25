@@ -21,10 +21,10 @@ parser = argparse.ArgumentParser(description='SSL for NLP')
 
 parser.add_argument('--seed', default=42, type=int)
 parser.add_argument('--data_seed', default=42, type=int)
-parser.add_argument('--lr', default=2e-5, type=float)
+parser.add_argument('--lr', default=1e-5, type=float)
 parser.add_argument('--do_lower_case', default=True, type=bool)
 
-parser.add_argument('--train_batch_size', default=32, type=int)
+parser.add_argument('--train_batch_size', default=16, type=int)
 parser.add_argument('--val_batch_size', default=32, type=int)
 
 # mixup
