@@ -183,6 +183,7 @@ class DataSet():
             input_ids_dev, attention_masks_dev, seg_ids_dev, label_ids_dev, num_tokens_dev = self.retrieve_tensors(df_dev, 'sup')
             if self.cfg.mixmatch:
                 ori_input_ids, ori_input_mask, ori_seg_ids, aug_input_ids, ori_input_mask, ori_seg_ids = self.retrieve_tensors(df_unsup, 'unsup')
+                print('Number of unsup sentences: {:,}\n'.format(df_dev.shape[0]))
         else:
             input_ids_dev, attention_masks_dev, seg_ids_dev, label_ids_dev, num_tokens_dev = self.preprocess(df_dev)
 
@@ -193,5 +194,5 @@ class DataSet():
         unsup_dataset = None
         if self.cfg.mixmatch:
             unsup_dataset = TensorDataset(ori_input_ids, ori_input_mask, ori_seg_ids, aug_input_ids, ori_input_mask, ori_seg_ids)
-        pdb.set_trace()
+
         return train_dataset, val_dataset, unsup_dataset
