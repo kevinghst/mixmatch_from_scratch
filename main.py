@@ -27,10 +27,14 @@ parser.add_argument('--do_lower_case', default=True, type=bool)
 parser.add_argument('--train_batch_size', default=32, type=int)
 parser.add_argument('--val_batch_size', default=32, type=int)
 
-# MixMatch
+# mixup
 parser.add_argument('--mixup', choices=['cls', 'word'])
 parser.add_argument('--alpha', default=1, type=float)
+
+#mixmatch
 parser.add_argument('--mixmatch', action='store_true')
+parser.add_argument('--lambda_u', default=75, type=float)
+parser.add_argument('T', default=0.5, type=float)
 
 parser.add_argument('--data_parallel', default=True, type=bool)
 
@@ -96,7 +100,7 @@ else:
 dataset = DataSet(cfg)
 
 
-train_dataset, val_dataset, unlabeled_dataset = dataset.get_dataset()
+train_dataset, val_dataset, unsup_dataset = dataset.get_dataset()
 
 
 # Create the DataLoaders for our training and validation sets.
@@ -113,6 +117,14 @@ validation_dataloader = DataLoader(
             sampler = SequentialSampler(val_dataset), # Pull out batches sequentially.
             batch_size = cfg.val_batch_size # Evaluate with this batch size.
         )
+
+unsup_dataloader = None
+if unsup_dataset:
+    unsup_dataloader = DataLoader(
+        unsup_dataset,
+        sampler = SequentialSampler(unsup_dataset),
+        batch_size = cfg.train_batch_size
+    )
 
 # Load BertForSequenceClassification, the pretrained BERT model with a single 
 # linear classification layer on top. 
@@ -159,6 +171,7 @@ trainer = Trainer(
     scheduler=scheduler,
     train_loader=train_dataloader,
     val_loader=validation_dataloader,
+    unsup_loader=unsup_datalloader,
     cfg=cfg,
     num_labels=NUM_LABELS[cfg.task]
 )

@@ -16,7 +16,8 @@ class Trainer():
     def __init__(
             self, 
             model=None, optimizer=None, device=None, scheduler=None,
-            train_loader=None, val_loader=None, cfg=None, num_labels=None
+            train_loader=None, val_loader=None, unsup_loader=None,
+            cfg=None, num_labels=None
         ):
         self.model = model
         self.optimizer = optimizer
@@ -24,6 +25,7 @@ class Trainer():
         self.scheduler = scheduler
         self.train_loader = train_loader
         self.val_loader = val_loader
+        self.unsup_loader = unsup_loader
         self.cfg = cfg
         self.num_labels = num_labels
 
@@ -35,6 +37,37 @@ class Trainer():
         torch.cuda.manual_seed_all(seed) # if you are using multi-GPU.
         torch.backends.cudnn.benchmark = False
         torch.backends.cudnn.deterministic = True
+
+    def train_mixmatch(self):
+        t0 = time.time()
+
+        model = self.model
+        optimizer = self.optimizer
+        device = self.device
+        scheduler = self.scheduler
+        train_loader = self.train_loader
+        unsup_loader = self.unsup_loader
+        cfg = self.cfg
+
+        labeled_train_iter = iter(train_loader)
+
+        total_train_loss
+        model.train()
+
+        for step, batch in enumerate(unsup_loader):
+            try:
+                sup_ids, sup_mask, sup_seg, sup_labels, sup_num_tokens = labeled_train_iter.next()
+            except:
+                labeled_train_iter = iter(train_loader)
+                sup_ids, sup_mask, sup_seg, sup_labels, sup_num_tokens = labeled_train_iter.next()
+
+            ori_ids, ori_mask, ori_seg, aug_ids, ori_mask, ori_seg = batch
+
+            batch_size = sup_ids.size(0)
+
+            pdb.set_trace()
+
+        return (None, None)
 
     def train(self):
         # Measure how long the training epoch takes.
@@ -48,7 +81,7 @@ class Trainer():
         cfg = self.cfg
 
         total_train_loss = 0
-        model.train
+        model.train()
 
         # For each batch of training data...
         for step, batch in enumerate(train_loader):
@@ -75,24 +108,6 @@ class Trainer():
             sup_idx = torch.randperm(batch_size)
 
             c_input_ids = b_input_ids.clone()
-
-            ## pad all sequences to the maximum length in batch
-            #max_len = int(max(b_num_tokens))
-            #max_mask_ones = torch.tensor([1] * max_len)
-            #max_mask_zeros = torch.tensor([0] * (128 - max_len))
-            #sep_tensor = torch.tensor([102])
-            #max_mask = torch.cat((max_mask_ones, max_mask_zeros), 0)
-
-            #for i in range(0, batch_size):
-            #    current_len = int(b_num_tokens[i])
-            #    if current_len < max_len:
-            #        first = b_input_ids[i][0:current_len-1]
-            #        second = torch.tensor([1] * (max_len - current_len))
-            #        third = torch.cat((sep_tensor, max_mask_zeros))
-            #        combined = torch.cat((first, second, third), 0)
-            #        b_input_ids[i] = combined
-            #        b_input_mask[i] = max_mask
-
 
             if cfg.mixup == 'word':
                 for i in range(0, batch_size):
@@ -283,8 +298,10 @@ class Trainer():
             print('======== Epoch {:} / {:} ========'.format(epoch_i + 1, epochs))
             print('Training...')
 
-
-            avg_train_loss, training_time = self.train()
+            if self.cfg.mixmatch:
+                avg_train_loss, training_time = self.train_mixmatch()
+            else:
+                avg_train_loss, training_time = self.train()
     
         
             # ========================================
