@@ -38,7 +38,7 @@ class Trainer():
         torch.backends.cudnn.benchmark = False
         torch.backends.cudnn.deterministic = True
 
-    def train_mixmatch(self):
+    def train_mixmatch(self, epoch):
         t0 = time.time()
 
         model = self.model
@@ -65,7 +65,37 @@ class Trainer():
 
             batch_size = sup_ids.size(0)
 
+            model.zero_grad()
+            
+            #convert label_ids to hot vector
+            sup_labels = torch.zeros(batch_size, self.num_labels).scatter_(1, sup_labels.view(-1,1), 1).cuda()
+
+            # compute guessed labels of unlabeled samples:
+            with torch.no_grad():
+                outputs_u = model(input_ids=ori_ids, attention_mask=ori_mask)
+                outputs_u2 = model(input_ids=aug_ids, attention_mask=aug_mask)
+                p = (torch.softmax(outputs_u, dim=1) + torch.softmax(outputs_u2, dim=1)) / 2
+                pt = p**(1/cfg.T)
+                targets_u = pt / pt.sum(dim=1, keepdim=True)
+                targets_u = targets_u.detach()
+
+            unsup_labels = torch.cat([targets_u, targets_u], dim=0)
+
+            all_ids = torch.cat([sup_ids, ori_ids, aug_ids], dim=0).to(device)
+            all_mask = torch.cat([sup_mask, ori_mask, aug_mask], dim=0).to(device)
+
+            all_logits = model(input_ids=all_ids, attention_mask=all_mask)
+
             pdb.set_trace()
+
+            Lx, Lu, w = semi_loss(
+                all_logits[:batch_size],
+                sup_labels,
+                all_logits[batch_size:],
+                unsup_labels,
+                epoch + step/len(unsup_loader)
+            )
+
 
         return (None, None)
 
@@ -299,7 +329,7 @@ class Trainer():
             print('Training...')
 
             if self.cfg.mixmatch:
-                avg_train_loss, training_time = self.train_mixmatch()
+                avg_train_loss, training_time = self.train_mixmatch(epoch_i)
             else:
                 avg_train_loss, training_time = self.train()
     
