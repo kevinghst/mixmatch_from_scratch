@@ -44,6 +44,7 @@ parser.add_argument('--num_labels', default=2, type=int)
 
 parser.add_argument('--train_cap', default=-1, type=int)
 parser.add_argument('--dev_cap', default=-1, type=int)
+parser.add_argument('--unsup_cap', default=-1, type=int)
 
 parser.add_argument('--epochs', default=3, type=int)
 
@@ -171,7 +172,7 @@ trainer = Trainer(
     scheduler=scheduler,
     train_loader=train_dataloader,
     val_loader=validation_dataloader,
-    unsup_loader=unsup_datalloader,
+    unsup_loader=unsup_dataloader,
     cfg=cfg,
     num_labels=NUM_LABELS[cfg.task]
 )
