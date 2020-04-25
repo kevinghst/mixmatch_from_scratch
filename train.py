@@ -47,7 +47,7 @@ class Trainer():
             current = np.clip(current / rampup_length, 0.0, 1.0)
             return float(current)
 
-    def semi_loss(self, outputs_x, targets_x, ouputs_u, targets_u, current_epoch):
+    def semi_loss(self, outputs_x, targets_x, outputs_u, targets_u, current_epoch):
         probs_u = torch.softmax(outputs_u, dim=1)
 
         Lx = -torch.mean(torch.sum(F.log_softmax(outputs_x, dim=1) * targets_x, dim=1))
