@@ -162,7 +162,7 @@ class DataSet():
                     df_unsup = pd.read_csv(f_unsup, sep='\t')
                     sup_data = 25000
                     df_unsup = df_unsup.iloc[sup_data:]
-                    if self.cfg.unsup_cap:
+                    if self.cfg.unsup_cap > 0:
                         df_unsup = df_unsup.sample(self.cfg.unsup_cap, random_state=self.cfg.data_seed)
 
                     self.reindex(df_unsup)
