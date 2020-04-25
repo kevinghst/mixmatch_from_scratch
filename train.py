@@ -51,7 +51,7 @@ class Trainer():
 
         labeled_train_iter = iter(train_loader)
 
-        total_train_loss
+        total_train_loss = 0
         model.train()
 
         for step, batch in enumerate(unsup_loader):
