@@ -38,6 +38,22 @@ class Trainer():
         torch.backends.cudnn.benchmark = False
         torch.backends.cudnn.deterministic = True
 
+    def linear_rampup(self, current, rampup_length=self.cfg.epochs):
+        if rampup_length == 0:
+            return 1.0
+        else:
+            current = np.clip(current / rampup_length, 0.0, 1.0)
+            return float(current)
+
+    def semi_loss(self, outputs_x, targets_x, ouputs_u, targets_u, current_epoch):
+        probs_u = torch.softmax(outputs_u, dim=1)
+
+        Lx = -torch.mean(torch.sum(F.log_softmax(outputs_x, dim=1) * targets_x, dim=1))
+        Lu = torch.mean((probs_u - targets_u)**2)
+
+        return Lx, Lu, self.cfg.lambda_u * self.linear_rampup(current_epoch)
+
+
     def train_mixmatch(self, epoch):
         t0 = time.time()
 
@@ -66,6 +82,8 @@ class Trainer():
             batch_size = sup_ids.size(0)
 
             model.zero_grad()
+
+            pdb.set_trace()
             
             #convert label_ids to hot vector
             sup_labels = torch.zeros(batch_size, self.num_labels).scatter_(1, sup_labels.view(-1,1), 1).cuda()
@@ -86,9 +104,7 @@ class Trainer():
 
             all_logits = model(input_ids=all_ids, attention_mask=all_mask)
 
-            pdb.set_trace()
-
-            Lx, Lu, w = semi_loss(
+            Lx, Lu, w = self.semi_loss(
                 all_logits[:batch_size],
                 sup_labels,
                 all_logits[batch_size:],
@@ -96,8 +112,34 @@ class Trainer():
                 epoch + step/len(unsup_loader)
             )
 
+            loss = Lx + w * Lu
 
-        return (None, None)
+            total_train_loss += loss.item()
+
+            # Perform a backward pass to calculate the gradients.
+            loss.backward()
+
+            # Clip the norm of the gradients to 1.0.
+            # This is to help prevent the "exploding gradients" problem.
+            torch.nn.utils.clip_grad_norm_(model.parameters(), 1.0)
+
+            optimizer.step()
+
+            # Update the learning rate.
+            scheduler.step()
+
+        # Calculate the average loss over all of the batches.
+        avg_train_loss = total_train_loss / len(unsup_loader)   
+        
+        # Measure how long this epoch took.
+        training_time = format_time(time.time() - t0)
+
+        print("")
+        print("  Average training loss: {0:.2f}".format(avg_train_loss))
+        print("  Training epcoh took: {:}".format(training_time))
+
+        return avg_train_loss, training_time
+
 
     def train(self):
         # Measure how long the training epoch takes.
