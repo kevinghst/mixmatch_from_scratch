@@ -38,7 +38,9 @@ class Trainer():
         torch.backends.cudnn.benchmark = False
         torch.backends.cudnn.deterministic = True
 
-    def linear_rampup(self, current, rampup_length=self.cfg.epochs):
+    def linear_rampup(self, current):
+        rampup_length = self.cfg.epochs
+
         if rampup_length == 0:
             return 1.0
         else:
