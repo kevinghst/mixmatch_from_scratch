@@ -70,6 +70,9 @@ class Trainer():
         labeled_train_iter = iter(train_loader)
 
         total_train_loss = 0
+        total_sup_loss = 0
+        total_unsup_loss = 0
+
         model.train()
 
         for step, batch in enumerate(unsup_loader):
@@ -112,10 +115,11 @@ class Trainer():
                 epoch + step/len(unsup_loader)
             )
 
-            #loss = Lx + w * Lu
-            loss = Lx
+            loss = Lx + w * Lu
 
             total_train_loss += loss.item()
+            total_sup_loss += Lx.item()
+            total_unsup_loss += Lu.item()
 
             # Perform a backward pass to calculate the gradients.
             loss.backward()
@@ -130,13 +134,17 @@ class Trainer():
             scheduler.step()
 
         # Calculate the average loss over all of the batches.
-        avg_train_loss = total_train_loss / len(unsup_loader)   
+        avg_train_loss = total_train_loss / len(unsup_loader)
+        avg_sup_loss = total_sup_loss / len(unsup_loader)
+        avg_unsup_loss = total_unsup_loss / len(unsup_loader)
         
         # Measure how long this epoch took.
         training_time = format_time(time.time() - t0)
 
         print("")
         print("  Average training loss: {0:.2f}".format(avg_train_loss))
+        print("  Average sup loss: {0:.2f}".format(avg_sup_loss))
+        print("  Average unsup loss: {0:.2f}".format(avg_unsup_loss))
         print("  Training epcoh took: {:}".format(training_time))
 
         return avg_train_loss, training_time
