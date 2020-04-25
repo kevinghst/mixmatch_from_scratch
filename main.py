@@ -34,7 +34,7 @@ parser.add_argument('--alpha', default=1, type=float)
 #mixmatch
 parser.add_argument('--mixmatch', action='store_true')
 parser.add_argument('--lambda_u', default=75, type=float)
-parser.add_argument('T', default=0.5, type=float)
+parser.add_argument('--T', default=0.5, type=float)
 
 parser.add_argument('--data_parallel', default=True, type=bool)
 
