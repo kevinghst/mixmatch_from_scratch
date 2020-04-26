@@ -38,7 +38,7 @@ parser.add_argument('--T', default=0.5, type=float)
 
 # uda
 parser.add_argument('--uda', action='store_true')
-parser.add_argument('--tsa', default="linear_schedule", type=str)
+parser.add_argument('--tsa', default="", type=str)
 parser.add_argument('--unsup_ratio', default=3, type=int)
 parser.add_argument('--uda_coeff', default=1, type=int)
 parser.add_argument('--uda_softmax_temp', default=0.85, type=float)
