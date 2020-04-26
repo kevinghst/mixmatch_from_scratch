@@ -130,7 +130,7 @@ class Trainer():
 
             total_train_loss += sup_loss.item()
 
-            loss.backward()
+            sup_loss.backward()
 
             torch.nn.utils.clip_grad_norm_(model.parameters(), 1.0)
 
