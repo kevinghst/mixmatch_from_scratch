@@ -104,9 +104,9 @@ class Trainer():
             ori_input_ids, ori_segment_ids, ori_input_mask, \
             aug_input_ids, aug_segment_ids, aug_input_mask  = batch
 
-            input_ids = torch.cat((input_ids, aug_input_ids), dim=0)
-            segment_ids = torch.cat((segment_ids, aug_segment_ids), dim=0)
-            input_mask = torch.cat((input_mask, aug_input_mask), dim=0)
+            input_ids = torch.cat((input_ids, aug_input_ids), dim=0).to(device)
+            segment_ids = torch.cat((segment_ids, aug_segment_ids), dim=0).to(device)
+            input_mask = torch.cat((input_mask, aug_input_mask), dim=0).to(device)
 
             #logits
             logits = model(input_ids=input_ids, attention_mask=input_mask)
