@@ -473,7 +473,7 @@ class Trainer():
             print('======== Epoch {:} / {:} ========'.format(epoch_i + 1, epochs))
             print('Training...')
 
-            if sel.uda:
+            if self.cfg.uda:
                 avg_train_loss, training_time = self.train_uda(epoch_i)
             if self.cfg.mixmatch:
                 avg_train_loss, training_time = self.train_mixmatch(epoch_i)
