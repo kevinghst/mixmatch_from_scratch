@@ -90,7 +90,7 @@ class Trainer():
 
         model.train()
 
-        for step, batch in enumerate(train_loader):
+        for step, batch in enumerate(unsup_loader):
 
             model.zero_grad() 
 
