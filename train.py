@@ -114,7 +114,7 @@ class Trainer():
             model.zero_grad()
             
             #convert label_ids to hot vector
-            sup_labels = torch.zeros(batch_size, self.num_labels).scatter_(1, sup_labels.view(-1,1), 1).cuda()
+            sup_labels = torch.zeros(batch_size, self.num_labels).scatter_(1, sup_labels.view(-1,1), 1)
 
             # compute guessed labels of unlabeled samples:
             with torch.no_grad():
