@@ -90,7 +90,7 @@ class Trainer():
 
         model.train()
 
-        for step, batch in enumerate(unsup_loader):
+        for step, unnsup_batch in enumerate(unsup_loader):
             # Progress update every 40 batches.
             if step % 100 == 0 and not step == 0:
                 # Calculate elapsed time in minutes.
@@ -101,12 +101,13 @@ class Trainer():
 
 
             try:
-                sup_ids, sup_mask, sup_seg, sup_labels, sup_num_tokens = labeled_train_iter.next()
+                sup_batch = labeled_train_iter.next()
             except:
                 labeled_train_iter = iter(train_loader)
-                sup_ids, sup_mask, sup_seg, sup_labels, sup_num_tokens = labeled_train_iter.next()
+                sup_batch = labeled_train_iter.next()
 
-            ori_ids, ori_mask, ori_seg, aug_ids, aug_mask, aug_seg = batch
+            sup_ids, sup_mask, sup_seg, sup_labels, sup_num_tokens = [t.to(device) for t in sup_batch]
+            ori_ids, ori_mask, ori_seg, aug_ids, aug_mask, aug_seg = [t.to(device) for t in unsup_batch]
 
             batch_size = sup_ids.size(0)
 
@@ -126,8 +127,8 @@ class Trainer():
 
             unsup_labels = torch.cat([targets_u, targets_u], dim=0)
 
-            all_ids = torch.cat([sup_ids, ori_ids, aug_ids], dim=0).to(device)
-            all_mask = torch.cat([sup_mask, ori_mask, aug_mask], dim=0).to(device)
+            all_ids = torch.cat([sup_ids, ori_ids, aug_ids], dim=0)
+            all_mask = torch.cat([sup_mask, ori_mask, aug_mask], dim=0)
 
             all_logits = model(input_ids=all_ids, attention_mask=all_mask)
 
@@ -150,7 +151,7 @@ class Trainer():
 
             # Clip the norm of the gradients to 1.0.
             # This is to help prevent the "exploding gradients" problem.
-            #torch.nn.utils.clip_grad_norm_(model.parameters(), 1.0)
+            torch.nn.utils.clip_grad_norm_(model.parameters(), 1.0)
 
             optimizer.step()
 
@@ -319,15 +320,9 @@ class Trainer():
 
         # Evaluate data for one epoch
         for batch in val_loader:
-                
+            batch = [t.to(device) for t in batch]
             b_input_ids, b_input_mask, b_segment_ids, b_labels, b_num_tokens = batch
             batch_size = b_input_ids.size(0)
-
-            b_input_ids = b_input_ids.to(device)
-            b_input_mask = b_input_mask.to(device)
-            b_segment_ids = b_segment_ids.to(device)
-            b_labels = b_labels.to(device)
-
 
             with torch.no_grad():        
                 logits = model(
