@@ -60,7 +60,7 @@ class Trainer():
         if rampup_length == 0:
             return 1.0
         else:
-            current = np.clip(current / rampup_length, 0.0, 1.0)
+            current = np.clip(float(current) / float(rampup_length), 0.0, 1.0)
             return float(current)
 
     def semi_loss(self, outputs_x, targets_x, outputs_u, targets_u, current_epoch):
@@ -70,85 +70,6 @@ class Trainer():
         Lu = torch.mean((probs_u - targets_u)**2)
 
         return Lx, Lu, self.cfg.lambda_u * self.linear_rampup(current_epoch)
-
-    def train_uda(self, epoch):
-        t0 = time.time()
-
-        model = self.model
-        optimizer = self.optimizer
-        device = self.device
-        scheduler = self.scheduler
-        train_loader = self.train_loader
-        unsup_loader = self.unsup_loader
-        cfg = self.cfg
-
-        labeled_train_iter = iter(train_loader)
-
-        total_train_loss = 0
-        total_sup_loss = 0
-        total_unsup_loss = 0
-
-        model.train()
-
-        for step, batch in enumerate(unsup_loader):
-
-            model.zero_grad() 
-
-            #batch
-            try:
-                input_ids, input_mask, segment_ids, label_ids, num_tokens = labeled_train_iter.next()
-            except:
-                labeled_train_iter = iter(train_loader)
-                input_ids, input_mask, segment_ids, label_ids, num_tokens = labeled_train_iter.next()
-
-            ori_input_ids, ori_segment_ids, ori_input_mask, \
-            aug_input_ids, aug_segment_ids, aug_input_mask  = batch
-
-            label_ids = label_ids.to(device)
-            input_ids = torch.cat((input_ids, aug_input_ids), dim=0).to(device)
-            segment_ids = torch.cat((segment_ids, aug_segment_ids), dim=0).to(device)
-            input_mask = torch.cat((input_mask, aug_input_mask), dim=0).to(device)
-
-            #logits
-            logits = model(input_ids=input_ids, attention_mask=input_mask)
-
-            #sup loss
-            sup_criterion = nn.CrossEntropyLoss(reduction='none')
-            current = float(epoch) + float(step/len(unsup_loader))
-            rampup_length = float(cfg.epochs)
-
-            sup_size = label_ids.shape[0]            
-            sup_loss = sup_criterion(logits[:sup_size], label_ids)  # shape : train_batch_size
-            if cfg.tsa:
-                tsa_thresh = get_tsa_thresh(cfg.tsa, current, rampup_length, start=1./logits.shape[-1], end=1)
-                larger_than_threshold = torch.exp(-sup_loss) > tsa_thresh   # prob = exp(log_prob), prob > tsa_threshold
-                # larger_than_threshold = torch.sum(  F.softmax(pred[:sup_size]) * torch.eye(num_labels)[sup_label_ids]  , dim=-1) > tsa_threshold
-                loss_mask = torch.ones_like(label_ids, dtype=torch.float32) * (1 - larger_than_threshold.type(torch.float32))
-                sup_loss = torch.sum(sup_loss * loss_mask, dim=-1) / torch.max(torch.sum(loss_mask, dim=-1), torch_device_one())
-            else:
-                sup_loss = torch.mean(sup_loss)
-
-            total_train_loss += sup_loss.item()
-
-            sup_loss.backward()
-
-            torch.nn.utils.clip_grad_norm_(model.parameters(), 1.0)
-
-            optimizer.step()
-
-            scheduler.step()
-
-        # Calculate the average loss over all of the batches.
-        avg_train_loss = total_train_loss / len(unsup_loader)   
-        
-        # Measure how long this epoch took.
-        training_time = format_time(time.time() - t0)
-
-        print("")
-        print("  Average training loss: {0:.2f}".format(avg_train_loss))
-        print("  Training epcoh took: {:}".format(training_time))
-
-        return avg_train_loss, training_time
 
     def train_mixmatch(self, epoch):
         t0 = time.time()
@@ -206,11 +127,10 @@ class Trainer():
                 sup_labels,
                 all_logits[batch_size:],
                 unsup_labels,
-                epoch + step/len(unsup_loader)
+                epoch + float(step/len(unsup_loader))
             )
 
             loss = Lx + w * Lu
-            #loss = Lx
 
             total_train_loss += loss.item()
             total_sup_loss += Lx.item()

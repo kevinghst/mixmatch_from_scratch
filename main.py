@@ -33,8 +33,8 @@ parser.add_argument('--alpha', default=1, type=float)
 
 #mixmatch
 parser.add_argument('--mixmatch', action='store_true')
-parser.add_argument('--lambda_u', default=10, type=float)
-parser.add_argument('--T', default=0.5, type=float)
+parser.add_argument('--lambda_u', default=100, type=float)
+parser.add_argument('--T', default=0.85, type=float)
 
 # uda
 parser.add_argument('--uda', action='store_true')
@@ -131,7 +131,7 @@ unsup_dataloader = None
 if unsup_dataset:
     unsup_dataloader = DataLoader(
         unsup_dataset,
-        sampler = SequentialSampler(unsup_dataset),
+        sampler = RandomSampler(unsup_dataset),
         batch_size = cfg.train_batch_size
     )
 
