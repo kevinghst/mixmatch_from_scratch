@@ -91,6 +91,15 @@ class Trainer():
         model.train()
 
         for step, batch in enumerate(unsup_loader):
+            # Progress update every 40 batches.
+            if step % 100 == 0 and not step == 0:
+                # Calculate elapsed time in minutes.
+                elapsed = format_time(time.time() - t0)
+            
+                # Report progress.
+                print('  Batch {:>5,}  of  {:>5,}.    Elapsed: {:}.'.format(step, len(unsup_loader), elapsed))
+
+
             try:
                 sup_ids, sup_mask, sup_seg, sup_labels, sup_num_tokens = labeled_train_iter.next()
             except:
