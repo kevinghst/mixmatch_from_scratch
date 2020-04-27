@@ -106,7 +106,7 @@ class Trainer():
                 labeled_train_iter = iter(train_loader)
                 sup_batch = labeled_train_iter.next()
 
-            sup_ids, sup_mask, sup_seg, sup_labels, sup_num_tokens = [t.to(device) for t in sup_batch]
+            sup_ids, sup_mask, sup_seg, sup_labels, sup_num_tokens = sup_batch
             ori_ids, ori_mask, ori_seg, aug_ids, aug_mask, aug_seg = [t.to(device) for t in unsup_batch]
 
             batch_size = sup_ids.size(0)
@@ -115,6 +115,8 @@ class Trainer():
             
             #convert label_ids to hot vector
             sup_labels = torch.zeros(batch_size, self.num_labels).scatter_(1, sup_labels.view(-1,1), 1)
+
+            sup_ids,sup_mask,sup_seg,sup_labels = sup_ids.cuda(),sup_mask.cuda(),sup_seg.cuda(),sup_labels.cuda(non_blocking=True)
 
             # compute guessed labels of unlabeled samples:
             with torch.no_grad():
