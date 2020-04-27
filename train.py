@@ -90,7 +90,7 @@ class Trainer():
 
         model.train()
 
-        for step, unnsup_batch in enumerate(unsup_loader):
+        for step, unsup_batch in enumerate(unsup_loader):
             # Progress update every 40 batches.
             if step % 100 == 0 and not step == 0:
                 # Calculate elapsed time in minutes.
