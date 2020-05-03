@@ -98,6 +98,7 @@ class DataSet():
 
         for i in range(min_label, min_label + num_classes):
             sample_number = class_pop.pop(0)
+            pdb.set_trace()
             df_sub = df[df['label'] == i].sample(sample_number, random_state=self.cfg.data_seed)
             if i == num_classes:
                 df_sub['label'] = 0
