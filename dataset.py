@@ -191,8 +191,6 @@ class DataSet():
         train_dataset = TensorDataset(input_ids_train, attention_masks_train, seg_ids_train, label_ids_train, num_tokens_train)
         val_dataset = TensorDataset(input_ids_dev, attention_masks_dev, seg_ids_dev, label_ids_dev, num_tokens_dev)
 
-        pdb.set_trace()
-
         unsup_dataset = None
         if self.cfg.mixmatch or self.cfg.uda:
             unsup_dataset = TensorDataset(ori_input_ids, ori_input_mask, ori_seg_ids, aug_input_ids, aug_input_mask, aug_seg_ids)
