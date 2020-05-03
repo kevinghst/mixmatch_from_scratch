@@ -247,7 +247,6 @@ class Trainer():
                         if i_count < j_count:
                             b_input_mask[i] = b_input_mask[j]
             
-            pdb.set_trace()
             #for i in range(0, batch_size):
             #    new_mask = b_input_mask[i]
             #    new_ids = b_input_ids[i]

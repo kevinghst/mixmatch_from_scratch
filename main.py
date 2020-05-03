@@ -116,7 +116,7 @@ train_dataset, val_dataset, unsup_dataset = dataset.get_dataset()
 # We'll take training samples in random order. 
 train_dataloader = DataLoader(
             train_dataset,  # The training samples.
-            sampler = SequentialSampler(train_dataset), # Select batches randomly
+            sampler = RandomSampler(train_dataset), # Select batches randomly
             batch_size = cfg.train_batch_size # Trains with this batch size.
         )
 
