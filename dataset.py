@@ -98,7 +98,6 @@ class DataSet():
 
         for i in range(min_label, min_label + num_classes):
             sample_number = class_pop.pop(0)
-            pdb.set_trace()
             df_sub = df[df['label'] == i].sample(sample_number, random_state=self.cfg.data_seed)
             if i == num_classes:
                 df_sub['label'] = 0
@@ -191,6 +190,8 @@ class DataSet():
         # Combine the training inputs into a TensorDataset.
         train_dataset = TensorDataset(input_ids_train, attention_masks_train, seg_ids_train, label_ids_train, num_tokens_train)
         val_dataset = TensorDataset(input_ids_dev, attention_masks_dev, seg_ids_dev, label_ids_dev, num_tokens_dev)
+
+        pdb.set_trace()
 
         unsup_dataset = None
         if self.cfg.mixmatch or self.cfg.uda:
