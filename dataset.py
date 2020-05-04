@@ -111,6 +111,21 @@ class DataSet():
             input_columns = ['ori_input_ids', 'ori_input_mask', 'ori_input_type_ids',
                              'aug_input_ids', 'aug_input_mask', 'aug_input_type_ids']
             tensors = [torch.tensor(data[c].apply(lambda x: ast.literal_eval(x)), dtype=torch.long) for c in input_columns]
+
+            ori_num_tokens = []
+            aug_num_tokens = []
+
+            for ori_inp in tensors[0]:
+                num = (ori_inp!=0).sum()
+                ori_num_tokens.append(num.item())
+
+            for aug_inp in tensors[3]:
+                num = (aug_inp!=0).sum()
+                aug_num_tokens.append(num.item())
+
+            tensors.append(torch.tensor(ori_num_tokens))
+            tensors.append(torch.tensor(aug_num_tokens))
+
         else:
             input_columns = ['input_ids', 'input_mask', 'input_type_ids', 'label']
             tensors = [torch.tensor(data[c].apply(lambda x: ast.literal_eval(x)), dtype=torch.long)    \
@@ -151,21 +166,22 @@ class DataSet():
             df_dev = pd.read_csv("./dbpedia/test.csv", header=None, names=['label', 'title', 'sentence']).iloc[1:]
         elif self.cfg.task == "imdb":
             df_train = pd.read_csv("./imdb/sup_train.csv", header=None, names=['sentence', 'label']).iloc[1:]
-            if self.cfg.use_prepro:
-                f_dev = open("./imdb/imdb_sup_test.txt", 'r', encoding='utf-8')
-                df_dev = pd.read_csv(f_dev, sep='\t')
-                df_dev.rename(columns={"label_ids": "label"}, inplace=True)
-                self.swap_binary_label(df_dev)
+            #if self.cfg.use_prepro:
+            # use prepro for unsup and val
+            f_dev = open("./imdb/imdb_sup_test.txt", 'r', encoding='utf-8')
+            df_dev = pd.read_csv(f_dev, sep='\t')
+            df_dev.rename(columns={"label_ids": "label"}, inplace=True)
+            self.swap_binary_label(df_dev)
 
-                if self.cfg.mixmatch or self.cfg.uda:
-                    f_unsup = open("./imdb/imdb_unsup_train.txt", 'r', encoding='utf-8')
-                    df_unsup = pd.read_csv(f_unsup, sep='\t')
-                    sup_data = 25000
-                    df_unsup = df_unsup.iloc[sup_data:]
-                    if self.cfg.unsup_cap > 0:
-                        df_unsup = df_unsup.sample(self.cfg.unsup_cap, random_state=self.cfg.data_seed)
+            if self.cfg.uda_mode:
+                f_unsup = open("./imdb/imdb_unsup_train.txt", 'r', encoding='utf-8')
+                df_unsup = pd.read_csv(f_unsup, sep='\t')
+                sup_data = 25000
+                df_unsup = df_unsup.iloc[sup_data:]
+                if self.cfg.unsup_cap > 0:
+                    df_unsup = df_unsup.sample(self.cfg.unsup_cap, random_state=self.cfg.data_seed)
 
-                    self.reindex(df_unsup)
+                self.reindex(df_unsup)
             else:
                 df_dev = pd.read_csv("./imdb/sup_dev.csv", header=None, names=['sentence', 'label'])
 
@@ -181,18 +197,18 @@ class DataSet():
 
         if 'input_ids' in df_dev:
             input_ids_dev, attention_masks_dev, seg_ids_dev, label_ids_dev, num_tokens_dev = self.retrieve_tensors(df_dev, 'sup')
-            if self.cfg.mixmatch or self.cfg.uda:
-                ori_input_ids, ori_input_mask, ori_seg_ids, aug_input_ids, aug_input_mask, aug_seg_ids = self.retrieve_tensors(df_unsup, 'unsup')
+            if self.cfg.uda_mode:
+                ori_input_ids, ori_input_mask, ori_seg_ids, aug_input_ids, aug_input_mask, aug_seg_ids, ori_num_tokens, aug_num_tokens = self.retrieve_tensors(df_unsup, 'unsup')
                 print('Number of unsup sentences: {:,}\n'.format(ori_input_ids.shape[0]))
         else:
             input_ids_dev, attention_masks_dev, seg_ids_dev, label_ids_dev, num_tokens_dev = self.preprocess(df_dev)
 
         # Combine the training inputs into a TensorDataset.
-        train_dataset = TensorDataset(input_ids_train, attention_masks_train, seg_ids_train, label_ids_train, num_tokens_train)
-        val_dataset = TensorDataset(input_ids_dev, attention_masks_dev, seg_ids_dev, label_ids_dev, num_tokens_dev)
+        train_dataset = TensorDataset(input_ids_train, seg_ids_train, attention_masks_train, label_ids_train, num_tokens_train)
+        val_dataset = TensorDataset(input_ids_dev, seg_ids_dev, attention_masks_dev, label_ids_dev)
 
         unsup_dataset = None
-        if self.cfg.mixmatch or self.cfg.uda:
-            unsup_dataset = TensorDataset(ori_input_ids, ori_input_mask, ori_seg_ids, aug_input_ids, aug_input_mask, aug_seg_ids)
+        if self.cfg.uda_mode:
+            unsup_dataset = TensorDataset(ori_input_ids, ori_seg_ids, ori_input_mask, aug_input_ids, aug_seg_ids, aug_input_mask, ori_num_tokens, aug_num_tokens)
 
         return train_dataset, val_dataset, unsup_dataset
