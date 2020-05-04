@@ -26,6 +26,7 @@ parser.add_argument('--do_lower_case', default=True, type=bool)
 
 parser.add_argument('--train_batch_size', default=16, type=int)
 parser.add_argument('--val_batch_size', default=16, type=int)
+parser.add_argument('--results_dir', default='results')
 
 # mixup
 parser.add_argument('--mixup', choices=['cls', 'word'])

@@ -9,6 +9,8 @@ import torch
 import torch.nn as nn
 
 from utils import *
+from tensorboardX import SummaryWriter
+import shutil
 
 import pdb
 
@@ -370,6 +372,14 @@ class Trainer():
     def iterate(self, epochs):
         cfg = self.cfg
 
+        if cfg.results_dir:
+            dir = os.path.join('results', cfg.results_dir)
+            if os.path.exists(dir) and os.path.isdir(dir):
+                shutil.rmtree(dir)
+
+            writer = SummaryWriter(log_dir=dir)
+
+
         # Set the seed value all over the place to make this reproducible.        
         self.seed_torch(cfg.seed)
 
@@ -407,7 +417,7 @@ class Trainer():
             else:
                 avg_train_loss, training_time = self.train()
     
-        
+            writer.add_scalars('data/losses', {'train_loss': avg_train_loss}, epoch_i+1)
             # ========================================
             #               Validation
             # ========================================
@@ -420,6 +430,8 @@ class Trainer():
         
             avg_prec1, avg_prec5, avg_val_loss, validation_time = self.validate()
 
+            writer.add_scalars('data/losses', {'eval_loss': avg_val_loss}, epoch_i+1)
+            writer.add_scalars('data/accuracies', {'eval_acc': avg_prec1}, epoch_i+1)
     
             # update best val accuracy
             if avg_prec1 > best_val_acc:
@@ -450,3 +462,5 @@ class Trainer():
         print("Best Training Loss: {}".format(best_train_loss))
         print("Best Val Loss: {}".format(best_val_loss))
         print("Best Validation Accuracy: {0:.4f}".format(best_val_acc))
+
+        writer.close()
