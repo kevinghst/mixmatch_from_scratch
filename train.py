@@ -74,111 +74,172 @@ class Trainer():
 
         return Lx, Lu, self.cfg.lambda_u * self.linear_rampup(current_epoch)
 
-    def train_mixmatch(self, epoch):
-        t0 = time.time()
-
+    def get_loss_ict(self, sup_batch, unsup_batch):
         model = self.model
-        optimizer = self.optimizer
-        device = self.device
-        scheduler = self.scheduler
-        train_loader = self.train_loader
-        unsup_loader = self.unsup_loader
         cfg = self.cfg
+        device = self.device
 
-        labeled_train_iter = iter(train_loader)
+        # batch
+        input_ids, segment_ids, input_mask, og_label_ids, num_tokens = sup_batch
+        ori_input_ids, ori_segment_ids, ori_input_mask, \
+        aug_input_ids, aug_segment_ids, aug_input_mask, \
+        ori_num_tokens, aug_num_tokens = unsup_batch
 
-        total_train_loss = 0
-        total_sup_loss = 0
-        total_unsup_loss = 0
+        # convert label ids to hot vectors
+        sup_size = input_ids.size(0)
+        label_ids = torch.zeros(sup_size, 2).scatter_(1, og_label_ids.cpu().view(-1,1), 1)
+        label_ids = label_ids.cuda(non_blocking=True)
 
-        model.train()
+        # sup mixup
+        sup_l = np.random.beta(cfg.alpha, cfg.alpha)
+        sup_l = max(sup_l, 1-sup_l)
+        sup_idx = torch.randperm(sup_size)
 
-        for step, unsup_batch in enumerate(unsup_loader):
-            # Progress update every 40 batches.
-            if step % 100 == 0 and not step == 0:
-                # Calculate elapsed time in minutes.
-                elapsed = format_time(time.time() - t0)
+        if cfg.sup_mixup == 'word':
+            input_ids, c_input_ids = pad_for_word_mixup(
+                input_ids, input_mask, num_tokens, sup_idx    
+            )
+        else:
+            c_input_ids = None
+
+        # sup loss
+        logits = model(
+            input_ids=input_ids, 
+            c_input_ids=c_input_ids,
+            attention_mask=input_mask,
+            mixup=cfg.sup_mixup,
+            shuffle_idx=sup_idx,
+            l=sup_l
+        )
+
+        if cfg.sup_mixup:
+            label_ids = mixup_op(label_ids, sup_l, sup_idx)
+
+        sup_loss = -torch.sum(F.log_softmax(logits, dim=1) * label_ids, dim=1)
+
+        if cfg.no_unsup_loss:
+            return sup_loss, sup_loss, sup_loss, sup_loss
+        
+        # unsup loss
+        unsup_size = ori_input_ids.size(0)
+
+        with torch.no_grad():
+            ori_logits = model(
+                input_ids=ori_input_ids,
+                attention_mask=ori_input_mask
+            )
+            ori_prob = F.softmax(ori_logits, dim=-1)    # target
+
+        # mixup
+        l = np.random.beta(cfg.alpha, cfg.alpha)
+        l = max(l, 1-l)
+        idx = torch.randperm(unsup_size)
+
+        if cfg.unsup_mixup == 'word':
+            ori_input_ids, c_ori_input_ids = pad_for_word_mixup(
+                ori_input_ids, ori_input_mask, ori_num_tokens, idx
+            )
+        else:
+            c_ori_input_ids = None
+
+        logits = model(
+            input_ids=ori_input_ids, 
+            c_input_ids=c_ori_input_ids,
+            attention_mask=ori_input_mask,
+            mixup=cfg.mixup,
+            shuffle_idx=idx,
+            l=l
+        )
+        
+        if cfg.unsup_mixup:
+            ori_prob = mixup_op(ori_prob, l, idx)
+
+        probs_u = torch.softmax(logits, dim=1)
+        unsup_loss = torch.mean((probs_u - ori_prob)**2)
+
+        w = cfg.uda_coeff * sigmoid_rampup(global_step, cfg.consistency_rampup_ends - cfg.consistency_rampup_starts)
+        final_loss = sup_loss + w*unsup_loss
+        return final_loss, sup_loss, unsup_loss, w*unsup_loss
+
+
+    def get_loss(self, batch):
+            model = self.model
+            cfg = self.cfg
+            device = self.device
+
+            input_ids, input_mask, segment_ids, labels, num_tokens = batch
             
-                # Report progress.
-                print('  Batch {:>5,}  of  {:>5,}.    Elapsed: {:}.'.format(step, len(unsup_loader), elapsed))
+            batch_size = input_ids.size(0)
 
+            model.zero_grad()        
 
-            try:
-                sup_batch = labeled_train_iter.next()
-            except:
-                labeled_train_iter = iter(train_loader)
-                sup_batch = labeled_train_iter.next()
+            # convert label_ids to hot vector
+            label_ids = torch.zeros(batch_size, self.num_labels).scatter_(1, labels.view(-1,1), 1).cuda()
 
-            sup_ids, sup_mask, sup_seg, sup_labels, sup_num_tokens = sup_batch
-            ori_ids, ori_mask, ori_seg, aug_ids, aug_mask, aug_seg = [t.to(device) for t in unsup_batch]
+            sup_l = np.random.beta(cfg.alpha, cfg.alpha)
+            sup_l = max(sup_l, 1-sup_l)
+            sup_idx = torch.randperm(batch_size)
 
-            batch_size = sup_ids.size(0)
+            c_input_ids = input_ids.clone()
 
-            model.zero_grad()
+            if cfg.mixup == 'word':
+                for i in range(0, batch_size):
+                    j = sup_idx[i]
+                    i_count = int(num_tokens[i])
+                    j_count = int(num_tokens[j])
+
+                    if i_count < j_count:
+                        small = i
+                        big = j
+                        small_count = i_count
+                        big_count = j_count
+                        small_ids = input_ids
+                        big_ids = c_input_ids
+                    elif i_count > j_count:
+                        small = j
+                        big = i
+                        small_count = j_count
+                        big_count = i_count
+                        small_ids = c_input_ids
+                        big_ids = input_ids
+
+                    if i_count != j_count:
+                        first = small_ids[small][0:small_count-1]
+                        second = torch.tensor([1] * (big_count - small_count))
+                        third = big_ids[big][big_count-1:128]
+                        combined = torch.cat((first, second, third), 0)
+                        small_ids[small] = combined
+                        if i_count < j_count:
+                            input_mask[i] = input_mask[j]
             
-            #convert label_ids to hot vector
-            sup_labels = torch.zeros(batch_size, self.num_labels).scatter_(1, sup_labels.view(-1,1), 1)
+            #for i in range(0, batch_size):
+            #    new_mask = input_mask[i]
+            #    new_ids = input_ids[i]
+            #    old_ids = c_input_ids[i]
+            #    pdb.set_trace()
 
-            sup_ids,sup_mask,sup_seg,sup_labels = sup_ids.cuda(),sup_mask.cuda(),sup_seg.cuda(),sup_labels.cuda(non_blocking=True)
+            input_ids = input_ids.to(device)
+            input_mask = input_mask.to(device)
+            segment_ids = segment_ids.to(device)
+            num_tokens = num_tokens.to(device)
 
-            # compute guessed labels of unlabeled samples:
-            with torch.no_grad():
-                outputs_u = model(input_ids=ori_ids, attention_mask=ori_mask)
-                outputs_u2 = model(input_ids=aug_ids, attention_mask=aug_mask)
-                p = (torch.softmax(outputs_u, dim=1) + torch.softmax(outputs_u2, dim=1)) / 2
-                pt = p**(1/cfg.T)
-                targets_u = pt / pt.sum(dim=1, keepdim=True)
-                targets_u = targets_u.detach()
-
-            unsup_labels = torch.cat([targets_u, targets_u], dim=0)
-
-            all_ids = torch.cat([sup_ids, ori_ids, aug_ids], dim=0)
-            all_mask = torch.cat([sup_mask, ori_mask, aug_mask], dim=0)
-
-            all_logits = model(input_ids=all_ids, attention_mask=all_mask)
-
-            Lx, Lu, w = self.semi_loss(
-                all_logits[:batch_size],
-                sup_labels,
-                all_logits[batch_size:],
-                unsup_labels,
-                epoch + float(step/len(unsup_loader))
+            sup_logits = model(
+                input_ids=input_ids,
+                c_input_ids=c_input_ids,
+                attention_mask=input_mask,
+                mixup=cfg.mixup,
+                shuffle_idx=sup_idx,
+                l=sup_l
             )
 
-            loss = Lx + w * Lu
+            if cfg.mixup:
+                sup_label_a, sup_label_b = label_ids, label_ids[sup_idx]
+                label_ids = sup_l * sup_label_a + (1 - sup_l) * sup_label_b
 
-            total_train_loss += loss.item()
-            total_sup_loss += Lx.item()
-            total_unsup_loss += Lu.item()
+            loss = -torch.sum(F.log_softmax(sup_logits, dim=1) * label_ids, dim=1)
+            loss = torch.mean(loss)
 
-            # Perform a backward pass to calculate the gradients.
-            loss.backward()
-
-            # Clip the norm of the gradients to 1.0.
-            # This is to help prevent the "exploding gradients" problem.
-            torch.nn.utils.clip_grad_norm_(model.parameters(), 1.0)
-
-            optimizer.step()
-
-            # Update the learning rate.
-            scheduler.step()
-
-        # Calculate the average loss over all of the batches.
-        avg_train_loss = total_train_loss / len(unsup_loader)
-        avg_sup_loss = total_sup_loss / len(unsup_loader)
-        avg_unsup_loss = total_unsup_loss / len(unsup_loader)
-        
-        # Measure how long this epoch took.
-        training_time = format_time(time.time() - t0)
-
-        print("")
-        print("  Average training loss: {0:.2f}".format(avg_train_loss))
-        print("  Average sup loss: {0:.2f}".format(avg_sup_loss))
-        print("  Average unsup loss: {0:.2f}".format(avg_unsup_loss))
-        print("  Training epcoh took: {:}".format(training_time))
-
-        return avg_train_loss, training_time
-
+            return loss
 
     def train(self):
         # Measure how long the training epoch takes.
@@ -186,10 +247,8 @@ class Trainer():
 
         model = self.model
         optimizer = self.optimizer
-        device = self.device
         scheduler = self.scheduler
         train_loader = self.train_loader
-        cfg = self.cfg
 
         total_train_loss = 0
         model.train()
@@ -205,77 +264,8 @@ class Trainer():
                 # Report progress.
                 print('  Batch {:>5,}  of  {:>5,}.    Elapsed: {:}.'.format(step, len(train_loader), elapsed))
 
-            b_input_ids, b_input_mask, b_segment_ids, b_labels, b_num_tokens = batch
-            
-            batch_size = b_input_ids.size(0)
-
-            model.zero_grad()        
-
-            # convert label_ids to hot vector
-            label_ids = torch.zeros(batch_size, self.num_labels).scatter_(1, b_labels.view(-1,1), 1).cuda()
-
-            sup_l = np.random.beta(cfg.alpha, cfg.alpha)
-            sup_l = max(sup_l, 1-sup_l)
-            sup_idx = torch.randperm(batch_size)
-
-            c_input_ids = b_input_ids.clone()
-
-            if cfg.mixup == 'word':
-                for i in range(0, batch_size):
-                    j = sup_idx[i]
-                    i_count = int(b_num_tokens[i])
-                    j_count = int(b_num_tokens[j])
-
-                    if i_count < j_count:
-                        small = i
-                        big = j
-                        small_count = i_count
-                        big_count = j_count
-                        small_ids = b_input_ids
-                        big_ids = c_input_ids
-                    elif i_count > j_count:
-                        small = j
-                        big = i
-                        small_count = j_count
-                        big_count = i_count
-                        small_ids = c_input_ids
-                        big_ids = b_input_ids
-
-                    if i_count != j_count:
-                        first = small_ids[small][0:small_count-1]
-                        second = torch.tensor([1] * (big_count - small_count))
-                        third = big_ids[big][big_count-1:128]
-                        combined = torch.cat((first, second, third), 0)
-                        small_ids[small] = combined
-                        if i_count < j_count:
-                            b_input_mask[i] = b_input_mask[j]
-            
-            #for i in range(0, batch_size):
-            #    new_mask = b_input_mask[i]
-            #    new_ids = b_input_ids[i]
-            #    old_ids = c_input_ids[i]
-            #    pdb.set_trace()
-
-            b_input_ids = b_input_ids.to(device)
-            b_input_mask = b_input_mask.to(device)
-            b_segment_ids = b_segment_ids.to(device)
-            b_num_tokens = b_num_tokens.to(device)
-
-            sup_logits = model(
-                input_ids=b_input_ids,
-                c_input_ids=c_input_ids,
-                attention_mask=b_input_mask,
-                mixup=cfg.mixup,
-                shuffle_idx=sup_idx,
-                l=sup_l
-            )
-
-            if cfg.mixup:
-                sup_label_a, sup_label_b = label_ids, label_ids[sup_idx]
-                label_ids = sup_l * sup_label_a + (1 - sup_l) * sup_label_b
-
-            loss = -torch.sum(F.log_softmax(sup_logits, dim=1) * label_ids, dim=1)
-            loss = torch.mean(loss)
+            # loss function
+            loss = self.get_loss(batch)
 
             total_train_loss += loss.item()
 
