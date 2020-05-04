@@ -29,7 +29,8 @@ parser.add_argument('--val_batch_size', default=16, type=int)
 parser.add_argument('--results_dir', default='results')
 
 # mixup
-parser.add_argument('--mixup', choices=['cls', 'word'])
+parser.add_argument('--sup_mixup', choices=['cls', 'word'])
+parser.add_argument('--unsup_mixup', choices=['cls', 'word'])
 parser.add_argument('--alpha', default=1, type=float)
 
 #mixmatch

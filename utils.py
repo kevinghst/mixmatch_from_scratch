@@ -1,6 +1,46 @@
 import numpy as np
 import datetime
 
+def mixup_op(input, l, idx):
+    input_a, input_b = input, input[idx]
+    mixed_input = l * input_a + (1 - l) * input_b
+    return mixed_input
+
+def pad_for_word_mixup(input_ids, input_mask, num_tokens, idx):
+    c_input_ids = input_ids.clone()
+
+    for i in range(0, batch_size):
+        j = idx[i]
+        i_count = int(num_tokens[i])
+        j_count = int(num_tokens[j])
+
+        if i_count < j_count:
+            small = i
+            big = j
+            small_count = i_count
+            big_count = j_count
+            small_ids = input_ids
+            big_ids = c_input_ids
+        elif i_count > j_count:
+            small = j
+            big = i
+            small_count = j_count
+            big_count = i_count
+            small_ids = c_input_ids
+            big_ids = input_ids
+
+        if i_count != j_count:
+            first = small_ids[small][0:small_count-1]
+            second = torch.tensor([1] * (big_count - small_count))
+            third = big_ids[big][big_count-1:128]
+            combined = torch.cat((first, second, third), 0)
+            small_ids[small] = combined
+            if i_count < j_count:
+                input_mask[i] = input_mask[j]
+
+    return input_ids, c_input_ids
+
+
 # Function to calculate the accuracy of our predictions vs labels
 def bin_accuracy(preds, labels):
     pred_flat = np.argmax(preds, axis=1).flatten()

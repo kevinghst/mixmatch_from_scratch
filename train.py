@@ -146,7 +146,7 @@ class Trainer():
             input_ids=ori_input_ids, 
             c_input_ids=c_ori_input_ids,
             attention_mask=ori_input_mask,
-            mixup=cfg.mixup,
+            mixup=cfg.unsup_mixup,
             shuffle_idx=idx,
             l=l
         )
@@ -180,37 +180,10 @@ class Trainer():
             sup_l = max(sup_l, 1-sup_l)
             sup_idx = torch.randperm(batch_size)
 
-            c_input_ids = input_ids.clone()
-
-            if cfg.mixup == 'word':
-                for i in range(0, batch_size):
-                    j = sup_idx[i]
-                    i_count = int(num_tokens[i])
-                    j_count = int(num_tokens[j])
-
-                    if i_count < j_count:
-                        small = i
-                        big = j
-                        small_count = i_count
-                        big_count = j_count
-                        small_ids = input_ids
-                        big_ids = c_input_ids
-                    elif i_count > j_count:
-                        small = j
-                        big = i
-                        small_count = j_count
-                        big_count = i_count
-                        small_ids = c_input_ids
-                        big_ids = input_ids
-
-                    if i_count != j_count:
-                        first = small_ids[small][0:small_count-1]
-                        second = torch.tensor([1] * (big_count - small_count))
-                        third = big_ids[big][big_count-1:128]
-                        combined = torch.cat((first, second, third), 0)
-                        small_ids[small] = combined
-                        if i_count < j_count:
-                            input_mask[i] = input_mask[j]
+            if cfg.sup_mixup == 'word':
+                input_ids, c_input_ids = pad_for_word_mixup(
+                    input_ids, input_mask, num_tokens, sup_idx    
+                )
             
             #for i in range(0, batch_size):
             #    new_mask = input_mask[i]
@@ -227,14 +200,13 @@ class Trainer():
                 input_ids=input_ids,
                 c_input_ids=c_input_ids,
                 attention_mask=input_mask,
-                mixup=cfg.mixup,
+                mixup=cfg.sup_mixup,
                 shuffle_idx=sup_idx,
                 l=sup_l
             )
 
-            if cfg.mixup:
-                sup_label_a, sup_label_b = label_ids, label_ids[sup_idx]
-                label_ids = sup_l * sup_label_a + (1 - sup_l) * sup_label_b
+            if cfg.sup_mixup:
+                label_ids = mixup_op(label_ids, sup_l, sup_idx)
 
             loss = -torch.sum(F.log_softmax(sup_logits, dim=1) * label_ids, dim=1)
             loss = torch.mean(loss)
