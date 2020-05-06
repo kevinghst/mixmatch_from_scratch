@@ -7,7 +7,7 @@
 
 source activate mixmatch
 
-cd /scratch/wz1232/mixmatch_from_scratch
+cd /scratch/iav225/nlu/mixmatch_from_scratch
 $1
 $2
 $3
