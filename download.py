@@ -19,7 +19,7 @@ def download_file_from_google_drive(id, destination):
         params = { 'id' : id, 'confirm' : token }
         response = session.get(URL, params = params, stream = True)
 
-    save_response_content(response, destination)    
+    save_response_content(response, destination)
 
 def get_confirm_token(response):
     for key, value in response.cookies.items():
@@ -69,3 +69,27 @@ if not path.exists("./dbpedia"):
 if not path.exists('./imdb'):
     with zipfile.ZipFile("imdb.zip") as zip_ref:
         zip_ref.extractall(data_dir)
+
+
+# Download CoLA
+task = "CoLA"
+task_path = "https://firebasestorage.googleapis.com/v0/b/mtl-sentence-representations.appspot.com/o/data%2FCoLA.zip?alt=media&token=46d5e637-3411-4188-bc44-5809b5bfb5f4"
+data_dir = './'
+if not path.exists('./CoLA'):
+    data_file = "%s.zip" % task
+    urllib.request.urlretrieve(task_path, data_file)
+    with zipfile.ZipFile(data_file) as zip_ref:
+        zip_ref.extractall(data_dir)
+    os.remove(data_file)
+
+
+# Download AG News
+data_file = 'ag_news_csv.tgz'
+destination = './agnews/' + data_file
+
+if not path.exists("./agnews"):
+    urllib.request.urlretrieve("https://s3.amazonaws.com/fast-ai-nlp/ag_news_csv.tgz", data_file)
+    with tarfile.open(data_file) as tar_ref:
+        tar_ref.extractall('.')
+    os.remove(data_file)
+    os.rename('ag_news_csv', 'agnews')

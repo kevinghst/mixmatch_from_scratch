@@ -9,13 +9,17 @@ import pdb
 MAX_LENGTHS = {
     "SST": 128,
     "dbpedia": 256,
-    "imdb": 128
+    "imdb": 128,
+    "CoLA": 128,
+    "agnews": 256
 }
 
 NUM_LABELS = {
     "SST": 2,
     "dbpedia": 10,
-    "imdb": 2
+    "imdb": 2,
+    "CoLA": 2,
+    "agnews": 4
 }
 
 
@@ -28,7 +32,7 @@ class DataSet():
         sentences = df.sentence.values
         labels = df.label.values
 
-        # Tokenize all of the sentences and map the tokens to thier word IDs. 
+        # Tokenize all of the sentences and map the tokens to thier word IDs.
         input_ids = []
         attention_masks = []
         segment_ids = []
@@ -42,7 +46,7 @@ class DataSet():
             #   (4) Map tokens to their IDs.
             #   (5) Pad or truncate the sentence to `max_length`
             #   (6) Create attention masks for [PAD] tokens.
-           
+
             max_len = MAX_LENGTHS[self.cfg.task]
 
             tokens = self.tokenizer.tokenize(sent)
@@ -53,7 +57,7 @@ class DataSet():
 
             #max_sent_length = 66
             #paddings = max_sent_length - 2 - len(tokens)
-            
+
             #for i in range(0, paddings):
             #    unused_token = '[unused0]'
             #    tokens.append(unused_token)
@@ -85,7 +89,7 @@ class DataSet():
     def sample_dataset(self, df, total):
         if total <= 0:
             return df
-        
+
         num_classes = NUM_LABELS[self.cfg.task]
         per_class = int(total / num_classes)
 
@@ -158,12 +162,14 @@ class DataSet():
         if self.cfg.task == "SST":
             df_train = pd.read_csv("./SST-2/train.tsv", delimiter='\t', header=None, names=['sentence', 'label']).iloc[1:]
             df_dev = pd.read_csv("./SST-2/dev.tsv", delimiter='\t', header=None, names=['sentence', 'label']).iloc[1:]
-             
+
             df_train['label'] = df_train['label'].astype(int)
             df_dev['label'] = df_dev['label'].astype(int)
+
         elif self.cfg.task == "dbpedia":
             df_train = pd.read_csv("./dbpedia/train.csv", header=None, names=['label', 'title', 'sentence']).iloc[1:]
             df_dev = pd.read_csv("./dbpedia/test.csv", header=None, names=['label', 'title', 'sentence']).iloc[1:]
+
         elif self.cfg.task == "imdb":
             df_train = pd.read_csv("./imdb/sup_train.csv", header=None, names=['sentence', 'label']).iloc[1:]
             #if self.cfg.use_prepro:
@@ -185,6 +191,17 @@ class DataSet():
             else:
                 df_dev = pd.read_csv("./imdb/sup_dev.csv", header=None, names=['sentence', 'label'])
 
+        elif self.cfg.task == 'CoLA':
+            df_train = pd.read_csv("./CoLA/train.tsv", delimiter='\t', header=None, names=['title', 'label', 'star', 'sentence']).iloc[1:]
+            df_dev = pd.read_csv("./CoLA/dev.tsv", delimiter='\t', header=None, names=['title', 'label', 'star', 'sentence']).iloc[1:]
+
+            df_train['label'] = df_train['label'].astype(int)
+            df_dev['label'] = df_dev['label'].astype(int)
+
+
+        elif self.cfg.task == 'agnews':
+            df_train = pd.read_csv("./agnews/train.csv", header=None, names=['label', 'title', 'sentence']).iloc[1:]
+            df_dev = pd.read_csv("./agnews/test.csv", header=None, names=['label', 'title', 'sentence']).iloc[1:]
 
 
         df_train = self.sample_dataset(df_train, self.cfg.train_cap)
