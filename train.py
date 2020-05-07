@@ -184,6 +184,8 @@ class Trainer():
                 input_ids, c_input_ids = pad_for_word_mixup(
                     input_ids, input_mask, num_tokens, sup_idx    
                 )
+            else:
+                c_input_ids=None
             
             #for i in range(0, batch_size):
             #    new_mask = input_mask[i]
