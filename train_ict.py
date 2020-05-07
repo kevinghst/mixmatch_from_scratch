@@ -230,6 +230,7 @@ class ICT_Trainer():
                     continue
 
             optimizer.zero_grad()
+            pdb.set_trace()
             final_loss, sup_loss, unsup_loss, weighted_unsup_loss = self.get_loss_ict(sup_batch, unsup_batch, global_step)
 
             meters.update('train_loss', final_loss.item())

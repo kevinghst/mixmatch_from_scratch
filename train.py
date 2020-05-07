@@ -144,6 +144,7 @@ class Trainer():
             if cfg.ict:
                 exit = "exit"
             else:
+                pdb.set_trace()
                 loss = self.get_loss(batch)
 
             total_train_loss += loss.item()

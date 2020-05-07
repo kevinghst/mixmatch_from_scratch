@@ -19,6 +19,7 @@ def mixup_op(input, l, idx):
     return mixed_input
 
 def pad_for_word_mixup(input_ids, input_mask, num_tokens, idx):
+    batch_size = input_ids.size(0)
     c_input_ids = input_ids.clone()
 
     for i in range(0, batch_size):
