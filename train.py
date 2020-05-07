@@ -165,7 +165,7 @@ class Trainer():
             model.zero_grad()        
 
             # convert label_ids to hot vector
-            label_ids = torch.zeros(batch_size, self.num_labels).scatter_(1, labels.view(-1,1), 1).cuda()
+            label_ids = torch.zeros(batch_size, self.num_labels).scatter_(1, labels.cpu().view(-1,1), 1).cuda()
 
             sup_l = np.random.beta(cfg.alpha, cfg.alpha)
             sup_l = max(sup_l, 1-sup_l)
@@ -183,11 +183,6 @@ class Trainer():
             #    new_ids = input_ids[i]
             #    old_ids = c_input_ids[i]
             #    pdb.set_trace()
-
-            input_ids = input_ids.to(device)
-            input_mask = input_mask.to(device)
-            segment_ids = segment_ids.to(device)
-            num_tokens = num_tokens.to(device)
 
             sup_logits = model(
                 input_ids=input_ids,
@@ -220,6 +215,7 @@ class Trainer():
 
         # For each batch of training data...
         for step, batch in enumerate(train_loader):
+            batch = [t.to(device) for t in batch]
 
             # Progress update every 40 batches.
             if step % 40 == 0 and not step == 0:
