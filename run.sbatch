@@ -11,3 +11,6 @@ cd /scratch/wz1232/mixmatch_from_scratch
 $1
 $2
 $3
+$4
+$5
+$6
