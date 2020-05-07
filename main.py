@@ -15,6 +15,8 @@ from models import BertForSequenceClassificationCustom
 from dataset import DataSet
 from train import Trainer
 
+from utils import set_seeds
+
 from torch.utils.data import DataLoader, RandomSampler, SequentialSampler
 
 parser = argparse.ArgumentParser(description='SSL for NLP')
@@ -96,6 +98,7 @@ model_cfg = {
 
 model_cfg = AttributeDict(model_cfg)
 
+set_seeds(cfg.seed)
 
 # If there's a GPU available...
 if torch.cuda.is_available():

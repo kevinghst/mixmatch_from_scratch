@@ -33,15 +33,6 @@ class Trainer():
         self.cfg = cfg
         self.num_labels = num_labels
 
-    def seed_torch(self, seed):
-        random.seed(seed)
-        np.random.seed(seed)
-        torch.manual_seed(seed)
-        torch.cuda.manual_seed(seed)
-        torch.cuda.manual_seed_all(seed) # if you are using multi-GPU.
-        torch.backends.cudnn.benchmark = False
-        torch.backends.cudnn.deterministic = True
-
     # TSA
     def get_tsa_thresh(schedule, current, rampup_length, start, end):
         training_progress = torch.tensor(float(current) / float(rampup_length))

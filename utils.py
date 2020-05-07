@@ -1,5 +1,17 @@
 import numpy as np
 import datetime
+import torch
+import random
+
+def set_seeds(seed):
+    random.seed(seed)
+    np.random.seed(seed)
+    torch.manual_seed(seed)
+    torch.cuda.manual_seed(seed)
+    torch.cuda.manual_seed_all(seed) # if you are using multi-GPU.
+    torch.backends.cudnn.benchmark = False
+    torch.backends.cudnn.deterministic = True
+
 
 def mixup_op(input, l, idx):
     input_a, input_b = input, input[idx]
