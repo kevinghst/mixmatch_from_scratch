@@ -207,6 +207,9 @@ class ICT_Trainer():
         max_acc = [0., 0, 0., 0.]   # acc, step, val_loss, train_loss
         no_improvement = 0
 
+        sup_batch_size = None
+        unsup_batch_size = None
+
         iter_bar = tqdm(unsup_iter, total=cfg.total_steps, disable=cfg.hide_tqdm) if cfg.ict \
               else tqdm(sup_iter, total=cfg.total_steps, disable=cfg.hide_tqdm)
 
