@@ -227,7 +227,7 @@ class ICT_Trainer():
                 unsup_batch = None
 
             optimizer.zero_grad()
-            final_loss, sup_loss, unsup_loss, weighted_unsup_loss = self.get_loss_ict(model, sup_batch, unsup_batch, global_step)
+            final_loss, sup_loss, unsup_loss, weighted_unsup_loss = self.get_loss_ict(sup_batch, unsup_batch, global_step)
 
             if cfg.no_sup_loss:
                 final_loss = unsup_loss
