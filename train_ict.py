@@ -185,6 +185,7 @@ class ICT_Trainer():
         cfg = self.cfg
         model = self.model
         device = self.device
+        optimizer = self.optimizer
 
         sup_iter = self.repeat_dataloader(self.train_loader)
         unsup_iter = self.repeat_dataloader(self.unsup_loader)
@@ -206,50 +207,50 @@ class ICT_Trainer():
         max_acc = [0., 0, 0., 0.]   # acc, step, val_loss, train_loss
         no_improvement = 0
 
-        iter_bar = tqdm(self.unsup_iter, total=self.cfg.total_steps, disable=self.cfg.hide_tqdm) if cfg.ict \
-              else tqdm(self.sup_iter, total=self.cfg.total_steps, disable=self.cfg.hide_tqdm)
+        iter_bar = tqdm(unsup_iter, total=cfg.total_steps, disable=cfg.hide_tqdm) if cfg.ict \
+              else tqdm(sup_iter, total=cfg.total_steps, disable=cfg.hide_tqdm)
 
         for i, batch in enumerate(iter_bar):
             if cfg.ict:
-                sup_batch = [t.to(self.device) for t in next(self.sup_iter)]
-                unsup_batch = [t.to(self.device) for t in batch]
+                sup_batch = [t.to(device) for t in next(sup_iter)]
+                unsup_batch = [t.to(device) for t in batch]
 
                 unsup_batch_size = unsup_batch_size or unsup_batch[0].shape[0]
 
                 if unsup_batch[0].shape[0] != unsup_batch_size:
                     continue
             else:
-                sup_batch = [t.to(self.device) for t in batch]
+                sup_batch = [t.to(device) for t in batch]
                 unsup_batch = None
 
-            self.optimizer.zero_grad()
+            optimizer.zero_grad()
             final_loss, sup_loss, unsup_loss, weighted_unsup_loss = get_loss_ict(model, sup_batch, unsup_batch, global_step)
 
-            if self.cfg.no_sup_loss:
+            if cfg.no_sup_loss:
                 final_loss = unsup_loss
-            elif self.cfg.no_unsup_loss:
+            elif cfg.no_unsup_loss:
                 final_loss = sup_loss
 
             meters.update('train_loss', final_loss.item())
             meters.update('sup_loss', sup_loss.item())
             meters.update('unsup_loss', unsup_loss.item())
             meters.update('w_unsup_loss', weighted_unsup_loss.item())
-            meters.update('lr', self.optimizer.get_lr()[0])
+            meters.update('lr', optimizer.get_lr()[0])
 
             final_loss.backward()
-            self.optimizer.step()
+            optimizer.step()
 
             # print loss
             global_step += 1
 
-            if global_step % cfg.check_steps == 0 and global_step > self.cfg.check_after:
+            if global_step % cfg.check_steps == 0 and global_step > cfg.check_after:
                 total_accuracy, avg_val_loss = self.validate()
 
                 #logging
                 writer.add_scalars('data/eval_acc', {'eval_acc' : total_accuracy}, global_step)
                 writer.add_scalars('data/eval_loss', {'eval_loss': avg_val_loss}, global_step)
 
-                if self.cfg.no_unsup_loss:
+                if cfg.no_unsup_loss:
                     writer.add_scalars('data/train_loss', {'train_loss': meters['train_loss'].avg}, global_step)
                     writer.add_scalars('data/lr', {'lr': meters['lr'].avg}, global_step)
                 else:
@@ -262,7 +263,6 @@ class ICT_Trainer():
                 meters.reset()
 
                 if max_acc[0] < total_accuracy:
-                    self.save(global_step)
                     max_acc = total_accuracy, global_step, avg_val_loss, final_loss.item()
                     no_improvement = 0
                 else:
@@ -274,14 +274,14 @@ class ICT_Trainer():
                 if ssl_mode:
                     print("  Sup Loss: {0:.4f}".format(sup_loss.item()))
                     print("  Unsup Loss: {0:.4f}".format(unsup_loss.item()))
-                print("  Learning rate: {0:.7f}".format(self.optimizer.get_lr()[0]))
+                print("  Learning rate: {0:.7f}".format(optimizer.get_lr()[0]))
 
                 print(
                     'Max Accuracy : %5.3f Best Val Loss : %5.3f Best Train Loss : %5.4f Max global_steps : %d Cur global_steps : %d' 
                     %(max_acc[0], max_acc[2], max_acc[3], max_acc[1], global_step), end='\n\n'
                 )
 
-                if no_improvement == self.cfg.early_stopping:
+                if no_improvement == cfg.early_stopping:
                     print("Early stopped")
                     break
 
