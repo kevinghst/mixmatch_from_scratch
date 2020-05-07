@@ -128,15 +128,14 @@ else:
     print('No GPU available, using the CPU instead.')
     device = torch.device("cpu")
 
-dataset = DataSet(cfg)
-
 if (cfg.mixmatch or cfg.uda or cfg.ict) and not cfg.no_unsup_loss:
     ssl = True
 else:
     ssl = False
 
+dataset = DataSet(cfg, ssl)
 
-train_dataset, val_dataset, unsup_dataset = dataset.get_dataset(ssl)
+train_dataset, val_dataset, unsup_dataset = dataset.get_dataset()
 
 # Create the DataLoaders for our training and validation sets.
 # We'll take training samples in random order.
