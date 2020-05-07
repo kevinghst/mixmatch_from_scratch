@@ -13,7 +13,7 @@ from transformers import get_linear_schedule_with_warmup
 from models_new import Classifier
 from models import BertForSequenceClassificationCustom
 from dataset import DataSet
-#from train import Trainer
+from train import Trainer
 
 from torch.utils.data import DataLoader, RandomSampler, SequentialSampler
 
