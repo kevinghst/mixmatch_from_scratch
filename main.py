@@ -35,6 +35,9 @@ parser.add_argument('--sup_mixup', choices=['cls', 'word'])
 parser.add_argument('--unsup_mixup', choices=['cls', 'word'])
 parser.add_argument('--alpha', default=1, type=float)
 
+# SSL
+parser.add_argument('--no_unsup_loss', action='store_true')
+
 #mixmatch
 parser.add_argument('--mixmatch', action='store_true')
 parser.add_argument('--lambda_u', default=100, type=float)

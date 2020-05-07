@@ -107,6 +107,7 @@ class Trainer():
             label_ids = mixup_op(label_ids, sup_l, sup_idx)
 
         sup_loss = -torch.sum(F.log_softmax(logits, dim=1) * label_ids, dim=1)
+        sup_loss = torch.mean(loss)
 
         if cfg.no_unsup_loss:
             return sup_loss, sup_loss, sup_loss, sup_loss
@@ -162,8 +163,6 @@ class Trainer():
             
             batch_size = input_ids.size(0)
 
-            model.zero_grad()        
-
             # convert label_ids to hot vector
             label_ids = torch.zeros(batch_size, self.num_labels).scatter_(1, labels.cpu().view(-1,1), 1).cuda()
 
@@ -210,6 +209,7 @@ class Trainer():
         scheduler = self.scheduler
         train_loader = self.train_loader
         device = self.device
+        cfg = self.cfg
 
         total_train_loss = 0
         model.train()
@@ -217,6 +217,8 @@ class Trainer():
         # For each batch of training data...
         for step, batch in enumerate(train_loader):
             batch = [t.to(device) for t in batch]
+
+            pdb.set_trace()
 
             # Progress update every 40 batches.
             if step % 40 == 0 and not step == 0:
@@ -226,8 +228,13 @@ class Trainer():
                 # Report progress.
                 print('  Batch {:>5,}  of  {:>5,}.    Elapsed: {:}.'.format(step, len(train_loader), elapsed))
 
+            model.zero_grad()
+
             # loss function
-            loss = self.get_loss(batch)
+            if cfg.ict:
+                exit = "exit"
+            else:
+                loss = self.get_loss(batch)
 
             total_train_loss += loss.item()
 
