@@ -2,6 +2,6 @@
   "ExpandedNodes": [
     ""
   ],
-  "SelectedNode": "\\run.sbatch",
+  "SelectedNode": "\\train.py",
   "PreviewInSolutionExplorer": false
 }

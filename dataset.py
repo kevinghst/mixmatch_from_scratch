@@ -179,7 +179,7 @@ class DataSet():
             df_dev.rename(columns={"label_ids": "label"}, inplace=True)
             self.swap_binary_label(df_dev)
 
-            if self.cfg.uda_mode:
+            if self.cfg.mixmatch or self.cfg.uda:
                 f_unsup = open("./imdb/imdb_unsup_train.txt", 'r', encoding='utf-8')
                 df_unsup = pd.read_csv(f_unsup, sep='\t')
                 sup_data = 25000
@@ -214,7 +214,7 @@ class DataSet():
 
         if 'input_ids' in df_dev:
             input_ids_dev, attention_masks_dev, seg_ids_dev, label_ids_dev, num_tokens_dev = self.retrieve_tensors(df_dev, 'sup')
-            if self.cfg.uda_mode:
+            if self.cfg.mixmatch or self.cfg.uda:
                 ori_input_ids, ori_input_mask, ori_seg_ids, aug_input_ids, aug_input_mask, aug_seg_ids, ori_num_tokens, aug_num_tokens = self.retrieve_tensors(df_unsup, 'unsup')
                 print('Number of unsup sentences: {:,}\n'.format(ori_input_ids.shape[0]))
         else:
@@ -225,7 +225,7 @@ class DataSet():
         val_dataset = TensorDataset(input_ids_dev, seg_ids_dev, attention_masks_dev, label_ids_dev)
 
         unsup_dataset = None
-        if self.cfg.uda_mode:
+        if self.cfg.mixmatch or self.cfg.uda:
             unsup_dataset = TensorDataset(ori_input_ids, ori_seg_ids, ori_input_mask, aug_input_ids, aug_seg_ids, aug_input_mask, ori_num_tokens, aug_num_tokens)
 
         return train_dataset, val_dataset, unsup_dataset
