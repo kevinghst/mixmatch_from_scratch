@@ -76,7 +76,7 @@ class ICT_Trainer():
             label_ids = mixup_op(label_ids, sup_l, sup_idx)
 
         sup_loss = -torch.sum(F.log_softmax(logits, dim=1) * label_ids, dim=1)
-        sup_loss = torch.mean(loss)
+        sup_loss = torch.mean(sup_loss)
 
         if cfg.no_unsup_loss:
             return sup_loss, sup_loss, sup_loss, sup_loss
