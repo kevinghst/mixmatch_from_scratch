@@ -209,6 +209,7 @@ class Trainer():
         optimizer = self.optimizer
         scheduler = self.scheduler
         train_loader = self.train_loader
+        device = self.device
 
         total_train_loss = 0
         model.train()
