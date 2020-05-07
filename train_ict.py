@@ -238,7 +238,7 @@ class ICT_Trainer():
             meters.update('sup_loss', sup_loss.item())
             meters.update('unsup_loss', unsup_loss.item())
             meters.update('w_unsup_loss', weighted_unsup_loss.item())
-            meters.update('lr', optimizer.get_lr()[0])
+            #meters.update('lr', optimizer.get_lr()[0])
 
             final_loss.backward()
             optimizer.step()
@@ -255,13 +255,13 @@ class ICT_Trainer():
 
                 if cfg.no_unsup_loss:
                     writer.add_scalars('data/train_loss', {'train_loss': meters['train_loss'].avg}, global_step)
-                    writer.add_scalars('data/lr', {'lr': meters['lr'].avg}, global_step)
+                    #writer.add_scalars('data/lr', {'lr': meters['lr'].avg}, global_step)
                 else:
                     writer.add_scalars('data/train_loss', {'train_loss': meters['train_loss'].avg}, global_step)
                     writer.add_scalars('data/sup_loss', {'sup_loss': meters['sup_loss'].avg}, global_step)
                     writer.add_scalars('data/unsup_loss', {'unsup_loss': meters['unsup_loss'].avg}, global_step)
                     writer.add_scalars('data/w_unsup_loss', {'w_unsup_loss': meters['w_unsup_loss'].avg}, global_step)
-                    writer.add_scalars('data/lr', {'lr': meters['lr'].avg}, global_step)
+                    #writer.add_scalars('data/lr', {'lr': meters['lr'].avg}, global_step)
 
                 meters.reset()
 
@@ -277,7 +277,7 @@ class ICT_Trainer():
                 if ssl_mode:
                     print("  Sup Loss: {0:.4f}".format(sup_loss.item()))
                     print("  Unsup Loss: {0:.4f}".format(unsup_loss.item()))
-                print("  Learning rate: {0:.7f}".format(optimizer.get_lr()[0]))
+                #print("  Learning rate: {0:.7f}".format(optimizer.get_lr()[0]))
 
                 print(
                     'Max Accuracy : %5.3f Best Val Loss : %5.3f Best Train Loss : %5.4f Max global_steps : %d Cur global_steps : %d' 
