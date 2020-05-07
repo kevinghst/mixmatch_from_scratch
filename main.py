@@ -14,6 +14,7 @@ from models_new import Classifier
 from models import BertForSequenceClassificationCustom
 from dataset import DataSet
 from train import Trainer
+from train_ict import ICT_Trainer
 
 from utils import set_seeds
 
@@ -29,6 +30,11 @@ parser.add_argument('--do_lower_case', default=True, type=bool)
 parser.add_argument('--train_batch_size', default=16, type=int)
 parser.add_argument('--val_batch_size', default=16, type=int)
 parser.add_argument('--results_dir', default='results')
+parser.add_argument('--hide_tqdm', action='store_true')
+parser.add_argument('--total_steps', default=1000, type=int)
+parser.add_argument('--check_steps', default=1, type=int)
+parser.add_argument('--check_after', default=-1, type=int)
+parser.add_argument('--early_stopping', action='store_true')
 
 # mixup
 parser.add_argument('--sup_mixup', choices=['cls', 'word'])
@@ -186,17 +192,29 @@ total_steps = len(train_dataloader) * cfg.epochs
 scheduler = get_linear_schedule_with_warmup(optimizer,
                                             num_warmup_steps = 0, # Default value in run_glue.py
                                             num_training_steps = total_steps)
-
-trainer = Trainer(
-    model=model,
-    optimizer=optimizer,
-    device=device,
-    scheduler=scheduler,
-    train_loader=train_dataloader,
-    val_loader=validation_dataloader,
-    unsup_loader=unsup_dataloader,
-    cfg=cfg,
-    num_labels=NUM_LABELS[cfg.task]
-)
+if cfg.ict:
+    trainer = ICT_Trainer(
+        model=model,
+        optimizer=optimizer,
+        device=device,
+        scheduler=scheduler,
+        train_loader=train_dataloader,
+        val_loader=validation_dataloader,
+        unsup_loader=unsup_dataloader,
+        cfg=cfg,
+        num_labels=NUM_LABELS[cfg.task]  
+    )
+else:
+    trainer = Trainer(
+        model=model,
+        optimizer=optimizer,
+        device=device,
+        scheduler=scheduler,
+        train_loader=train_dataloader,
+        val_loader=validation_dataloader,
+        unsup_loader=unsup_dataloader,
+        cfg=cfg,
+        num_labels=NUM_LABELS[cfg.task]
+    )
 
 trainer.iterate(cfg.epochs)
