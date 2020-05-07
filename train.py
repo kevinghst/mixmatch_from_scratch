@@ -336,9 +336,6 @@ class Trainer():
             writer = SummaryWriter(log_dir=dir)
 
 
-        # Set the seed value all over the place to make this reproducible.        
-        self.seed_torch(cfg.seed)
-
         # We'll store a number of quantities such as training and validation loss, 
         # validation accuracy, and timings.
         training_stats = []
