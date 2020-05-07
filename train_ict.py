@@ -41,9 +41,10 @@ class ICT_Trainer():
 
         # batch
         input_ids, segment_ids, input_mask, og_label_ids, num_tokens = sup_batch
-        ori_input_ids, ori_segment_ids, ori_input_mask, \
-        aug_input_ids, aug_segment_ids, aug_input_mask, \
-        ori_num_tokens, aug_num_tokens = unsup_batch
+        if unsup_batch:
+            ori_input_ids, ori_segment_ids, ori_input_mask, \
+            aug_input_ids, aug_segment_ids, aug_input_mask, \
+            ori_num_tokens, aug_num_tokens = unsup_batch
 
         # convert label ids to hot vectors
         sup_size = input_ids.size(0)
@@ -210,11 +211,16 @@ class ICT_Trainer():
         sup_batch_size = None
         unsup_batch_size = None
 
-        iter_bar = tqdm(unsup_iter, total=cfg.total_steps, disable=cfg.hide_tqdm) if cfg.ict \
-              else tqdm(sup_iter, total=cfg.total_steps, disable=cfg.hide_tqdm)
+        if cfg.no_unsup_loss:
+            iter_bar = tqdm(sup_iter, total=cfg.total_steps, disable=cfg.hide_tqdm)
+        else:
+            tqdm(unsup_iter, total=cfg.total_steps, disable=cfg.hide_tqdm)
 
         for i, batch in enumerate(iter_bar):
-            if cfg.ict:
+            if cfg.no_unsup_loss:
+                sup_batch = [t.to(device) for t in batch]
+                unsup_batch = None
+            else:
                 sup_batch = [t.to(device) for t in next(sup_iter)]
                 unsup_batch = [t.to(device) for t in batch]
 
@@ -222,17 +228,9 @@ class ICT_Trainer():
 
                 if unsup_batch[0].shape[0] != unsup_batch_size:
                     continue
-            else:
-                sup_batch = [t.to(device) for t in batch]
-                unsup_batch = None
 
             optimizer.zero_grad()
             final_loss, sup_loss, unsup_loss, weighted_unsup_loss = self.get_loss_ict(sup_batch, unsup_batch, global_step)
-
-            if cfg.no_sup_loss:
-                final_loss = unsup_loss
-            elif cfg.no_unsup_loss:
-                final_loss = sup_loss
 
             meters.update('train_loss', final_loss.item())
             meters.update('sup_loss', sup_loss.item())
