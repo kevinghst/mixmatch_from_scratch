@@ -218,7 +218,6 @@ class Trainer():
         for step, batch in enumerate(train_loader):
             batch = [t.to(device) for t in batch]
 
-            pdb.set_trace()
 
             # Progress update every 40 batches.
             if step % 40 == 0 and not step == 0:
@@ -233,7 +232,6 @@ class Trainer():
             # loss function
             if cfg.ict:
                 exit = "exit"
-                loss = 30
             else:
                 loss = self.get_loss(batch)
 
