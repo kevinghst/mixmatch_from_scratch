@@ -39,7 +39,7 @@ parser.add_argument('--alpha', default=1, type=float)
 parser.add_argument('--no_unsup_loss', action='store_true')
 
 # ICT
-parser.add_argument('ict', action='store_true')
+parser.add_argument('--ict', action='store_true')
 
 #mixmatch
 parser.add_argument('--mixmatch', action='store_true')
