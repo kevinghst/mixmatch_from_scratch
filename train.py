@@ -140,12 +140,7 @@ class Trainer():
 
             model.zero_grad()
 
-            # loss function
-            if cfg.ict:
-                exit = "exit"
-            else:
-                pdb.set_trace()
-                loss = self.get_loss(batch)
+            loss = self.get_loss(batch)
 
             total_train_loss += loss.item()
 

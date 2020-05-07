@@ -230,7 +230,6 @@ class ICT_Trainer():
                     continue
 
             optimizer.zero_grad()
-            pdb.set_trace()
             final_loss, sup_loss, unsup_loss, weighted_unsup_loss = self.get_loss_ict(sup_batch, unsup_batch, global_step)
 
             meters.update('train_loss', final_loss.item())
@@ -245,7 +244,7 @@ class ICT_Trainer():
             # print loss
             global_step += 1
 
-            if global_step % cfg.check_steps == 0 and global_step > cfg.check_after:
+            if (global_step + 1) % cfg.check_steps == 0 and global_step > cfg.check_after:
                 total_accuracy, avg_val_loss = self.validate()
 
                 #logging
