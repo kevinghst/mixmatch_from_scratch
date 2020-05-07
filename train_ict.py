@@ -184,6 +184,7 @@ class ICT_Trainer():
     def iterate(self, epochs):
         cfg = self.cfg
         model = self.model
+        device = self.device
 
         sup_iter = self.repeat_dataloader(self.train_loader)
         unsup_iter = self.repeat_dataloader(self.unsup_loader)
