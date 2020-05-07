@@ -274,7 +274,7 @@ class ICT_Trainer():
                 print("  Top 1 Accuracy: {0:.4f}".format(total_accuracy))
                 print("  Validation Loss: {0:.4f}".format(avg_val_loss))
                 print("  Train Loss: {0:.4f}".format(final_loss.item()))
-                if ssl_mode:
+                if not cfg.no_unsup_loss:
                     print("  Sup Loss: {0:.4f}".format(sup_loss.item()))
                     print("  Unsup Loss: {0:.4f}".format(unsup_loss.item()))
                 #print("  Learning rate: {0:.7f}".format(optimizer.get_lr()[0]))
