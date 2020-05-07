@@ -130,8 +130,13 @@ else:
 
 dataset = DataSet(cfg)
 
+if (cfg.mixmatch or cfg.uda or cfg.ict) and not cfg.no_unsup_loss:
+    ssl = True
+else:
+    ssl = False
 
-train_dataset, val_dataset, unsup_dataset = dataset.get_dataset()
+
+train_dataset, val_dataset, unsup_dataset = dataset.get_dataset(ssl)
 
 # Create the DataLoaders for our training and validation sets.
 # We'll take training samples in random order.
@@ -203,7 +208,8 @@ if cfg.ict:
         val_loader=validation_dataloader,
         unsup_loader=unsup_dataloader,
         cfg=cfg,
-        num_labels=NUM_LABELS[cfg.task]  
+        num_labels=NUM_LABELS[cfg.task],
+        ssl=ssl
     )
 else:
     trainer = Trainer(

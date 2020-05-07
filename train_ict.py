@@ -22,7 +22,7 @@ class ICT_Trainer():
             self, 
             model=None, optimizer=None, device=None, scheduler=None,
             train_loader=None, val_loader=None, unsup_loader=None,
-            cfg=None, num_labels=None
+            cfg=None, num_labels=None, ssl=None
         ):
         self.model = model
         self.optimizer = optimizer
@@ -33,6 +33,7 @@ class ICT_Trainer():
         self.unsup_loader = unsup_loader
         self.cfg = cfg
         self.num_labels = num_labels
+        self.ssl = ssl
 
     def get_loss_ict(self, sup_batch, unsup_batch, global_step):
         model = self.model
@@ -79,7 +80,7 @@ class ICT_Trainer():
         sup_loss = -torch.sum(F.log_softmax(logits, dim=1) * label_ids, dim=1)
         sup_loss = torch.mean(sup_loss)
 
-        if cfg.no_unsup_loss:
+        if not self.ssl:
             return sup_loss, sup_loss, sup_loss, sup_loss
         
         # unsup loss
@@ -189,7 +190,9 @@ class ICT_Trainer():
         optimizer = self.optimizer
 
         sup_iter = self.repeat_dataloader(self.train_loader)
-        unsup_iter = self.repeat_dataloader(self.unsup_loader)
+
+        if self.ssl:
+            unsup_iter = self.repeat_dataloader(self.unsup_loader)
 
         if cfg.results_dir:
             dir = os.path.join('results', cfg.results_dir)
@@ -211,16 +214,14 @@ class ICT_Trainer():
         sup_batch_size = None
         unsup_batch_size = None
 
-        if cfg.no_unsup_loss:
-            iter_bar = tqdm(sup_iter, total=cfg.total_steps, disable=cfg.hide_tqdm)
+        if self.ssl:
+            iter_bar = tqdm(unsup_iter, total=cfg.total_steps, disable=cfg.hide_tqdm)
         else:
-            tqdm(unsup_iter, total=cfg.total_steps, disable=cfg.hide_tqdm)
+            iter_bar = tqdm(sup_iter, total=cfg.total_steps, disable=cfg.hide_tqdm)
+
 
         for i, batch in enumerate(iter_bar):
-            if cfg.no_unsup_loss:
-                sup_batch = [t.to(device) for t in batch]
-                unsup_batch = None
-            else:
+            if self.ssl:
                 sup_batch = [t.to(device) for t in next(sup_iter)]
                 unsup_batch = [t.to(device) for t in batch]
 
@@ -228,6 +229,10 @@ class ICT_Trainer():
 
                 if unsup_batch[0].shape[0] != unsup_batch_size:
                     continue
+            else:
+                sup_batch = [t.to(device) for t in batch]
+                unsup_batch = None
+
 
             optimizer.zero_grad()
             final_loss, sup_loss, unsup_loss, weighted_unsup_loss = self.get_loss_ict(sup_batch, unsup_batch, global_step)
@@ -251,14 +256,14 @@ class ICT_Trainer():
                 writer.add_scalars('data/eval_acc', {'eval_acc' : total_accuracy}, global_step)
                 writer.add_scalars('data/eval_loss', {'eval_loss': avg_val_loss}, global_step)
 
-                if cfg.no_unsup_loss:
-                    writer.add_scalars('data/train_loss', {'train_loss': meters['train_loss'].avg}, global_step)
-                    #writer.add_scalars('data/lr', {'lr': meters['lr'].avg}, global_step)
-                else:
+                if self.ssl:
                     writer.add_scalars('data/train_loss', {'train_loss': meters['train_loss'].avg}, global_step)
                     writer.add_scalars('data/sup_loss', {'sup_loss': meters['sup_loss'].avg}, global_step)
                     writer.add_scalars('data/unsup_loss', {'unsup_loss': meters['unsup_loss'].avg}, global_step)
                     writer.add_scalars('data/w_unsup_loss', {'w_unsup_loss': meters['w_unsup_loss'].avg}, global_step)
+                    #writer.add_scalars('data/lr', {'lr': meters['lr'].avg}, global_step)
+                else:
+                    writer.add_scalars('data/train_loss', {'train_loss': meters['train_loss'].avg}, global_step)
                     #writer.add_scalars('data/lr', {'lr': meters['lr'].avg}, global_step)
 
                 meters.reset()
@@ -272,7 +277,7 @@ class ICT_Trainer():
                 print("  Top 1 Accuracy: {0:.4f}".format(total_accuracy))
                 print("  Validation Loss: {0:.4f}".format(avg_val_loss))
                 print("  Train Loss: {0:.4f}".format(final_loss.item()))
-                if not cfg.no_unsup_loss:
+                if self.ssl:
                     print("  Sup Loss: {0:.4f}".format(sup_loss.item()))
                     print("  Unsup Loss: {0:.4f}".format(unsup_loss.item()))
                 #print("  Learning rate: {0:.7f}".format(optimizer.get_lr()[0]))
@@ -285,6 +290,10 @@ class ICT_Trainer():
                 if no_improvement == cfg.early_stopping:
                     print("Early stopped")
                     break
+
+            if cfg.total_steps and cfg.total_steps < global_step:
+                print('The total steps have been reached')
+                return
 
         writer.close()
 
