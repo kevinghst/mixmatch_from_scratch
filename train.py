@@ -233,6 +233,7 @@ class Trainer():
             # loss function
             if cfg.ict:
                 exit = "exit"
+                loss = 30
             else:
                 loss = self.get_loss(batch)
 
