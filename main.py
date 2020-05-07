@@ -34,7 +34,7 @@ parser.add_argument('--hide_tqdm', action='store_true')
 parser.add_argument('--total_steps', default=1000, type=int)
 parser.add_argument('--check_steps', default=1, type=int)
 parser.add_argument('--check_after', default=-1, type=int)
-parser.add_argument('--early_stopping', action='store_true')
+parser.add_argument('--early_stopping', default=-1, type=int)
 
 # mixup
 parser.add_argument('--sup_mixup', choices=['cls', 'word'])
