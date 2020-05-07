@@ -117,7 +117,6 @@ dataset = DataSet(cfg)
 
 train_dataset, val_dataset, unsup_dataset = dataset.get_dataset()
 
-"""
 # Create the DataLoaders for our training and validation sets.
 # We'll take training samples in random order.
 train_dataloader = DataLoader(
@@ -192,4 +191,3 @@ trainer = Trainer(
 )
 
 trainer.iterate(cfg.epochs)
-"""
