@@ -233,7 +233,6 @@ class ICT_Trainer():
                 sup_batch = [t.to(device) for t in batch]
                 unsup_batch = None
 
-            pdb.set_trace()
             optimizer.zero_grad()
             final_loss, sup_loss, unsup_loss, weighted_unsup_loss = self.get_loss_ict(sup_batch, unsup_batch, global_step)
 
