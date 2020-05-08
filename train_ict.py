@@ -249,7 +249,7 @@ class ICT_Trainer():
             # print loss
             global_step += 1
 
-            if (global_step + 1) % cfg.check_steps == 0 and global_step > cfg.check_after:
+            if global_step % cfg.check_steps == 0 and global_step > cfg.check_after:
                 total_accuracy, avg_val_loss = self.validate()
 
                 #logging
