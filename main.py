@@ -99,7 +99,7 @@ NUM_LABELS = {
     "CoLA": 2,
     "agnews": 4
 }
-pdb.set_trace()
+
 model_cfg = {
 	"dim": 768,
 	"dim_ff": 3072,
