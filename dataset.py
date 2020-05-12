@@ -11,7 +11,7 @@ MAX_LENGTHS = {
     "dbpedia": 256,
     "imdb": 128,
     "CoLA": 128,
-    "agnews": 256
+    "agnews": 128
 }
 
 NUM_LABELS = {
