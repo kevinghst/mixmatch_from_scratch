@@ -281,7 +281,7 @@ class BertModel(BertPreTrainedModel):
             l=l,
             shuffle_idx=shuffle_idx
         )
-
+        pdb.set_trace()
         encoder_outputs = self.encoder(
             embedding_output,
             attention_mask=extended_attention_mask,
