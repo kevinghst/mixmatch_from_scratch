@@ -35,6 +35,8 @@ parser.add_argument('--total_steps', default=1000, type=int)
 parser.add_argument('--check_steps', default=1, type=int)
 parser.add_argument('--check_after', default=-1, type=int)
 parser.add_argument('--early_stopping', default=-1, type=int)
+parser.add_argument('--p_drop_attn', default=0.1, type=float)
+parser.add_argument('--p_drop_hidden', default=0.1, type=float)
 
 # mixup
 parser.add_argument('--sup_mixup', choices=['cls', 'word'])
@@ -101,9 +103,9 @@ model_cfg = {
 	"dim": 768,
 	"dim_ff": 3072,
 	"n_layers": 12,
-	"p_drop_attn": 0.1,
+	"p_drop_attn": cfg.p_drop_attn,
 	"n_heads": 12,
-	"p_drop_hidden": 0.1,
+	"p_drop_hidden": cfg.p_drop_hidden,
 	"max_len": MAX_LENGTHS[cfg.task],
 	"n_segments": 2,
 	"vocab_size": 30522
