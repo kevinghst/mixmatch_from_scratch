@@ -84,7 +84,8 @@ class BertEncoder(nn.Module):
         self.layer = nn.ModuleList([BertLayer(config) for _ in range(config.num_hidden_layers)])
 
     def forward(
-            self, hidden_states, c_hidden_states, attention_mask, head_mask=None, mixup_layer=-1
+            self, hidden_states, c_hidden_states, attention_mask, head_mask=None, 
+            mixup_layer=-1, l=1, shuffle_idx=None, mixup=None
         ):
         all_hidden_states = ()
         all_attentions = ()
@@ -96,7 +97,17 @@ class BertEncoder(nn.Module):
 
             layer_outputs = layer_module(hidden_states, attention_mask, head_mask[i])
             hidden_states = layer_outputs[0]
-            pdb.set_trace()
+            
+            if c_hidden_states is not None:
+                with torch.no_grad():
+                    c_layer_outputs = layer_module(c_hidden_states, attention_mask, head_mask[i])
+                    c_hidden_states = c_layer_outputs[0]
+
+                if mixup_layer == layer and (mixup == 'word' or mixup == 'word_cls'):
+                    h_a, h_b = hidden_states, c_hidden_states[shuffle_idx]
+                    hidden_states = l * h_a + (1-l) * h_b
+                    c_hidden_states = None
+             
 
             if self.output_attentions:
                 all_attentions = all_attentions + (layer_outputs[1],)
@@ -311,7 +322,10 @@ class BertModel(BertPreTrainedModel):
             c_embedding_output,
             attention_mask=extended_attention_mask,
             head_mask=head_mask,
-            mixup_layer=mixup_layer
+            mixup_layer=mixup_layer,
+            l=l,
+            shuffle_idx=shuffle_idx,
+            mixup=mixup
         )
         sequence_output = encoder_outputs[0]
         pooled_output = self.pooler(sequence_output)
