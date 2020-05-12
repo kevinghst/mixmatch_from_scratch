@@ -32,7 +32,8 @@ class BertEmbeddings(nn.Module):
             inputs_embeds=None, 
             mixup=None,
             l=1,
-            shuffle_idx=None
+            shuffle_idx=None,
+            mixup_layer=-1
         ):
         if input_ids is not None:
             input_shape = input_ids.size()
@@ -47,20 +48,33 @@ class BertEmbeddings(nn.Module):
         if token_type_ids is None:
             token_type_ids = torch.zeros(input_shape, dtype=torch.long, device=device)
 
-        if inputs_embeds is None:
-            inputs_embeds = self.word_embeddings(input_ids)
-            if mixup == 'word':
-                c_inputs_embeds = self.word_embeddings(c_input_ids)
-                embeds_a, embeds_b = inputs_embeds, c_inputs_embeds[shuffle_idx]
-                inputs_embeds = l * embeds_a + (1-l) * embeds_b
-
         position_embeddings = self.position_embeddings(position_ids)
         token_type_embeddings = self.token_type_embeddings(token_type_ids)
 
+        if inputs_embeds is None:
+            inputs_embeds = self.word_embeddings(input_ids)
+
+            if mixup and 'word' in mixup:
+                with torch.no_grad():
+                    c_inputs_embeds = self.word_embeddings(c_input_ids)
+
+                if mixup_layer == 0:
+                    embeds_a, embeds_b = inputs_embeds, c_inputs_embeds[shuffle_idx]
+                    inputs_embeds = l * embeds_a + (1-l) * embeds_b
+                else:
+                    embeddings = inputs_embeds + position_embeddings + token_type_embeddings
+                    c_embeddings = c_inputs_embeds + position_embeddings + token_type_embeddings
+
+                    h = self.dropout(self.LayerNorm(embeddings))
+
+                    with torch.no_grad():
+                        hc = self.dropout(self.LayerNorm(c_embeddings))
+
+                    return h, hc
+
         embeddings = inputs_embeds + position_embeddings + token_type_embeddings
-        embeddings = self.LayerNorm(embeddings)
-        embeddings = self.dropout(embeddings)
-        return embeddings
+        return self.dropout(self.LayerNorm(embeddings)), None
+
 
 class BertEncoder(nn.Module):
     def __init__(self, config):
@@ -69,18 +83,23 @@ class BertEncoder(nn.Module):
         self.output_hidden_states = config.output_hidden_states
         self.layer = nn.ModuleList([BertLayer(config) for _ in range(config.num_hidden_layers)])
 
-    def forward(self, hidden_states, attention_mask, head_mask=None):
+    def forward(self, hidden_states, c_hidden_states, attention_mask, head_mask=None):
         all_hidden_states = ()
         all_attentions = ()
+
+        layer = 1
         for i, layer_module in enumerate(self.layer):
             if self.output_hidden_states:
                 all_hidden_states = all_hidden_states + (hidden_states,)
 
             layer_outputs = layer_module(hidden_states, attention_mask, head_mask[i])
             hidden_states = layer_outputs[0]
+            pdb.set_trace()
 
             if self.output_attentions:
                 all_attentions = all_attentions + (layer_outputs[1],)
+
+            layer += 1
 
         # Add last layer
         if self.output_hidden_states:
@@ -109,6 +128,7 @@ class BertModel(BertPreTrainedModel):
     def __init__(self, config):
         super().__init__(config)
         self.config = config
+        self.layers = config.num_hidden_layers
 
         self.embeddings = BertEmbeddings(config)
         self.encoder = BertEncoder(config)
@@ -143,7 +163,8 @@ class BertModel(BertPreTrainedModel):
         encoder_attention_mask=None,
         mixup=None,
         shuffle_idx=None,
-        l=1
+        l=1,
+        mixup_layer=-1
     ):
         r"""
     Return:
@@ -271,7 +292,7 @@ class BertModel(BertPreTrainedModel):
         else:
             head_mask = [None] * self.config.num_hidden_layers
 
-        embedding_output = self.embeddings(
+        embedding_output, c_embedding_output = self.embeddings(
             input_ids=input_ids, 
             c_input_ids=c_input_ids,
             position_ids=position_ids, 
@@ -279,18 +300,21 @@ class BertModel(BertPreTrainedModel):
             inputs_embeds=inputs_embeds,
             mixup=mixup,
             l=l,
-            shuffle_idx=shuffle_idx
+            shuffle_idx=shuffle_idx,
+            mixup_layer=mixup_layer
         )
 
         encoder_outputs = self.encoder(
             embedding_output,
+            c_embedding_output,
             attention_mask=extended_attention_mask,
-            head_mask=head_mask
+            head_mask=head_mask,
+            mixup_layer=mixup_layer
         )
         sequence_output = encoder_outputs[0]
         pooled_output = self.pooler(sequence_output)
 
-        if mixup == 'cls':
+        if mixup_layer == self.layers + 1:
             cls_a, cls_b = pooled_output, pooled_output[shuffle_idx]
             pooled_output = l * cls_a + (1-l) * cls_b
 
@@ -305,6 +329,7 @@ class BertForSequenceClassificationCustom(BertPreTrainedModel):
     def __init__(self, config):
         super().__init__(config)
         self.num_labels = config.num_labels
+        self.layers = config.num_hidden_layers
 
         self.bert = BertModel(config)
         self.dropout = nn.Dropout(config.hidden_dropout_prob)
@@ -330,14 +355,14 @@ class BertForSequenceClassificationCustom(BertPreTrainedModel):
         manifold_mixup=None
     ):
         if input_h is None:
-            #if mixup == 'word':
-            #    mixup_layer = random.randint(0, self.layers) if manifold_mixup else 0
-            #elif mixup == 'word_cls':
-            #    mixup_layer = random.randint(0, self.layers+1) if manifold_mixup else 0
-            #elif mixup == 'cls':
-            #    mixup_layer = self.layers + 1
-            #else:
-            #    mixup_layer = -1
+            if mixup == 'word':
+                mixup_layer = random.randint(0, self.layers) if manifold_mixup else 0
+            elif mixup == 'word_cls':
+                mixup_layer = random.randint(0, self.layers+1) if manifold_mixup else 0
+            elif mixup == 'cls':
+                mixup_layer = self.layers + 1
+            else:
+                mixup_layer = -1
 
 
             outputs = self.bert(
@@ -350,7 +375,8 @@ class BertForSequenceClassificationCustom(BertPreTrainedModel):
                 inputs_embeds=inputs_embeds,
                 mixup=mixup,
                 shuffle_idx=shuffle_idx,
-                l=l
+                l=l,
+                mixup_layer=mixup_layer
             )
 
             pooled_output = outputs[1]
