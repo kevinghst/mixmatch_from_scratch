@@ -1,5 +1,5 @@
 from transformers import BertPreTrainedModel
-from transformers.modeling_bert import BertPooler
+from transformers.modeling_bert import BertLayer, BertPooler
 import torch.nn as nn
 from torch.nn import CrossEntropyLoss, MSELoss
 import torch
