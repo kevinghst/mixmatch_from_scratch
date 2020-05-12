@@ -281,13 +281,11 @@ class BertModel(BertPreTrainedModel):
             l=l,
             shuffle_idx=shuffle_idx
         )
-        pdb.set_trace()
+
         encoder_outputs = self.encoder(
             embedding_output,
             attention_mask=extended_attention_mask,
-            head_mask=head_mask,
-            encoder_hidden_states=encoder_hidden_states,
-            encoder_attention_mask=encoder_extended_attention_mask,
+            head_mask=head_mask
         )
         sequence_output = encoder_outputs[0]
         pooled_output = self.pooler(sequence_output)
