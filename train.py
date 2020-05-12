@@ -81,7 +81,7 @@ class Trainer():
             sup_l = max(sup_l, 1-sup_l)
             sup_idx = torch.randperm(batch_size)
 
-            if cfg.sup_mixup == 'word':
+            if cfg.sup_mixup and 'word' in cfg.sup_mixup:
                 input_ids, c_input_ids = pad_for_word_mixup(
                     input_ids, input_mask, num_tokens, sup_idx    
                 )
@@ -100,7 +100,8 @@ class Trainer():
                 attention_mask=input_mask,
                 mixup=cfg.sup_mixup,
                 shuffle_idx=sup_idx,
-                l=sup_l
+                l=sup_l,
+                manifold_mixup = cfg.manifold_mixup
             )
 
             if cfg.sup_mixup:

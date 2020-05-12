@@ -40,9 +40,10 @@ parser.add_argument('--p_drop_attn', default=0.1, type=float)
 parser.add_argument('--p_drop_hidden', default=0.1, type=float)
 
 # mixup
-parser.add_argument('--sup_mixup', choices=['cls', 'word'])
-parser.add_argument('--unsup_mixup', choices=['cls', 'word'])
+parser.add_argument('--sup_mixup', choices=['cls', 'word', 'word_cls'])
+parser.add_argument('--unsup_mixup', choices=['cls', 'word', 'word_cls'])
 parser.add_argument('--alpha', default=1, type=float)
+parser.add_argument('--manifold_mixup', action='store_true')
 
 # SSL
 parser.add_argument('--no_unsup_loss', action='store_true')
