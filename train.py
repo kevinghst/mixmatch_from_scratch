@@ -186,7 +186,7 @@ class Trainer():
         total_eval_loss = 0
         nb_eval_steps = 0
         total_prec1 = 0
-        total_prec5 = 0
+        total_prec3 = 0
 
         # Evaluate data for one epoch
         for batch in val_loader:
@@ -213,18 +213,18 @@ class Trainer():
                 b_labels = b_labels.to('cpu').numpy()
                 total_prec1 += bin_accuracy(logits, b_labels)
             else:
-                prec1, prec5 = multi_accuracy(logits, b_labels, topk=(1,5))
+                prec1, prec3 = multi_accuracy(logits, b_labels, topk=(1,3))
                 total_prec1 += prec1
-                total_prec5 += prec5
+                total_prec3 += prec3
 
         avg_prec1 = total_prec1 / len(val_loader)
-        avg_prec5 = total_prec5 / len(val_loader)
+        avg_prec3 = total_prec3 / len(val_loader)
 
         avg_val_loss = total_eval_loss / len(val_loader)
         
         # Report the final accuracy for this validation run.
         print("  Top 1 Accuracy: {0:.4f}".format(avg_prec1))
-        print("  Top 5 Accuracy: {0:.4f}".format(avg_prec5))
+        print("  Top 5 Accuracy: {0:.4f}".format(avg_prec3))
 
         # Measure how long the validation run took.
         validation_time = format_time(time.time() - t0)
@@ -233,7 +233,7 @@ class Trainer():
         print("  Validation took: {:}".format(validation_time))
 
 
-        return avg_prec1, avg_prec5, avg_val_loss, validation_time
+        return avg_prec1, avg_prec3, avg_val_loss, validation_time
 
     def iterate(self, epochs):
         cfg = self.cfg
@@ -291,7 +291,7 @@ class Trainer():
             print("Running Validation...")
 
         
-            avg_prec1, avg_prec5, avg_val_loss, validation_time = self.validate()
+            avg_prec1, avg_prec3, avg_val_loss, validation_time = self.validate()
 
             writer.add_scalars('data/losses', {'eval_loss': avg_val_loss}, epoch_i+1)
             writer.add_scalars('data/accuracies', {'eval_acc': avg_prec1}, epoch_i+1)
@@ -311,7 +311,7 @@ class Trainer():
                     'Training Loss': avg_train_loss * 100,
                     'Valid. Loss': avg_val_loss * 100,
                     'Valid. Accur_top1.': avg_prec1,
-                    'Valid. Accur_top5.': avg_prec5,
+                    'Valid. Accur_top3.': avg_prec3,
                     'Training Time': training_time,
                     'Validation Time': validation_time
                 }
