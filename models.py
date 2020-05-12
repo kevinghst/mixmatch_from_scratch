@@ -3,6 +3,7 @@ from transformers.modeling_bert import BertLayer, BertPooler
 import torch.nn as nn
 from torch.nn import CrossEntropyLoss, MSELoss
 import torch
+import random
 
 import pdb
 
