@@ -189,6 +189,9 @@ class Trainer():
         total_prec1 = 0
         total_prec3 = 0
 
+        y_pred = []
+        y_true = []
+
         # Evaluate data for one epoch
         for batch in val_loader:
             batch = [t.to(device) for t in batch]
