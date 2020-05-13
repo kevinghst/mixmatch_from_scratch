@@ -216,12 +216,15 @@ class Trainer():
                 logits = logits.detach().cpu().numpy()
                 b_labels = b_labels.to('cpu').numpy()
                 total_prec1 += bin_accuracy(logits, b_labels)
-            else:
+
                 if cfg.debug:
                     pdb.set_trace()
+
+            else:
                 prec1, prec3 = multi_accuracy(logits, b_labels, topk=(1,3))
                 total_prec1 += prec1
                 total_prec3 += prec3
+
 
         avg_prec1 = total_prec1 / len(val_loader)
         avg_prec3 = total_prec3 / len(val_loader)
