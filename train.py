@@ -315,7 +315,9 @@ class Trainer():
 
             writer.add_scalars('data/losses', {'eval_loss': avg_val_loss}, epoch_i+1)
             writer.add_scalars('data/accuracies', {'eval_acc': avg_prec1}, epoch_i+1)
-            writer.add_scalars('data/matt_corr', {'matt_corr': matt_corr}, epoch_i+1)
+
+            if matt_corr:
+                writer.add_scalars('data/matt_corr', {'matt_corr': matt_corr}, epoch_i+1)
             
             # selecting metric for early stopping
             if cfg.task == "CoLA":
