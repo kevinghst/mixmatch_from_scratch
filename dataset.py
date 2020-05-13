@@ -91,8 +91,8 @@ class DataSet():
         if total <= 0:
             return df
 
-        if self.cfg.debug:
-            pdb.set_trace()
+        if self.cfg.random_cap:
+            return df.sample(total, random_state=self.cfg.data_seed)
 
         num_classes = NUM_LABELS[self.cfg.task]
         per_class = int(total / num_classes)

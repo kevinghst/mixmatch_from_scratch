@@ -76,6 +76,7 @@ parser.add_argument('--num_labels', default=2, type=int)
 parser.add_argument('--train_cap', default=-1, type=int)
 parser.add_argument('--dev_cap', default=-1, type=int)
 parser.add_argument('--unsup_cap', default=-1, type=int)
+parser.add_argument('--random_cap', action='store_true')
 
 parser.add_argument('--epochs', default=3, type=int)
 
