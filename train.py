@@ -4,6 +4,7 @@ import random
 import numpy as np
 from torch.nn import CrossEntropyLoss
 import torch.nn.functional as F
+from sklearn.metrics import matthews_corrcoef
 
 import torch
 import torch.nn as nn
@@ -189,8 +190,8 @@ class Trainer():
         total_prec1 = 0
         total_prec3 = 0
 
-        y_pred = []
-        y_true = []
+        y_pred = np.array([])
+        y_true = np.array([])
 
         # Evaluate data for one epoch
         for batch in val_loader:
@@ -217,8 +218,10 @@ class Trainer():
                 b_labels = b_labels.to('cpu').numpy()
                 total_prec1 += bin_accuracy(logits, b_labels)
 
-                if cfg.debug:
-                    pdb.set_trace()
+                preds = np.argmax(logits, axis=1).flatten()
+                y_true = np.append(y_true, b_labels)
+                y_pred = np.append(y_pred, preds)
+
 
             else:
                 prec1, prec3 = multi_accuracy(logits, b_labels, topk=(1,3))
@@ -230,10 +233,17 @@ class Trainer():
         avg_prec3 = total_prec3 / len(val_loader)
 
         avg_val_loss = total_eval_loss / len(val_loader)
+
+        if y_true.size > 0:
+            matt_corr = matthews_corrcoef(y_true, y_pred)
+        else:
+            matt_corr = None
         
         # Report the final accuracy for this validation run.
         print("  Top 1 Accuracy: {0:.4f}".format(avg_prec1))
-        print("  Top 5 Accuracy: {0:.4f}".format(avg_prec3))
+        
+        if matt_corr is not None:
+            print("  Matthew Corr: {0:.4f}".format(matt_corr))
 
         # Measure how long the validation run took.
         validation_time = format_time(time.time() - t0)
@@ -242,7 +252,7 @@ class Trainer():
         print("  Validation took: {:}".format(validation_time))
 
 
-        return avg_prec1, avg_prec3, avg_val_loss, validation_time
+        return avg_prec1, avg_prec3, matt_corr, avg_val_loss, validation_time
 
     def iterate(self, epochs):
         cfg = self.cfg
@@ -262,7 +272,7 @@ class Trainer():
         # Measure the total training time for the whole run.
         total_t0 = time.time()
 
-        best_val_acc = 0
+        best_metric = 0
         best_epoch = 0
         best_train_loss = None
         best_val_loss = None
@@ -300,18 +310,25 @@ class Trainer():
             print("Running Validation...")
 
         
-            avg_prec1, avg_prec3, avg_val_loss, validation_time = self.validate()
+            avg_prec1, avg_prec3, matt_corr, avg_val_loss, validation_time = self.validate()
+
 
             writer.add_scalars('data/losses', {'eval_loss': avg_val_loss}, epoch_i+1)
             writer.add_scalars('data/accuracies', {'eval_acc': avg_prec1}, epoch_i+1)
-    
+            writer.add_scalars('data/matt_corr', {'matt_corr': matt_corr}, epoch_i+1)
+            
+            # selecting metric for early stopping
+            if cfg.task == "CoLA":
+                metric = matt_corr
+            else:
+                metric = avg_prec1
+
             # update best val accuracy
-            if avg_prec1 > best_val_acc:
-                best_val_acc = avg_prec1
+            if metric > best_metric:
+                best_metric = metric
                 best_epoch = epoch_i
                 best_train_loss = avg_train_loss
                 best_val_loss = avg_val_loss
-
 
             # Record all statistics from this epoch.
             training_stats.append(
@@ -320,9 +337,9 @@ class Trainer():
                     'Training Loss': avg_train_loss * 100,
                     'Valid. Loss': avg_val_loss * 100,
                     'Valid. Accur_top1.': avg_prec1,
-                    'Valid. Accur_top3.': avg_prec3,
                     'Training Time': training_time,
-                    'Validation Time': validation_time
+                    'Validation Time': validation_time,
+                    'Matthew Correlation': matt_corr
                 }
             )
 
@@ -330,7 +347,12 @@ class Trainer():
         print("Training complete!")
 
         print("Total training took {:} (h:mm:ss)".format(format_time(time.time()-total_t0)))
-        print("Best Validation Accuracy: {0:.4f}".format(best_val_acc))
+
+        if cfg.task == "CoLA":
+            print("Best Matthew Correlation: {0:.4f}".format(best_metric))
+        else:
+            print("Best Validation Accuracy: {0:.4f}".format(best_metric))
+
         print("Best Val Loss: {}".format(best_val_loss))
         print("Best Training Loss: {}".format(best_train_loss))
         print("Best Epoch: {}".format(best_epoch))
