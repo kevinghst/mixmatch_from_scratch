@@ -38,6 +38,8 @@ parser.add_argument('--check_after', default=-1, type=int)
 parser.add_argument('--early_stopping', default=-1, type=int)
 parser.add_argument('--p_drop_attn', default=0.1, type=float)
 parser.add_argument('--p_drop_hidden', default=0.1, type=float)
+parser.add_argument('--debug', actioin='store_true')
+
 
 # mixup
 parser.add_argument('--sup_mixup', choices=['cls', 'word', 'word_cls'])

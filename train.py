@@ -214,6 +214,8 @@ class Trainer():
                 b_labels = b_labels.to('cpu').numpy()
                 total_prec1 += bin_accuracy(logits, b_labels)
             else:
+                if cfg.debug:
+                    pdb.set_trace()
                 prec1, prec3 = multi_accuracy(logits, b_labels, topk=(1,3))
                 total_prec1 += prec1
                 total_prec3 += prec3
