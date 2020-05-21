@@ -276,6 +276,7 @@ class Trainer():
         best_epoch = 0
         best_train_loss = None
         best_val_loss = None
+        no_improvement = 0
 
         for epoch_i in range(0, epochs):
             model = self.model
@@ -331,6 +332,9 @@ class Trainer():
                 best_epoch = epoch_i
                 best_train_loss = avg_train_loss
                 best_val_loss = avg_val_loss
+                no_improvement = 0
+            else:
+                no_improvement += 1
 
             # Record all statistics from this epoch.
             training_stats.append(
@@ -344,6 +348,10 @@ class Trainer():
                     'Matthew Correlation': matt_corr
                 }
             )
+
+            if no_improvement == self.cfg.early_stopping:
+                print("Early stopped")
+                break
 
         print("")
         print("Training complete!")
