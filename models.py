@@ -105,7 +105,6 @@ class BertEncoder(nn.Module):
                     c_hidden_states = c_layer_outputs[0]
 
                 if mixup_layer == layer and (mixup == 'word' or mixup == 'word_cls'):
-                    pdb.set_trace()
                     h_a, h_b = hidden_states, c_hidden_states[shuffle_idx]
                     hidden_states = l * h_a + (1-l) * h_b
                     c_hidden_states = None
@@ -381,8 +380,6 @@ class BertForSequenceClassificationCustom(BertPreTrainedModel):
                 mixup_layer = self.layers + 1
             else:
                 mixup_layer = -1
-
-            pdb.set_trace()
 
             outputs = self.bert(
                 input_ids,
