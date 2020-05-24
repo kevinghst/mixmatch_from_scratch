@@ -56,6 +56,7 @@ class BertEmbeddings(nn.Module):
             inputs_embeds = self.word_embeddings(input_ids)
 
             if mixup and 'word' in mixup:
+                pdb.set_trace()
                 with torch.no_grad():
                     c_inputs_embeds = self.word_embeddings(c_input_ids)
 
@@ -100,6 +101,7 @@ class BertEncoder(nn.Module):
             hidden_states = layer_outputs[0]
             
             if c_hidden_states is not None:
+                pdb.set_trace()
                 with torch.no_grad():
                     c_layer_outputs = layer_module(c_hidden_states, attention_mask, head_mask[i])
                     c_hidden_states = c_layer_outputs[0]
@@ -332,6 +334,7 @@ class BertModel(BertPreTrainedModel):
         pooled_output = self.pooler(sequence_output)
 
         if mixup_layer == self.layers + 1:
+            pdb.set_trace()
             cls_a, cls_b = pooled_output, pooled_output[shuffle_idx]
             pooled_output = l * cls_a + (1-l) * cls_b
 
@@ -379,6 +382,7 @@ class BertForSequenceClassificationCustom(BertPreTrainedModel):
             elif mixup == 'cls':
                 mixup_layer = self.layers + 1
             else:
+                pdb.set_trace()
                 mixup_layer = -1
 
             outputs = self.bert(
