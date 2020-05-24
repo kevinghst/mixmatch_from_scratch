@@ -106,6 +106,7 @@ class Trainer():
             )
 
             if cfg.sup_mixup:
+                pdb.set_trace()
                 label_ids = mixup_op(label_ids, sup_l, sup_idx)
 
             loss = -torch.sum(F.log_softmax(sup_logits, dim=1) * label_ids, dim=1)
