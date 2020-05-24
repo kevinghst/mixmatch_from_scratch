@@ -102,7 +102,8 @@ class Trainer():
                 mixup=cfg.sup_mixup,
                 shuffle_idx=sup_idx,
                 l=sup_l,
-                manifold_mixup = cfg.manifold_mixup
+                manifold_mixup = cfg.manifold_mixup,
+                no_pretrained_pool=cfg.no_pretrained_pool
             )
 
             if cfg.sup_mixup:
@@ -202,7 +203,8 @@ class Trainer():
             with torch.no_grad():        
                 logits = model(
                     input_ids=b_input_ids,
-                    attention_mask=b_input_mask
+                    attention_mask=b_input_mask,
+                    no_pretrained_pool=cfg.no_pretrained_pool
                 )
                     
                 loss_fct = CrossEntropyLoss()
