@@ -40,7 +40,7 @@ def calculate_ece(true, pred, conf, mode):
             b_conf = 1/buckets * np.sum(conf_bucket)
 
             ece += (buckets/n) * (b_acc - b_conf)**2
-        
+        pdb.set_trace()
         return math.sqrt(ece)
     elif mode == "abs":
         buckets = 15
@@ -57,7 +57,7 @@ def calculate_ece(true, pred, conf, mode):
             b_conf = 1/buckets * np.sum(conf_bucket)
 
             ece += (buckets/n) * abs(b_acc - b_conf)
-
+        pdb.set_trace()
         return ece
 
 
