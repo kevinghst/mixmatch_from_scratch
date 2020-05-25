@@ -216,14 +216,16 @@ class Trainer():
             # Calculate the accuracy for this batch of test sentences, and
             # accumulate it over all batches.
 
+            probs = F.softmax(logits, dim=-1)
+
             if self.num_labels == 2:
                 logits = logits.detach().cpu().numpy()
+                probs = probs.detach().cpu().numpy()
                 b_labels = b_labels.to('cpu').numpy()
                 total_prec1 += bin_accuracy(logits, b_labels)
 
                 preds = np.argmax(logits, axis=1).flatten()
 
-                probs = F.softmax(logits, dim=-1)
                 pdb.set_trace()
                 conf = np.max(probs, axis=1).flatten()
 
