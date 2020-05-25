@@ -55,13 +55,10 @@ def calculate_ece(true, pred, conf, mode):
             true_bucket = true[i]
             b_acc = 1/buckets * np.sum(pred_bucket == true_bucket)
             b_conf = 1/buckets * np.sum(conf_bucket)
-            pdb.set_trace()
 
             ece += (buckets/n) * abs(b_acc - b_conf)
 
         return ece
-
-
 
 
 def mixup_op(input, l, idx):
