@@ -349,8 +349,6 @@ class Trainer():
                 best_true = y_true
                 best_pred = y_pred
                 best_conf = y_conf
-
-                ece = calculate_ece(best_true, best_pred, best_conf)
             else:
                 no_improvement += 1
 
@@ -368,9 +366,10 @@ class Trainer():
             )
 
             if no_improvement == self.cfg.early_stopping:
-                ece = calculate_ece(best_true, best_pred, best_conf)
                 print("Early stopped")
                 break
+
+        ece = calculate_ece(best_true, best_pred, best_conf)
 
         print("")
         print("Training complete!")

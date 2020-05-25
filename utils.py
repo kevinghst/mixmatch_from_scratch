@@ -39,7 +39,6 @@ def calculate_ece(true, pred, conf):
 
         ece += (buckets/n) * (1/buckets * b_acc - 1/buckets * b_conf)**2
         
-    pdb.set_trace()
     return math.sqrt(ece)
 
 def mixup_op(input, l, idx):
