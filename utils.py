@@ -14,8 +14,32 @@ def set_seeds(seed):
     torch.backends.cudnn.deterministic = True
 
 
-def calculate_ece(true, pred):
-    pdb.set_trace()
+def calculate_ece(true, pred, conf):
+    model = self.model
+
+    p = conf.argsort()
+    pred = pred[p]
+    true = true[p]
+    conf = conf[p]
+
+    total_size = len(conf)
+    bucket_size = 100
+    buckets = int(total_size/bucket_size)
+
+    pred = np.array_split(pred, buckets)
+    true = np.array_split(true, buckets)
+    conf = np.array_split(conf, buckets)
+
+    for i, conf_bucket in enumerate(conf):
+        pred_bucket = pred[i]
+        true_bucket = true[i]
+
+
+        
+
+
+
+
     end = "end"
 
 def mixup_op(input, l, idx):

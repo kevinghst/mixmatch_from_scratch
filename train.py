@@ -193,6 +193,7 @@ class Trainer():
 
         y_pred = np.array([])
         y_true = np.array([])
+        y_conf = np.array([])
 
         # Evaluate data for one epoch
         for batch in val_loader:
@@ -221,9 +222,12 @@ class Trainer():
                 total_prec1 += bin_accuracy(logits, b_labels)
 
                 preds = np.argmax(logits, axis=1).flatten()
+                pdb.set_trace()
+                conf = np.max(logits, axis=1).flatten()
+
                 y_true = np.append(y_true, b_labels)
                 y_pred = np.append(y_pred, preds)
-
+                y_conf = np.append(y_conf, conf)
 
             else:
                 prec1, prec3 = multi_accuracy(logits, b_labels, topk=(1,3))
@@ -254,7 +258,7 @@ class Trainer():
         print("  Validation took: {:}".format(validation_time))
 
 
-        return avg_prec1, avg_prec3, matt_corr, avg_val_loss, validation_time, y_true, y_pred
+        return avg_prec1, avg_prec3, matt_corr, avg_val_loss, validation_time, y_true, y_pred, y_conf
 
     def iterate(self, epochs):
         cfg = self.cfg
@@ -279,7 +283,11 @@ class Trainer():
         best_train_loss = None
         best_val_loss = None
         no_improvement = 0
+
         ece = -1
+        best_true = None
+        best_pred = None
+        best_conf = None
 
         for epoch_i in range(0, epochs):
             model = self.model
@@ -314,8 +322,7 @@ class Trainer():
             print("Running Validation...")
 
         
-            avg_prec1, avg_prec3, matt_corr, avg_val_loss, validation_time, y_true, y_pred = self.validate()
-            pdb.set_trace()
+            avg_prec1, avg_prec3, matt_corr, avg_val_loss, validation_time, y_true, y_pred, y_conf = self.validate()
 
             writer.add_scalars('data/losses', {'eval_loss': avg_val_loss}, epoch_i+1)
             writer.add_scalars('data/accuracies', {'eval_acc': avg_prec1}, epoch_i+1)
@@ -336,8 +343,10 @@ class Trainer():
                 best_train_loss = avg_train_loss
                 best_val_loss = avg_val_loss
                 no_improvement = 0
+                
                 best_true = y_true
                 best_pred = y_pred
+                best_conf = y_conf
             else:
                 no_improvement += 1
 
@@ -355,7 +364,7 @@ class Trainer():
             )
 
             if no_improvement == self.cfg.early_stopping:
-                ece = calculate_ece(best_true, best_pred)
+                ece = calculate_ece(best_true, best_pred, best_conf)
                 print("Early stopped")
                 break
 
