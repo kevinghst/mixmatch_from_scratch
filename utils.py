@@ -34,7 +34,6 @@ def calculate_ece(true, pred, conf):
     for i, conf_bucket in enumerate(conf):
         pred_bucket = pred[i]
         true_bucket = true[i]
-        pdb.set_trace()
         b_acc = np.sum(pred_bucket == true_bucket)
         b_conf = np.sum(conf_bucket)
 
