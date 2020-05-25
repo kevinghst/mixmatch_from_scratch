@@ -369,7 +369,7 @@ class Trainer():
                 print("Early stopped")
                 break
 
-        ece = calculate_ece(best_true, best_pred, best_conf)
+        ece = calculate_ece(best_true, best_pred, best_conf, cfg.ece)
 
         print("")
         print("Training complete!")

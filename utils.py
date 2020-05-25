@@ -15,31 +15,54 @@ def set_seeds(seed):
     torch.backends.cudnn.deterministic = True
 
 
-def calculate_ece(true, pred, conf):
+def calculate_ece(true, pred, conf, mode):
     p = conf.argsort()
     pred = pred[p]
     true = true[p]
     conf = conf[p]
 
     n = len(conf)
-    bucket_size = 100
-    buckets = int(n/bucket_size)
 
-    pred = np.array_split(pred, buckets)
-    true = np.array_split(true, buckets)
-    conf = np.array_split(conf, buckets)
+    if mode == "rms":
+        bucket_size = 100
+        buckets = int(n/bucket_size)
 
-    ece = 0
+        pred = np.array_split(pred, buckets)
+        true = np.array_split(true, buckets)
+        conf = np.array_split(conf, buckets)
 
-    for i, conf_bucket in enumerate(conf):
-        pred_bucket = pred[i]
-        true_bucket = true[i]
-        b_acc = np.sum(pred_bucket == true_bucket)
-        b_conf = np.sum(conf_bucket)
+        ece = 0
 
-        ece += (buckets/n) * (1/buckets * b_acc - 1/buckets * b_conf)**2
+        for i, conf_bucket in enumerate(conf):
+            pred_bucket = pred[i]
+            true_bucket = true[i]
+            b_acc = 1/buckets * np.sum(pred_bucket == true_bucket)
+            b_conf = 1/buckets * np.sum(conf_bucket)
+
+            ece += (buckets/n) * (b_acc - b_conf)**2
         
-    return math.sqrt(ece)
+        return math.sqrt(ece)
+    elif mode == "abs":
+        buckets = 15
+        pred = np.array_split(pred, buckets)
+        true = np.array_split(true, buckets)
+        conf = np.array_split(conf, buckets)
+       
+        ece = 0
+
+        for i, conf_bucket in enumerate(conf):
+            pred_bucket = pred[i]
+            true_bucket = true[i]
+            b_acc = 1/buckets * np.sum(pred_bucket == true_bucket)
+            b_conf = 1/buckets * np.sum(conf_bucket)
+            pdb.set_trace()
+
+            ece += (buckets/n) * abs(b_acc - b_conf)
+
+        return ece
+
+
+
 
 def mixup_op(input, l, idx):
     input_a, input_b = input, input[idx]
