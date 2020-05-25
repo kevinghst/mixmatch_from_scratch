@@ -3,6 +3,7 @@ import datetime
 import torch
 import random
 import pdb
+import math
 
 def set_seeds(seed):
     random.seed(seed)
@@ -22,25 +23,27 @@ def calculate_ece(true, pred, conf):
     true = true[p]
     conf = conf[p]
 
-    total_size = len(conf)
+    n = len(conf)
     bucket_size = 100
-    buckets = int(total_size/bucket_size)
+    buckets = int(n/bucket_size)
 
     pred = np.array_split(pred, buckets)
     true = np.array_split(true, buckets)
     conf = np.array_split(conf, buckets)
 
+    ece = 0
+
     for i, conf_bucket in enumerate(conf):
         pred_bucket = pred[i]
         true_bucket = true[i]
 
+        b_acc = np.sum(pred_bucket == true_bucket)
+        b_conf = np.sum(conf_bucket)
 
+        ece += (buckets/n) * (1/buckets * b_acc - 1/buckets * b_conf)**2
         
-
-
-
-
-    end = "end"
+    pdb.set_trace()
+    return math.sqrt(ece)
 
 def mixup_op(input, l, idx):
     input_a, input_b = input, input[idx]
