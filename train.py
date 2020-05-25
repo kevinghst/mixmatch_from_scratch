@@ -222,7 +222,10 @@ class Trainer():
                 total_prec1 += bin_accuracy(logits, b_labels)
 
                 preds = np.argmax(logits, axis=1).flatten()
-                conf = np.max(logits, axis=1).flatten()
+
+                probs = F.softmax(logits, dim=-1)
+                pdb.set_trace()
+                conf = np.max(probs, axis=1).flatten()
 
                 y_true = np.append(y_true, b_labels)
                 y_pred = np.append(y_pred, preds)
