@@ -349,7 +349,6 @@ class Trainer():
                 best_true = y_true
                 best_pred = y_pred
                 best_conf = y_conf
-                ece = calculate_ece(best_true, best_pred, best_conf, cfg.ece)
             else:
                 no_improvement += 1
 
