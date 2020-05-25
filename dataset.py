@@ -198,7 +198,6 @@ class DataSet():
         elif self.cfg.task == 'CoLA':
             df_train = pd.read_csv("./CoLA/train.tsv", delimiter='\t', header=None, names=['title', 'label', 'star', 'sentence']).iloc[1:]
             df_dev = pd.read_csv("./CoLA/dev.tsv", delimiter='\t', header=None, names=['title', 'label', 'star', 'sentence']).iloc[1:]
-            pdb.set_trace()
             df_train['label'] = df_train['label'].astype(int)
             df_dev['label'] = df_dev['label'].astype(int)
 
