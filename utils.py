@@ -14,6 +14,10 @@ def set_seeds(seed):
     torch.backends.cudnn.deterministic = True
 
 
+def calculate_ece(true, pred):
+    pdb.set_trace()
+    end = "end"
+
 def mixup_op(input, l, idx):
     input_a, input_b = input, input[idx]
     mixed_input = l * input_a + (1 - l) * input_b

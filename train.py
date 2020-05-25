@@ -254,7 +254,7 @@ class Trainer():
         print("  Validation took: {:}".format(validation_time))
 
 
-        return avg_prec1, avg_prec3, matt_corr, avg_val_loss, validation_time
+        return avg_prec1, avg_prec3, matt_corr, avg_val_loss, validation_time, y_true, y_pred
 
     def iterate(self, epochs):
         cfg = self.cfg
@@ -279,6 +279,7 @@ class Trainer():
         best_train_loss = None
         best_val_loss = None
         no_improvement = 0
+        ece = -1
 
         for epoch_i in range(0, epochs):
             model = self.model
@@ -313,8 +314,8 @@ class Trainer():
             print("Running Validation...")
 
         
-            avg_prec1, avg_prec3, matt_corr, avg_val_loss, validation_time = self.validate()
-
+            avg_prec1, avg_prec3, matt_corr, avg_val_loss, validation_time, y_true, y_pred = self.validate()
+            pdb.set_trace()
 
             writer.add_scalars('data/losses', {'eval_loss': avg_val_loss}, epoch_i+1)
             writer.add_scalars('data/accuracies', {'eval_acc': avg_prec1}, epoch_i+1)
@@ -335,6 +336,8 @@ class Trainer():
                 best_train_loss = avg_train_loss
                 best_val_loss = avg_val_loss
                 no_improvement = 0
+                best_true = y_true
+                best_pred = y_pred
             else:
                 no_improvement += 1
 
@@ -352,6 +355,7 @@ class Trainer():
             )
 
             if no_improvement == self.cfg.early_stopping:
+                ece = calculate_ece(best_true, best_pred)
                 print("Early stopped")
                 break
 
@@ -368,5 +372,6 @@ class Trainer():
         print("Best Val Loss: {}".format(best_val_loss))
         print("Best Training Loss: {}".format(best_train_loss))
         print("Best Epoch: {}".format(best_epoch))
+        print("Expected Calibration Error: {}".format(ece))
 
         writer.close()
