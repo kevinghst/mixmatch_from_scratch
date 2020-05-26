@@ -15,6 +15,7 @@ import shutil
 
 import os
 import pdb
+import pandas as pd
 
 
 class Trainer():
@@ -293,8 +294,9 @@ class Trainer():
 
         if cfg.save_predictions:
             avg_prec1, avg_prec3, matt_corr, avg_val_loss, validation_time, y_true, y_pred, y_conf = self.validate()
-            pdb.set_trace()
-            end = "end"
+            df = pd.DataFrame(y_pred)
+            file_path = os.path.join('results', cfg.results_dir, 'begin.xlsx')
+            df.to_excel(file_path, index=False)
 
         for epoch_i in range(0, epochs):
             model = self.model
@@ -375,6 +377,11 @@ class Trainer():
                 break
 
         ece = calculate_ece(best_true, best_pred, best_conf, cfg.ece)
+
+        if cfg.save_predictions:
+            df = pd.DataFrame(best_pred)
+            file_path = os.path.join('results', cfg.results_dir, 'best.xlsx')
+            df.to_excel(file_path, index=False)
 
         print("")
         print("Training complete!")
