@@ -292,17 +292,19 @@ class Trainer():
         best_pred = None
         best_conf = None
 
-        if cfg.save_predictions:
-            avg_prec1, avg_prec3, matt_corr, avg_val_loss, validation_time, y_true, y_pred, y_conf = self.validate()
-            df = pd.DataFrame({"pred": y_pred, "true": y_true})
-            file_path = os.path.join('results', cfg.results_dir, 'start.xlsx')
-            df.to_excel(file_path, index=False)
 
         for epoch_i in range(0, epochs):
             model = self.model
             device = self.device
             val_loader = self.val_loader
-    
+
+            if epoch_i <= 2 and cfg.save_predictions:
+                avg_prec1, avg_prec3, matt_corr, avg_val_loss, validation_time, y_true, y_pred, y_conf = self.validate()
+                df = pd.DataFrame({"pred": y_pred, "true": y_true})
+                file_name = str(epoch_i) + '_epoch.xlsx'
+                file_path = os.path.join('results', cfg.results_dir, file_name)
+                df.to_excel(file_path, index=False)
+
             # ========================================
             #               Training
             # ========================================
