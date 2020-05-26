@@ -41,6 +41,7 @@ parser.add_argument('--p_drop_hidden', default=0.1, type=float)
 parser.add_argument('--debug', action='store_true')
 parser.add_argument('--no_pretrained_pool', action='store_true')
 parser.add_argument('--ece', default="abs", choices=['rms', 'abs'])
+parser.add_argument('--save_predictions', action='store_true')
 
 # mixup
 parser.add_argument('--sup_mixup', choices=['cls', 'word', 'word_cls'])
