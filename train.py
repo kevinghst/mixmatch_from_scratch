@@ -294,6 +294,7 @@ class Trainer():
 
         if cfg.save_predictions:
             avg_prec1, avg_prec3, matt_corr, avg_val_loss, validation_time, y_true, y_pred, y_conf = self.validate()
+            pdb.set_trace()
             df = pd.DataFrame(y_pred)
             file_path = os.path.join('results', cfg.results_dir, 'start.xlsx')
             df.to_excel(file_path, index=False)
