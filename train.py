@@ -358,6 +358,8 @@ class Trainer():
                 best_true = y_true
                 best_pred = y_pred
                 best_conf = y_conf
+
+                self.save(epoch_i)
             else:
                 no_improvement += 1
 
@@ -401,3 +403,10 @@ class Trainer():
         print("Expected Calibration Error: {}".format(ece))
 
         writer.close()
+
+    def save(self, i):
+        """ save model """
+        if not os.path.isdir(os.path.join('results', self.cfg.results_dir, 'save')):
+            os.makedirs(os.path.join('results', self.cfg.results_dir, 'save'))
+        torch.save(self.model.state_dict(),
+                        os.path.join('results', self.cfg.results_dir, 'save', 'model_steps_'+str(i)+'.pt'))
