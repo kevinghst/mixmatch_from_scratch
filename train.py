@@ -133,15 +133,6 @@ class Trainer():
         for step, batch in enumerate(train_loader):
             batch = [t.to(device) for t in batch]
 
-
-            # Progress update every 40 batches.
-            if step % 40 == 0 and not step == 0:
-                # Calculate elapsed time in minutes.
-                elapsed = format_time(time.time() - t0)
-            
-                # Report progress.
-                print('  Batch {:>5,}  of  {:>5,}.    Elapsed: {:}.'.format(step, len(train_loader), elapsed))
-
             model.zero_grad()
 
             loss = self.get_loss(batch)
