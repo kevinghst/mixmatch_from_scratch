@@ -85,7 +85,7 @@ class Trainer():
 
             if cfg.sup_mixup and 'word' in cfg.sup_mixup:
                 input_ids, c_input_ids = pad_for_word_mixup(
-                    input_ids, input_mask, num_tokens, sup_idx    
+                    input_ids, input_mask, num_tokens, sup_idx, cfg.model    
                 )
             else:
                 c_input_ids=None

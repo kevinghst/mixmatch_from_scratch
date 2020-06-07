@@ -1,5 +1,5 @@
 import pandas as pd
-from transformers import BertTokenizer
+from transformers import BertTokenizer, RobertaTokenizer
 from torch.utils.data import TensorDataset, random_split
 import torch
 import ast
@@ -26,7 +26,10 @@ NUM_LABELS = {
 class DataSet():
     def __init__(self, cfg, ssl):
         self.cfg = cfg
-        self.tokenizer = BertTokenizer.from_pretrained('bert-base-uncased', do_lower_case=True)
+        if self.cfg.model == "bert":
+            self.tokenizer = BertTokenizer.from_pretrained('bert-base-uncased', do_lower_case=True)
+        else:
+            self.tokenizer = RobertaTokenizer.from_pretrained('roberta-base')
         self.ssl = ssl
 
     def preprocess(self, df):

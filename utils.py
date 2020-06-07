@@ -64,7 +64,12 @@ def mixup_op(input, l, idx):
     mixed_input = l * input_a + (1 - l) * input_b
     return mixed_input
 
-def pad_for_word_mixup(input_ids, input_mask, num_tokens, idx):
+def pad_for_word_mixup(input_ids, input_mask, num_tokens, idx, model):
+    if model == "bert":
+        unused = 1
+    elif model == "roberta":
+        unused = 50262
+
     batch_size = input_ids.size(0)
     c_input_ids = input_ids.clone()
 
@@ -90,7 +95,7 @@ def pad_for_word_mixup(input_ids, input_mask, num_tokens, idx):
 
         if i_count != j_count:
             first = small_ids[small][0:small_count-1]
-            second = torch.tensor([1] * (big_count - small_count)).cuda()
+            second = torch.tensor([unused] * (big_count - small_count)).cuda()
             third = big_ids[big][big_count-1:128]
             combined = torch.cat((first, second, third), 0)
             small_ids[small] = combined
