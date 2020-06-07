@@ -5,6 +5,7 @@ from torch.nn import CrossEntropyLoss, MSELoss
 import torch
 import random
 from transformers.configuration_roberta import RobertaConfig
+from transformers.modeling_utils import create_position_ids_from_input_ids
 
 import pdb
 
@@ -93,24 +94,23 @@ class RobertaEmbeddings(BertEmbeddings):
 
     def forward(
             self, 
-            input_ids=None, 
+            input_ids=None,
             c_input_ids=None,
-            token_type_ids=None, 
-            position_ids=None, 
+            token_type_ids=None,
+            position_ids=None,
             inputs_embeds=None,
             mixup=None,
             l=1,
             shuffle_idx=None,
             mixup_layer=-1
         ):
-        pdb.set_trace()
         if position_ids is None:
             if input_ids is not None:
                 # Create the position ids from the input token ids. Any padded tokens remain padded.
                 position_ids = create_position_ids_from_input_ids(input_ids, self.padding_idx).to(input_ids.device)
             else:
                 position_ids = self.create_position_ids_from_inputs_embeds(inputs_embeds)
-        pdb.set_trace()
+
         return super().forward(
             input_ids, token_type_ids=token_type_ids, position_ids=position_ids, inputs_embeds=inputs_embeds
         )
@@ -361,7 +361,7 @@ class BertModel(BertPreTrainedModel):
             )  # switch to fload if need + fp16 compatibility
         else:
             head_mask = [None] * self.config.num_hidden_layers
-        pdb.set_trace()
+
         embedding_output, c_embedding_output = self.embeddings(
             input_ids=input_ids, 
             c_input_ids=c_input_ids,
