@@ -1,5 +1,6 @@
 from transformers import BertPreTrainedModel
 from transformers.modeling_roberta import RobertaModel, RobertaClassificationHead
+from transformers.configuration_roberta import RobertaConfig
 
 class RobertaForSequenceClassification(BertPreTrainedModel):
     config_class = RobertaConfig
