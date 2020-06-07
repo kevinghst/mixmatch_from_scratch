@@ -225,7 +225,6 @@ class Trainer():
 
             else:
                 prec1, prec3 = multi_accuracy(logits, b_labels, topk=(1,3))
-                pdb.set_trace()
                 total_prec1 += prec1
                 total_prec3 += prec3
 
