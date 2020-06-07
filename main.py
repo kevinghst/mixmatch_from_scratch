@@ -12,7 +12,8 @@ from transformers import AdamW, BertConfig
 from transformers import get_linear_schedule_with_warmup
 
 from models_new import Classifier
-from models import BertForSequenceClassificationCustom
+from models import BertForSequenceClassificationCustom, RobertaForSequenceClassificationCustom
+
 from dataset import DataSet
 from train import Trainer
 from train_ict import ICT_Trainer
@@ -45,6 +46,7 @@ parser.add_argument('--save_predictions', action='store_true')
 parser.add_argument('--test_mode', action='store_true')
 parser.add_argument('--test_run', default='', type=str)
 parser.add_argument('--test_epoch', default='', type=str)
+parser.add_argument('--model', default='bert', type=str)
 
 # mixup
 parser.add_argument('--sup_mixup', choices=['cls', 'word', 'word_cls'])
@@ -174,12 +176,21 @@ if unsup_dataset:
 
 # Load BertForSequenceClassification, the pretrained BERT model with a single
 # linear classification layer on top.
-model = BertForSequenceClassificationCustom.from_pretrained(
-    "bert-base-uncased", # Use the 12-layer BERT model, with an uncased vocab.
-    num_labels = NUM_LABELS[cfg.task],
-    output_attentions = False, # Whether the model returns attentions weights.
-    output_hidden_states = False, # Whether the model returns all hidden-states.
-)
+
+if cfg.model == "bert":
+    model = BertForSequenceClassificationCustom.from_pretrained(
+        "bert-base-uncased", # Use the 12-layer BERT model, with an uncased vocab.
+        num_labels = NUM_LABELS[cfg.task],
+        output_attentions = False, # Whether the model returns attentions weights.
+        output_hidden_states = False, # Whether the model returns all hidden-states.
+    )
+elif cfg.model == 'roberta':
+    model = RobertaForSequenceClassificationCustom.from_pretrained(
+        "roberta-base",
+        num_labels = NUM_LABELS[cfg.task],
+        output_attentions = False, # Whether the model returns attentions weights.
+        output_hidden_states = False, # Whether the model returns all hidden-states.
+    )
 
 # Tell pytorch to run this model on the GPU.
 model.cuda()
