@@ -42,6 +42,9 @@ parser.add_argument('--debug', action='store_true')
 parser.add_argument('--no_pretrained_pool', action='store_true')
 parser.add_argument('--ece', default="abs", choices=['rms', 'abs'])
 parser.add_argument('--save_predictions', action='store_true')
+parser.add_argument('--test_mode', action='store_true')
+parser.add_argument('--test_run', default='', type=str)
+parser.add_argument('--test_epoch', default='', type=str)
 
 # mixup
 parser.add_argument('--sup_mixup', choices=['cls', 'word', 'word_cls'])
@@ -232,4 +235,7 @@ else:
         num_labels=NUM_LABELS[cfg.task]
     )
 
-trainer.iterate(cfg.epochs)
+if cfg.test_mode:
+    trainer.test()
+else:
+    trainer.iterate(cfg.epochs)

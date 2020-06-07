@@ -163,6 +163,14 @@ class Trainer():
 
         return avg_train_loss, training_time
     
+    def test(self):
+        cfg = self.cfg
+
+        path = os.path.join('results', cfg.test_run, 'save', 'model_steps_'+ cfg.test_epoch +'.pt')
+        pdb.set_trace()
+        checkpoint = torch.load(path)
+
+        result = "result"
 
     def validate(self):
         t0 = time.time()
@@ -254,6 +262,7 @@ class Trainer():
 
         return avg_prec1, avg_prec3, matt_corr, avg_val_loss, validation_time, y_true, y_pred, y_conf
 
+  
     def iterate(self, epochs):
         cfg = self.cfg
 
