@@ -165,12 +165,25 @@ class Trainer():
     
     def test(self):
         cfg = self.cfg
+        model = self.model
 
         path = os.path.join('results', cfg.test_run, 'save', 'model_steps_'+ cfg.test_epoch +'.pt')
-        pdb.set_trace()
         checkpoint = torch.load(path)
+        model.load_state_dict(checkpoint)
 
-        result = "result"
+        print("Running Test...")
+
+        avg_prec1, avg_prec3, matt_corr, avg_val_loss, validation_time, y_true, y_pred, y_conf = self.validate()
+
+        ece = calculate_ece(y_true, y_pred, y_conf, cfg.ece)
+
+        if cfg.task == "CoLA":
+            print("Test Matthew Correlation: {0:.4f}".format(matt_corr))
+        else:
+            print("Test Accuracy: {0:.4f}".format(avg_prec1))
+
+        print("Test Loss: {}".format(avg_val_loss))
+        print("Expected Calibration Error: {}".format(ece))
 
     def validate(self):
         t0 = time.time()
