@@ -91,7 +91,18 @@ class RobertaEmbeddings(BertEmbeddings):
         )
         self.test = "test"
 
-    def forward(self, input_ids=None, token_type_ids=None, position_ids=None, inputs_embeds=None):
+    def forward(
+            self, 
+            input_ids=None, 
+            c_input_ids=None,
+            token_type_ids=None, 
+            position_ids=None, 
+            inputs_embeds=None,
+            mixup=None,
+            l=1,
+            shuffle_idx=None,
+            mixup_layer=-1
+        ):
         pdb.set_trace()
         if position_ids is None:
             if input_ids is not None:
