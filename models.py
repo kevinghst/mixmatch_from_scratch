@@ -89,6 +89,7 @@ class RobertaEmbeddings(BertEmbeddings):
         self.position_embeddings = nn.Embedding(
             config.max_position_embeddings, config.hidden_size, padding_idx=self.padding_idx
         )
+        self.test = "test"
 
     def forward(self, input_ids=None, token_type_ids=None, position_ids=None, inputs_embeds=None):
         pdb.set_trace()
