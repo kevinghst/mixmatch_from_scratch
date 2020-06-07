@@ -186,7 +186,7 @@ if cfg.model == "bert":
         output_hidden_states = False, # Whether the model returns all hidden-states.
     )
 elif cfg.model == 'roberta':
-    confg = RobertaConfig.from_pretrained('roberta-base')
+    config = RobertaConfig.from_pretrained('roberta-base')
     config.num_labels = NUM_LABELS[cfg.task]
     model = RobertaForSequenceClassificationCustom(config)
 
