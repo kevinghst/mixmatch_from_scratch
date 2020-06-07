@@ -77,6 +77,45 @@ class BertEmbeddings(nn.Module):
         embeddings = inputs_embeds + position_embeddings + token_type_embeddings
         return self.dropout(self.LayerNorm(embeddings)), None
 
+class RobertaEmbeddings(BertEmbeddings):
+    """
+    Same as BertEmbeddings with a tiny tweak for positional embeddings indexing.
+    """
+
+    def __init__(self, config):
+        super().__init__(config)
+        self.padding_idx = config.pad_token_id
+        self.word_embeddings = nn.Embedding(config.vocab_size, config.hidden_size, padding_idx=self.padding_idx)
+        self.position_embeddings = nn.Embedding(
+            config.max_position_embeddings, config.hidden_size, padding_idx=self.padding_idx
+        )
+
+    def forward(self, input_ids=None, token_type_ids=None, position_ids=None, inputs_embeds=None):
+        pdb.set_trace()
+        if position_ids is None:
+            if input_ids is not None:
+                # Create the position ids from the input token ids. Any padded tokens remain padded.
+                position_ids = create_position_ids_from_input_ids(input_ids, self.padding_idx).to(input_ids.device)
+            else:
+                position_ids = self.create_position_ids_from_inputs_embeds(inputs_embeds)
+        pdb.set_trace()
+        return super().forward(
+            input_ids, token_type_ids=token_type_ids, position_ids=position_ids, inputs_embeds=inputs_embeds
+        )
+
+    def create_position_ids_from_inputs_embeds(self, inputs_embeds):
+        """ We are provided embeddings directly. We cannot infer which are padded so just generate
+        sequential position ids.
+        :param torch.Tensor inputs_embeds:
+        :return torch.Tensor:
+        """
+        input_shape = inputs_embeds.size()[:-1]
+        sequence_length = input_shape[1]
+
+        position_ids = torch.arange(
+            self.padding_idx + 1, sequence_length + self.padding_idx + 1, dtype=torch.long, device=inputs_embeds.device
+        )
+        return position_ids.unsqueeze(0).expand(input_shape)
 
 class BertEncoder(nn.Module):
     def __init__(self, config):
@@ -350,6 +389,26 @@ class BertModel(BertPreTrainedModel):
         return outputs  # sequence_output, pooled_output, (hidden_states), (attentions)
 
 
+class RobertaModel(BertModel):
+    """
+    This class overrides :class:`~transformers.BertModel`. Please check the
+    superclass for the appropriate documentation alongside usage examples.
+    """
+
+    config_class = RobertaConfig
+    base_model_prefix = "roberta"
+
+    def __init__(self, config):
+        super().__init__(config)
+
+        self.embeddings = RobertaEmbeddings(config)
+        self.init_weights()
+
+    def get_input_embeddings(self):
+        return self.embeddings.word_embeddings
+
+    def set_input_embeddings(self, value):
+        self.embeddings.word_embeddings = value
 
 class BertForSequenceClassificationCustom(BertPreTrainedModel):
     def __init__(self, config):
@@ -419,69 +478,6 @@ class BertForSequenceClassificationCustom(BertPreTrainedModel):
         
         return outputs  # logits, (hidden_states), (attentions)
 
-
-
-class RobertaEmbeddings(BertEmbeddings):
-    """
-    Same as BertEmbeddings with a tiny tweak for positional embeddings indexing.
-    """
-
-    def __init__(self, config):
-        super().__init__(config)
-        self.padding_idx = config.pad_token_id
-        self.word_embeddings = nn.Embedding(config.vocab_size, config.hidden_size, padding_idx=self.padding_idx)
-        self.position_embeddings = nn.Embedding(
-            config.max_position_embeddings, config.hidden_size, padding_idx=self.padding_idx
-        )
-
-    def forward(self, input_ids=None, token_type_ids=None, position_ids=None, inputs_embeds=None):
-        pdb.set_trace()
-        if position_ids is None:
-            if input_ids is not None:
-                # Create the position ids from the input token ids. Any padded tokens remain padded.
-                position_ids = create_position_ids_from_input_ids(input_ids, self.padding_idx).to(input_ids.device)
-            else:
-                position_ids = self.create_position_ids_from_inputs_embeds(inputs_embeds)
-        pdb.set_trace()
-        return super().forward(
-            input_ids, token_type_ids=token_type_ids, position_ids=position_ids, inputs_embeds=inputs_embeds
-        )
-
-    def create_position_ids_from_inputs_embeds(self, inputs_embeds):
-        """ We are provided embeddings directly. We cannot infer which are padded so just generate
-        sequential position ids.
-        :param torch.Tensor inputs_embeds:
-        :return torch.Tensor:
-        """
-        input_shape = inputs_embeds.size()[:-1]
-        sequence_length = input_shape[1]
-
-        position_ids = torch.arange(
-            self.padding_idx + 1, sequence_length + self.padding_idx + 1, dtype=torch.long, device=inputs_embeds.device
-        )
-        return position_ids.unsqueeze(0).expand(input_shape)
-
-
-class RobertaModel(BertModel):
-    """
-    This class overrides :class:`~transformers.BertModel`. Please check the
-    superclass for the appropriate documentation alongside usage examples.
-    """
-
-    config_class = RobertaConfig
-    base_model_prefix = "roberta"
-
-    def __init__(self, config):
-        super().__init__(config)
-
-        self.embeddings = RobertaEmbeddings(config)
-        self.init_weights()
-
-    def get_input_embeddings(self):
-        return self.embeddings.word_embeddings
-
-    def set_input_embeddings(self, value):
-        self.embeddings.word_embeddings = value
 
 class RobertaClassificationHead(nn.Module):
     """Head for sentence-level classification tasks."""
