@@ -14,6 +14,7 @@ from transformers.configuration_roberta import RobertaConfig
 
 from models_new import Classifier
 from models import BertForSequenceClassificationCustom, RobertaForSequenceClassificationCustom
+from models_roberta import RobertaForSequenceClassification
 
 from dataset import DataSet
 from train import Trainer
@@ -188,7 +189,7 @@ if cfg.model == "bert":
 elif cfg.model == 'roberta':
     config = RobertaConfig.from_pretrained('roberta-base')
     config.num_labels = NUM_LABELS[cfg.task]
-    model = RobertaForSequenceClassificationCustom(config)
+    model = RobertaForSequenceClassification(config)
 
 # Tell pytorch to run this model on the GPU.
 model.cuda()
