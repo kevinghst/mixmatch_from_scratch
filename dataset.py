@@ -112,6 +112,7 @@ class DataSet():
         labels = torch.tensor(labels)
         num_tokens = torch.tensor(num_tokens)
 
+        pdb.set_trace()
         if sentences2 is not None:
             pdb.set_trace()
 
