@@ -193,6 +193,7 @@ class DataSet():
     def get_dataset(self):
         # Load the dataset into a pandas dataframe.
         df_unsup = None
+        df_test = None
 
         if self.cfg.task == "SST":
             df_train = pd.read_csv("./SST-2/train.tsv", delimiter='\t', header=None, names=['sentence', 'label']).iloc[1:]
@@ -213,6 +214,11 @@ class DataSet():
             df_dev = pd.read_csv(f_dev, sep='\t')
             df_dev.rename(columns={"label_ids": "label"}, inplace=True)
             self.swap_binary_label(df_dev)
+
+            if self.cfg.test_also:
+                df_test = df_dev.copy()
+
+            pdb.set_trace()
 
             if self.ssl:
                 f_unsup = open("./imdb/imdb_unsup_train.txt", 'r', encoding='utf-8')
