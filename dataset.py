@@ -64,7 +64,7 @@ class DataSet():
             if len(tokens) > max_len - 2:
                 tokens = tokens[-(max_len - 2):]
 
-            if sentences2:
+            if sentences2 is not None:
                 tokens2 = self.tokenizer.tokenize(sentences2[i])
                 if len(tokens2) > max_len - 2:
                     tokens2 = tokens2[-(max_len - 2):]
@@ -111,7 +111,7 @@ class DataSet():
         labels = torch.tensor(labels)
         num_tokens = torch.tensor(num_tokens)
 
-        if sentences2:
+        if sentences2 is not None:
             pdb.set_trace()
 
 
