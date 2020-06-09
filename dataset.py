@@ -73,9 +73,10 @@ class DataSet():
                     raise Exception('Total length exceeds max length')
 
 
-            if not sentences2:
+            if sentences2 is not None:
                 encoded_dict = self.tokenizer.encode_plus(
                                     tokens,                      # Sentence to encode.
+                                    tokens2,                     # The other sentence
                                     add_special_tokens = True, # Add '[CLS]' and '[SEP]'
                                     max_length = max_len,           # Pad & truncate all sentences.
                                     pad_to_max_length = True,
@@ -86,7 +87,6 @@ class DataSet():
             else:
                 encoded_dict = self.tokenizer.encode_plus(
                                     tokens,                      # Sentence to encode.
-                                    tokens2,                     # The other sentence
                                     add_special_tokens = True, # Add '[CLS]' and '[SEP]'
                                     max_length = max_len,           # Pad & truncate all sentences.
                                     pad_to_max_length = True,
