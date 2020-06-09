@@ -48,6 +48,9 @@ class DataSet():
         attention_masks = []
         segment_ids = []
         num_tokens = []
+        
+        combined_lengths = []
+
         # For every sentence...
         for i, sent in enumerate(sentences):
             # `encode_plus` will:
@@ -69,8 +72,10 @@ class DataSet():
                 if len(tokens2) > max_len - 2:
                     tokens2 = tokens2[-(max_len - 2):]
 
-                if len(tokens) + len(tokens2) > max_len - 3:
-                    raise Exception('Total length exceeds max length')
+                combined_lengths.append(len(tokens) + len(tokens2) + 3)
+
+                #if len(tokens) + len(tokens2) > max_len - 3:
+                #    raise Exception('Total length exceeds max length')
 
 
             if sentences2 is not None:
