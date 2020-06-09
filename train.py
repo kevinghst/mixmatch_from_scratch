@@ -22,7 +22,7 @@ class Trainer():
     def __init__(
             self, 
             model=None, optimizer=None, device=None, scheduler=None,
-            train_loader=None, val_loader=None, unsup_loader=None,
+            train_loader=None, val_loader=None, test_loader=None, unsup_loader=None,
             cfg=None, num_labels=None
         ):
         self.model = model
@@ -31,6 +31,7 @@ class Trainer():
         self.scheduler = scheduler
         self.train_loader = train_loader
         self.val_loader = val_loader
+        self.test_loader = test_loader
         self.unsup_loader = unsup_loader
         self.cfg = cfg
         self.num_labels = num_labels
@@ -163,17 +164,17 @@ class Trainer():
 
         return avg_train_loss, training_time
     
-    def test(self):
+    def test(self, run, epoch):
         cfg = self.cfg
         model = self.model
 
-        path = os.path.join('results', cfg.test_run, 'save', 'model_steps_'+ cfg.test_epoch +'.pt')
+        path = os.path.join('results', run, 'save', 'model_steps_'+ epoch +'.pt')
         checkpoint = torch.load(path)
-        model.load_state_dict(checkpoint)
+        self.model.load_state_dict(checkpoint)
 
         print("Running Test...")
 
-        avg_prec1, avg_prec3, matt_corr, avg_val_loss, validation_time, y_true, y_pred, y_conf = self.validate()
+        avg_prec1, avg_prec3, matt_corr, avg_val_loss, validation_time, y_true, y_pred, y_conf = self.validate(test=True)
 
         ece = calculate_ece(y_true, y_pred, y_conf, cfg.ece)
 
@@ -185,12 +186,15 @@ class Trainer():
         print("Test Loss: {}".format(avg_val_loss))
         print("Expected Calibration Error: {}".format(ece))
 
-    def validate(self):
+    def validate(self, test=False):
         t0 = time.time()
 
         model = self.model
         device = self.device
-        val_loader = self.val_loader
+        if test:
+            val_loader = self.test_loader
+        else:
+            val_loader = self.val_loader
         cfg = self.cfg
 
         # Put the model in evaluation mode--the dropout layers behave differently
@@ -414,6 +418,9 @@ class Trainer():
         print("Best Training Loss: {}".format(best_train_loss))
         print("Best Epoch: {}".format(best_epoch))
         print("Expected Calibration Error: {}".format(ece))
+
+        if cfg.test_also:
+            self.test(cfg.results_dir, best_epoch)
 
         writer.close()
 

@@ -215,10 +215,8 @@ class DataSet():
             df_dev.rename(columns={"label_ids": "label"}, inplace=True)
             self.swap_binary_label(df_dev)
 
-            if self.cfg.test_also:
+            if self.cfg.test_also or self.cfg.test_mode:
                 df_test = df_dev.copy()
-
-            pdb.set_trace()
 
             if self.ssl:
                 f_unsup = open("./imdb/imdb_unsup_train.txt", 'r', encoding='utf-8')
@@ -268,18 +266,29 @@ class DataSet():
 
         if 'input_ids' in df_dev:
             input_ids_dev, attention_masks_dev, seg_ids_dev, label_ids_dev, num_tokens_dev = self.retrieve_tensors(df_dev, 'sup')
+
+            if df_test is not None:
+                input_ids_test, attention_masks_test, seg_ids_test, label_ids_test, num_tokens_test = self.retrieve_tensors(df_test, 'sup')
+
             if self.ssl:
                 ori_input_ids, ori_input_mask, ori_seg_ids, aug_input_ids, aug_input_mask, aug_seg_ids, ori_num_tokens, aug_num_tokens = self.retrieve_tensors(df_unsup, 'unsup')
                 print('Number of unsup sentences: {:,}\n'.format(ori_input_ids.shape[0]))
         else:
             input_ids_dev, attention_masks_dev, seg_ids_dev, label_ids_dev, num_tokens_dev = self.preprocess(df_dev)
 
+            if df_test is not None:
+                input_ids_test, attention_masks_test, seg_ids_test, label_ids_test, num_tokens_test = self.preprocess(df_test)
+
         # Combine the training inputs into a TensorDataset.
         train_dataset = TensorDataset(input_ids_train, seg_ids_train, attention_masks_train, label_ids_train, num_tokens_train)
         val_dataset = TensorDataset(input_ids_dev, seg_ids_dev, attention_masks_dev, label_ids_dev)
+
+        test_dataset = None
+        if df_test is not None:
+            test_dataset = TensorDataset(input_ids_test, seg_ids_test, attention_masks_test, label_ids_test)
 
         unsup_dataset = None
         if self.ssl:
             unsup_dataset = TensorDataset(ori_input_ids, ori_seg_ids, ori_input_mask, aug_input_ids, aug_seg_ids, aug_input_mask, ori_num_tokens, aug_num_tokens)
 
-        return train_dataset, val_dataset, unsup_dataset
+        return train_dataset, val_dataset, unsup_dataset, test_dataset

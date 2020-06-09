@@ -154,7 +154,7 @@ else:
 
 dataset = DataSet(cfg, ssl)
 
-train_dataset, val_dataset, unsup_dataset = dataset.get_dataset()
+train_dataset, val_dataset, unsup_dataset, test_dataset = dataset.get_dataset()
 
 # Create the DataLoaders for our training and validation sets.
 # We'll take training samples in random order.
@@ -170,6 +170,15 @@ validation_dataloader = DataLoader(
             sampler = SequentialSampler(val_dataset), # Pull out batches sequentially.
             batch_size = cfg.val_batch_size # Evaluate with this batch size.
         )
+
+test_dataloader = None
+if cfg.test_also:
+    test_dataloader = DataLoader(
+                test_dataset, # The validation samples.
+                sampler = SequentialSampler(val_dataset), # Pull out batches sequentially.
+                batch_size = cfg.val_batch_size # Evaluate with this batch size.
+            )
+
 
 unsup_dataloader = None
 if unsup_dataset:
@@ -243,12 +252,13 @@ else:
         scheduler=scheduler,
         train_loader=train_dataloader,
         val_loader=validation_dataloader,
+        test_loader=test_dataloader,
         unsup_loader=unsup_dataloader,
         cfg=cfg,
         num_labels=NUM_LABELS[cfg.task]
     )
 
 if cfg.test_mode:
-    trainer.test()
+    trainer.test(cfg.test_run, cfg.test_epoch)
 else:
     trainer.iterate(cfg.epochs)
