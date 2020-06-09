@@ -69,7 +69,7 @@ class DataSet():
                 if len(tokens2) > max_len - 2:
                     tokens2 = tokens2[-(max_len - 2):]
 
-                if len(tokens1) + len(tokens2) > max_len - 3:
+                if len(tokens) + len(tokens2) > max_len - 3:
                     raise Exception('Total length exceeds max length')
 
 
