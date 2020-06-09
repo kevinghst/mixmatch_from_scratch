@@ -215,9 +215,6 @@ class DataSet():
             df_dev.rename(columns={"label_ids": "label"}, inplace=True)
             self.swap_binary_label(df_dev)
 
-            if self.cfg.test_also or self.cfg.test_mode:
-                df_test = df_dev.copy()
-
             if self.ssl:
                 f_unsup = open("./imdb/imdb_unsup_train.txt", 'r', encoding='utf-8')
                 df_unsup = pd.read_csv(f_unsup, sep='\t')
@@ -229,6 +226,9 @@ class DataSet():
                 self.reindex(df_unsup)
             else:
                 df_dev = pd.read_csv("./imdb/sup_dev.csv", header=None, names=['sentence', 'label'])
+
+            if self.cfg.test_also or self.cfg.test_mode:
+                df_test = df_dev.copy()
 
         elif self.cfg.task == 'CoLA':
             df_train = pd.read_csv("./CoLA/train.tsv", delimiter='\t', header=None, names=['title', 'label', 'star', 'sentence']).iloc[1:]
