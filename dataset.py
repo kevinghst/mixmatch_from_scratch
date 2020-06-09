@@ -12,7 +12,7 @@ MAX_LENGTHS = {
     "imdb": 128,
     "CoLA": 128,
     "agnews": 128,
-    "RTE": 128
+    "RTE": 256
 }
 
 NUM_LABELS = {
@@ -49,8 +49,6 @@ class DataSet():
         segment_ids = []
         num_tokens = []
         
-        combined_lengths = []
-
         # For every sentence...
         for i, sent in enumerate(sentences):
             # `encode_plus` will:
@@ -72,10 +70,8 @@ class DataSet():
                 if len(tokens2) > max_len - 2:
                     tokens2 = tokens2[-(max_len - 2):]
 
-                combined_lengths.append(len(tokens) + len(tokens2) + 3)
-
-                #if len(tokens) + len(tokens2) > max_len - 3:
-                #    raise Exception('Total length exceeds max length')
+                if len(tokens) + len(tokens2) > max_len - 3:
+                    raise Exception('Total length exceeds max length')
 
 
             if sentences2 is not None:
@@ -115,10 +111,6 @@ class DataSet():
         segment_ids = torch.cat(segment_ids, dim=0)
         labels = torch.tensor(labels)
         num_tokens = torch.tensor(num_tokens)
-
-        if sentences2 is not None:
-            pdb.set_trace()
-
 
         return input_ids, attention_masks, segment_ids, labels, num_tokens
 
