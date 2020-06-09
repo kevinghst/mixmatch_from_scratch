@@ -2,6 +2,7 @@
 *.tgz
 CoLA/
 dbpedia/
+agnews/
 imdb/
 MNLI/
 SST-2/
