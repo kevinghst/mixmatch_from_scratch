@@ -102,7 +102,8 @@ MAX_LENGTHS = {
     "dbpedia": 256,
     "imdb": 128,
     "CoLA": 128,
-    "agnews": 128
+    "agnews": 128,
+    "RTE": 128
 }
 
 NUM_LABELS = {
@@ -110,7 +111,8 @@ NUM_LABELS = {
     "dbpedia": 10,
     "imdb": 2,
     "CoLA": 2,
-    "agnews": 4
+    "agnews": 4,
+    "RTE": 2
 }
 
 model_cfg = {

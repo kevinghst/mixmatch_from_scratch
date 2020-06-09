@@ -11,7 +11,8 @@ MAX_LENGTHS = {
     "dbpedia": 256,
     "imdb": 128,
     "CoLA": 128,
-    "agnews": 128
+    "agnews": 128,
+    "RTE": 128
 }
 
 NUM_LABELS = {
@@ -19,7 +20,8 @@ NUM_LABELS = {
     "dbpedia": 10,
     "imdb": 2,
     "CoLA": 2,
-    "agnews": 4
+    "agnews": 4,
+    "RTE": 2
 }
 
 
@@ -36,13 +38,18 @@ class DataSet():
         sentences = df.sentence.values
         labels = df.label.values
 
+        if 'sentence2' in df:
+            sentences2 = df.sentence2.values
+        else:
+            sentences2 = None
+
         # Tokenize all of the sentences and map the tokens to thier word IDs.
         input_ids = []
         attention_masks = []
         segment_ids = []
         num_tokens = []
         # For every sentence...
-        for sent in sentences:
+        for i, sent in enumerate(sentences):
             # `encode_plus` will:
             #   (1) Tokenize the sentence.
             #   (2) Prepend the `[CLS]` token to the start.
@@ -57,24 +64,36 @@ class DataSet():
             if len(tokens) > max_len - 2:
                 tokens = tokens[-(max_len - 2):]
 
-            # pad all tokens to the same length using UNS token
+            if sentences2:
+                tokens2 = self.tokenizer.tokenize(sentences2[i])
+                if len(tokens2) > max_len - 2:
+                    tokens2 = tokens2[-(max_len - 2):]
 
-            #max_sent_length = 66
-            #paddings = max_sent_length - 2 - len(tokens)
+                if len(tokens1) + len(tokens2) > max_len - 3:
+                    raise Exception('Total length exceeds max length')
 
-            #for i in range(0, paddings):
-            #    unused_token = '[unused0]'
-            #    tokens.append(unused_token)
 
-            encoded_dict = self.tokenizer.encode_plus(
-                                tokens,                      # Sentence to encode.
-                                add_special_tokens = True, # Add '[CLS]' and '[SEP]'
-                                max_length = max_len,           # Pad & truncate all sentences.
-                                pad_to_max_length = True,
-                                return_attention_mask = True,   # Construct attn. masks.
-                                return_tensors = 'pt',     # Return pytorch tensors.
-                                is_pretokenized = True
-                        )
+            if not sentences2:
+                encoded_dict = self.tokenizer.encode_plus(
+                                    tokens,                      # Sentence to encode.
+                                    add_special_tokens = True, # Add '[CLS]' and '[SEP]'
+                                    max_length = max_len,           # Pad & truncate all sentences.
+                                    pad_to_max_length = True,
+                                    return_attention_mask = True,   # Construct attn. masks.
+                                    return_tensors = 'pt',     # Return pytorch tensors.
+                                    is_pretokenized = True
+                            )
+            else:
+                encoded_dict = self.tokenizer.encode_plus(
+                                    tokens,                      # Sentence to encode.
+                                    tokens2,                     # The other sentence
+                                    add_special_tokens = True, # Add '[CLS]' and '[SEP]'
+                                    max_length = max_len,           # Pad & truncate all sentences.
+                                    pad_to_max_length = True,
+                                    return_attention_mask = True,   # Construct attn. masks.
+                                    return_tensors = 'pt',     # Return pytorch tensors.
+                                    is_pretokenized = True
+                            )
 
             input_ids.append(encoded_dict['input_ids'])
             attention_masks.append(encoded_dict['attention_mask'])
@@ -84,7 +103,7 @@ class DataSet():
                 holder = torch.tensor([0])
                 segment_ids.append(holder)
 
-            num_tokens.append(len(tokens) + 2)
+            num_tokens.append(len(tokens) + 2) #TODO: change for 2 sentence tasks
 
         input_ids = torch.cat(input_ids, dim=0)
         attention_masks = torch.cat(attention_masks, dim=0)
@@ -208,6 +227,20 @@ class DataSet():
             df_train['label'] = df_train['label'].astype(int)
             df_dev['label'] = df_dev['label'].astype(int)
 
+        elif self.cfg.task == 'RTE':
+            df_train = pd.read_csv('./RTE/train.tsv', delimiter='\t', header=None, names=['idx', 'sentence', 'sentence2', 'label']).iloc[1:]
+            df_dev = pd.read_csv('./RTE/dev.tsv', delimiter='\t', header=None, names=['idx', 'sentence', 'sentence2', 'label']).iloc[1:]
+
+            df_train = df_train[df_train['label'].notnull()]
+            df_dev = df_dev[df_dev['label'].notnull()]
+
+            df_train['label'].replace({'not_entailment': 0, 'entailment': 1}, inplace=True)
+            df_dev['label'].replace({'not_entailment': 0, 'entailment': 1}, inplace=True)
+
+            df_train['label'] = df_train['label'].astype(int)
+            df_dev['label'] = df_dev['label'].astype(int)
+
+            #df.loc[df['column_name'] == some_value]
 
         elif self.cfg.task == 'agnews':
             df_train = pd.read_csv("./agnews/train.csv", header=None, names=['label', 'title', 'sentence']).iloc[1:]

@@ -82,11 +82,11 @@ if not path.exists('./CoLA'):
         zip_ref.extractall(data_dir)
     os.remove(data_file)
 
-# Download MNLI
-task = "MNLI"
-task_path = "https://firebasestorage.googleapis.com/v0/b/mtl-sentence-representations.appspot.com/o/data%2FMNLI.zip?alt=media&token=50329ea1-e339-40e2-809c-10c40afff3ce"
+# Download RTE
+task = "RTE"
+task_path = "https://firebasestorage.googleapis.com/v0/b/mtl-sentence-representations.appspot.com/o/data%2FRTE.zip?alt=media&token=5efa7e85-a0bb-4f19-8ea2-9e1840f077fb"
 data_dir = './'
-if not path.exists('./MNLI'):
+if not path.exists('./RTE'):
     data_file = "%s.zip" % task
     urllib.request.urlretrieve(task_path, data_file)
     with zipfile.ZipFile(data_file) as zip_ref:
