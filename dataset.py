@@ -12,7 +12,7 @@ MAX_LENGTHS = {
     "imdb": 128,
     "CoLA": 128,
     "agnews": 128,
-    "RTE": 256
+    "RTE": 512
 }
 
 NUM_LABELS = {
@@ -73,8 +73,9 @@ class DataSet():
                     tokens2 = tokens2[-(max_len - 2):]
 
                 combined_lengths.append(len(tokens) + len(tokens2) + 3)
-                #if len(tokens) + len(tokens2) > max_len - 3:
-                #    raise Exception('Total length exceeds max length')
+
+                if len(tokens) + len(tokens2) > max_len - 3:
+                    raise Exception('Total length exceeds max length')
 
 
             if sentences2 is not None:
