@@ -105,6 +105,7 @@ class Trainer():
                 shuffle_idx=sup_idx,
                 l=sup_l,
                 manifold_mixup = cfg.manifold_mixup,
+                manifold_upper_cap = cfg.manifold_upper_cap,
                 no_pretrained_pool=cfg.no_pretrained_pool
             )
 

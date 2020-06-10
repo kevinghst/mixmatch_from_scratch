@@ -56,6 +56,7 @@ parser.add_argument('--sup_mixup', choices=['cls', 'word', 'word_cls'])
 parser.add_argument('--unsup_mixup', choices=['cls', 'word', 'word_cls'])
 parser.add_argument('--alpha', default=1, type=float)
 parser.add_argument('--manifold_mixup', action='store_true')
+parser.add_argument('--manifold_upper_cap', default=999, type=int)
 
 # SSL
 parser.add_argument('--no_unsup_loss', action='store_true')

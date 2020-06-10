@@ -419,13 +419,15 @@ class BertForSequenceClassificationCustom(BertPreTrainedModel):
         shuffle_idx=None,
         l=1,
         manifold_mixup=None,
+        manifold_upper_cap=999,
         no_pretrained_pool=False
     ):
         if input_h is None:
             if mixup == 'word':
                 mixup_layer = random.randint(0, self.layers) if manifold_mixup else 0
             elif mixup == 'word_cls':
-                mixup_layer = random.randint(0, self.layers+1) if manifold_mixup else 0
+                upper_cap = min(manifold_upper_cap, self.layers+1)
+                mixup_layer = random.randint(0, upper_cap) if manifold_mixup else 0
             elif mixup == 'cls':
                 mixup_layer = self.layers + 1
             else:
