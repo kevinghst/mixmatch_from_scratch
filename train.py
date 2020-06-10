@@ -420,7 +420,6 @@ class Trainer():
         print("Expected Calibration Error: {}".format(ece))
 
         if cfg.test_also:
-            pdb.set_trace()
             self.test(cfg.results_dir, str(best_epoch))
 
         writer.close()
