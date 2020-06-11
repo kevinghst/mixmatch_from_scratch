@@ -289,8 +289,6 @@ class Trainer():
         print("  Validation Loss: {0:.2f}".format(avg_val_loss))
         print("  Validation took: {:}".format(validation_time))
 
-        if cfg.debug:
-            pdb.set_trace()
         return avg_prec1, avg_prec3, matt_corr, avg_val_loss, validation_time, y_true, y_pred, y_conf
 
   
