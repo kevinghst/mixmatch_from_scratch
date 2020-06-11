@@ -249,20 +249,26 @@ class Trainer():
                 y_pred = np.append(y_pred, preds)
                 y_conf = np.append(y_conf, conf)
 
-                if cfg.debug:
-                    pdb.set_trace()
 
             else:
                 prec1, prec3 = multi_accuracy(logits, b_labels, topk=(1,3))
                 total_prec1 += prec1
                 total_prec3 += prec3
 
-                if cfg.debug:
-                    pdb.set_trace()
+                logits = logits.detach().cpu().numpy()
+                probs = probs.detach().cpu().numpy()
+                b_labels = b_labels.to('cpu').numpy()
+                preds = np.argmax(logits, axis=1).flatten()
+                conf = np.max(probs, axis=1).flatten()
+
+                y_true = np.append(y_true, b_labels)
+                y_pred = np.append(y_pred, preds)
+                y_conf = np.append(y_conf, conf)
 
 
         avg_prec1 = total_prec1 / len(val_loader)
         avg_prec3 = total_prec3 / len(val_loader)
+
 
         avg_val_loss = total_eval_loss / len(val_loader)
 
@@ -283,7 +289,8 @@ class Trainer():
         print("  Validation Loss: {0:.2f}".format(avg_val_loss))
         print("  Validation took: {:}".format(validation_time))
 
-
+        if cfg.debug:
+            pdb.set_trace()
         return avg_prec1, avg_prec3, matt_corr, avg_val_loss, validation_time, y_true, y_pred, y_conf
 
   
