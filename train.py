@@ -249,10 +249,16 @@ class Trainer():
                 y_pred = np.append(y_pred, preds)
                 y_conf = np.append(y_conf, conf)
 
+                if cfg.debug:
+                    pdb.set_trace()
+
             else:
                 prec1, prec3 = multi_accuracy(logits, b_labels, topk=(1,3))
                 total_prec1 += prec1
                 total_prec3 += prec3
+
+                if cfg.debug:
+                    pdb.set_trace()
 
 
         avg_prec1 = total_prec1 / len(val_loader)
