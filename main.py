@@ -10,11 +10,11 @@ import random
 import numpy as np
 from transformers import AdamW, BertConfig
 from transformers import get_linear_schedule_with_warmup
-from transformers import RobertaConfig, RobertaForSequenceClassification
+from transformers import RobertaConfig
 
 from models_new import Classifier
 from models import BertForSequenceClassificationCustom, RobertaForSequenceClassificationCustom
-#from models_roberta import RobertaForSequenceClassification
+from models_roberta import RobertaForSequenceClassification
 
 from dataset import DataSet
 from train import Trainer
@@ -200,14 +200,19 @@ if cfg.model == "bert":
         output_hidden_states = False, # Whether the model returns all hidden-states.
     )
 elif cfg.model == 'roberta':
-    config = RobertaConfig.from_pretrained(
-        'roberta-base',
-        num_labels=2
-    )
+    #config = RobertaConfig.from_pretrained(
+    #    'roberta-base',
+    #    num_labels=2
+    #)
+
+    #model = RobertaForSequenceClassification.from_pretrained(
+    #    'roberta-base',
+    #    config=config
+    #)
 
     model = RobertaForSequenceClassification.from_pretrained(
         'roberta-base',
-        config=config
+        num_labels = NUM_LABELS[cfg.task]    
     )
 
 # Tell pytorch to run this model on the GPU.
