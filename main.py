@@ -10,11 +10,11 @@ import random
 import numpy as np
 from transformers import AdamW, BertConfig
 from transformers import get_linear_schedule_with_warmup
-from transformers import RobertaConfig
+from transformers import RobertaConfig, RobertaForSequenceClassification
 
 from models_new import Classifier
 from models import BertForSequenceClassificationCustom, RobertaForSequenceClassificationCustom
-from models_roberta import RobertaForSequenceClassification
+#from models_roberta import RobertaForSequenceClassification
 
 from dataset import DataSet
 from train import Trainer
