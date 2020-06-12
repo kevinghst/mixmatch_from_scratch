@@ -200,15 +200,14 @@ if cfg.model == "bert":
         output_hidden_states = False, # Whether the model returns all hidden-states.
     )
 elif cfg.model == 'roberta':
-    #config = RobertaConfig.from_pretrained(
-    #    'roberta-base',
-    #    num_labels=2,
-    #    finetuning_task=cfg.task
-    #)
+    config = RobertaConfig.from_pretrained(
+        'roberta-base',
+        num_labels=2
+    )
 
     model = RobertaForSequenceClassification.from_pretrained(
-        "roberta-base",
-        num_labels = NUM_LABELS[cfg.task]
+        'roberta-base',
+        config=config
     )
 
 # Tell pytorch to run this model on the GPU.
