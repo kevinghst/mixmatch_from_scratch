@@ -208,8 +208,7 @@ elif cfg.model == 'roberta':
 
     model = RobertaForSequenceClassification.from_pretrained(
         "roberta-base",
-        num_labels = NUM_LABELS[cfg.task],
-        finetuning_task=cfg.task
+        num_labels = NUM_LABELS[cfg.task]
     )
 
 # Tell pytorch to run this model on the GPU.
