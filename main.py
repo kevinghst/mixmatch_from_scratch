@@ -207,7 +207,8 @@ elif cfg.model == 'roberta':
 
     model = RobertaForSequenceClassification.from_pretrained(
         'roberta-base',
-        config=config
+        config=config,
+        from_tf=True
     )
 
 # Tell pytorch to run this model on the GPU.
