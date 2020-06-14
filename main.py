@@ -16,9 +16,10 @@ from models_new import Classifier
 from models import BertForSequenceClassificationCustom
 
 from models_roberta import RobertaForSequenceClassification
-#from transformers import RobertaForSequenceClassification
+from models_albert import AlbertForSequenceClassification
 
-from transformers import AlbertForSequenceClassification
+#from transformers import RobertaForSequenceClassification
+#from transformers import AlbertForSequenceClassification
 
 from dataset import DataSet
 from train import Trainer
