@@ -1,4 +1,6 @@
 from transformers.modeling_albert import AlbertPreTrainedModel, AlbertEmbeddings, AlbertTransformer
+from transformers.configuration_albert import AlbertConfig
+
 import torch.nn as nn
 from torch.nn import CrossEntropyLoss, MSELoss
 
