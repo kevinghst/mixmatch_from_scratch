@@ -13,11 +13,12 @@ from transformers import get_linear_schedule_with_warmup
 from transformers import RobertaConfig
 
 from models_new import Classifier
-from models import BertForSequenceClassificationCustom, RobertaForSequenceClassificationCustom
+from models import BertForSequenceClassificationCustom
 
 from models_roberta import RobertaForSequenceClassification
 #from transformers import RobertaForSequenceClassification
 
+from transformers import AlbertForSequenceClassification
 
 from dataset import DataSet
 from train import Trainer
@@ -207,6 +208,15 @@ elif cfg.model == 'roberta':
         'roberta-base',
         num_labels = NUM_LABELS[cfg.task],
     )
+elif cfg.model == 'albert':
+    model = AlbertForSequenceClassification.from_pretrained(
+        'albert-large-v2,
+        num_labels = NUM_LABELS[cfg.task]
+    )
+
+
+
+pdb.set_trace()
 
 # Tell pytorch to run this model on the GPU.
 model.cuda()
