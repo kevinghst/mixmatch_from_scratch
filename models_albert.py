@@ -1,8 +1,56 @@
-from transformers.modeling_albert import AlbertPreTrainedModel, AlbertEmbeddings, AlbertTransformer, load_tf_weights_in_albert
+from transformers.modeling_albert import AlbertPreTrainedModel, AlbertEmbeddings, AlbertLayerGroup, load_tf_weights_in_albert
 from transformers.configuration_albert import AlbertConfig
 
 import torch.nn as nn
 from torch.nn import CrossEntropyLoss, MSELoss
+
+
+class AlbertTransformer(nn.Module):
+    def __init__(self, config):
+        super().__init__()
+
+        self.config = config
+        self.output_hidden_states = config.output_hidden_states
+        self.embedding_hidden_mapping_in = nn.Linear(config.embedding_size, config.hidden_size)
+        self.albert_layer_groups = nn.ModuleList([AlbertLayerGroup(config) for _ in range(config.num_hidden_groups)])
+
+    def forward(self, hidden_states, attention_mask=None, head_mask=None, output_attentions=False):
+        hidden_states = self.embedding_hidden_mapping_in(hidden_states)
+
+        all_attentions = ()
+
+        if self.output_hidden_states:
+            all_hidden_states = (hidden_states,)
+
+        for i in range(self.config.num_hidden_layers):
+            # Number of layers in a hidden group
+            layers_per_group = int(self.config.num_hidden_layers / self.config.num_hidden_groups)
+
+            # Index of the hidden group
+            group_idx = int(i / (self.config.num_hidden_layers / self.config.num_hidden_groups))
+
+            layer_group_output = self.albert_layer_groups[group_idx](
+                hidden_states,
+                attention_mask,
+                head_mask[group_idx * layers_per_group : (group_idx + 1) * layers_per_group],
+                output_attentions,
+            )
+            hidden_states = layer_group_output[0]
+
+            if output_attentions:
+                all_attentions = all_attentions + layer_group_output[-1]
+
+            if self.output_hidden_states:
+                all_hidden_states = all_hidden_states + (hidden_states,)
+
+        outputs = (hidden_states,)
+        if self.output_hidden_states:
+            outputs = outputs + (all_hidden_states,)
+        if output_attentions:
+            outputs = outputs + (all_attentions,)
+        return outputs  # last-layer hidden state, (all hidden states), (all attentions)
+
+
 
 class AlbertModel(AlbertPreTrainedModel):
 
@@ -34,16 +82,6 @@ class AlbertModel(AlbertPreTrainedModel):
         return self.embeddings.word_embeddings
 
     def _prune_heads(self, heads_to_prune):
-        """ Prunes heads of the model.
-            heads_to_prune: dict of {layer_num: list of heads to prune in this layer}
-            ALBERT has a different architecture in that its layers are shared across groups, which then has inner groups.
-            If an ALBERT model has 12 hidden layers and 2 hidden groups, with two inner groups, there
-            is a total of 4 different layers.
-            These layers are flattened: the indices [0,1] correspond to the two inner groups of the first hidden layer,
-            while [2,3] correspond to the two inner groups of the second hidden layer.
-            Any layer with in index other than [0,1,2,3] will result in an error.
-            See base class PreTrainedModel for more information about head pruning
-        """
         for layer, heads in heads_to_prune.items():
             group_idx = int(layer / self.config.inner_group_num)
             inner_group_idx = int(layer - group_idx * self.config.inner_group_num)
