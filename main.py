@@ -216,8 +216,6 @@ elif cfg.model == 'albert':
 
 
 
-pdb.set_trace()
-
 # Tell pytorch to run this model on the GPU.
 model.cuda()
 
