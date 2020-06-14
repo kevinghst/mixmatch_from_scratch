@@ -14,7 +14,10 @@ from transformers import RobertaConfig
 
 from models_new import Classifier
 from models import BertForSequenceClassificationCustom, RobertaForSequenceClassificationCustom
-from models_roberta import RobertaForSequenceClassification
+
+#from models_roberta import RobertaForSequenceClassification
+from transformers import RobertaForSequenceClassification
+
 
 from dataset import DataSet
 from train import Trainer
