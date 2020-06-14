@@ -2,6 +2,7 @@ from transformers.modeling_albert import AlbertPreTrainedModel, AlbertLayerGroup
 from transformers.configuration_albert import AlbertConfig
 from transformers.modeling_bert import BertEmbeddings
 
+import torch
 import torch.nn as nn
 from torch.nn import CrossEntropyLoss, MSELoss
 
