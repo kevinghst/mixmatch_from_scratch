@@ -1,10 +1,8 @@
 from transformers import BertPreTrainedModel
 from transformers.modeling_bert import BertLayer, BertPooler
 import torch.nn as nn
-from torch.nn import CrossEntropyLoss, MSELoss
 import torch
 import random
-from transformers.configuration_roberta import RobertaConfig
 from transformers.modeling_utils import create_position_ids_from_input_ids
 
 import pdb
@@ -78,56 +76,6 @@ class BertEmbeddings(nn.Module):
         embeddings = inputs_embeds + position_embeddings + token_type_embeddings
         return self.dropout(self.LayerNorm(embeddings)), None
 
-class RobertaEmbeddings(BertEmbeddings):
-    """
-    Same as BertEmbeddings with a tiny tweak for positional embeddings indexing.
-    """
-
-    def __init__(self, config):
-        super().__init__(config)
-        self.padding_idx = config.pad_token_id
-        self.word_embeddings = nn.Embedding(config.vocab_size, config.hidden_size, padding_idx=self.padding_idx)
-        self.position_embeddings = nn.Embedding(
-            config.max_position_embeddings, config.hidden_size, padding_idx=self.padding_idx
-        )
-        self.test = "test"
-
-    def forward(
-            self, 
-            input_ids=None,
-            c_input_ids=None,
-            token_type_ids=None,
-            position_ids=None,
-            inputs_embeds=None,
-            mixup=None,
-            l=1,
-            shuffle_idx=None,
-            mixup_layer=-1
-        ):
-        if position_ids is None:
-            if input_ids is not None:
-                # Create the position ids from the input token ids. Any padded tokens remain padded.
-                position_ids = create_position_ids_from_input_ids(input_ids, self.padding_idx).to(input_ids.device)
-            else:
-                position_ids = self.create_position_ids_from_inputs_embeds(inputs_embeds)
-
-        return super().forward(
-            input_ids, token_type_ids=token_type_ids, position_ids=position_ids, inputs_embeds=inputs_embeds
-        )
-
-    def create_position_ids_from_inputs_embeds(self, inputs_embeds):
-        """ We are provided embeddings directly. We cannot infer which are padded so just generate
-        sequential position ids.
-        :param torch.Tensor inputs_embeds:
-        :return torch.Tensor:
-        """
-        input_shape = inputs_embeds.size()[:-1]
-        sequence_length = input_shape[1]
-
-        position_ids = torch.arange(
-            self.padding_idx + 1, sequence_length + self.padding_idx + 1, dtype=torch.long, device=inputs_embeds.device
-        )
-        return position_ids.unsqueeze(0).expand(input_shape)
 
 class BertEncoder(nn.Module):
     def __init__(self, config):
@@ -370,27 +318,6 @@ class BertModel(BertPreTrainedModel):
         return outputs  # sequence_output, pooled_output, (hidden_states), (attentions)
 
 
-class RobertaModel(BertModel):
-    """
-    This class overrides :class:`~transformers.BertModel`. Please check the
-    superclass for the appropriate documentation alongside usage examples.
-    """
-
-    config_class = RobertaConfig
-    base_model_prefix = "roberta"
-
-    def __init__(self, config):
-        super().__init__(config)
-
-        self.embeddings = RobertaEmbeddings(config)
-        self.init_weights()
-
-    def get_input_embeddings(self):
-        return self.embeddings.word_embeddings
-
-    def set_input_embeddings(self, value):
-        self.embeddings.word_embeddings = value
-
 class BertForSequenceClassificationCustom(BertPreTrainedModel):
     def __init__(self, config):
         super().__init__(config)
@@ -461,75 +388,3 @@ class BertForSequenceClassificationCustom(BertPreTrainedModel):
         
         return outputs  # logits, (hidden_states), (attentions)
 
-
-class RobertaClassificationHead(nn.Module):
-    """Head for sentence-level classification tasks."""
-
-    def __init__(self, config):
-        super().__init__()
-        self.dense = nn.Linear(config.hidden_size, config.hidden_size)
-        self.dropout = nn.Dropout(config.hidden_dropout_prob)
-        self.out_proj = nn.Linear(config.hidden_size, config.num_labels)
-
-    def forward(self, features, **kwargs):
-        x = features[:, 0, :]  # take <s> token (equiv. to [CLS])
-        x = self.dropout(x)
-        x = self.dense(x)
-        x = torch.tanh(x)
-        x = self.dropout(x)
-        x = self.out_proj(x)
-        return x
-
-class RobertaForSequenceClassificationCustom(BertPreTrainedModel):
-    config_class = RobertaConfig
-    base_model_prefix = "roberta"
-
-    def __init__(self, config):
-        super().__init__(config)
-        self.num_labels = config.num_labels
-        self.layers = config.num_hidden_layers
-
-        self.roberta = RobertaModel(config)
-        self.classifier = RobertaClassificationHead(config)
-
-    def forward(
-        self,
-        input_ids=None,
-        c_input_ids=None,
-        attention_mask=None,
-        token_type_ids=None,
-        position_ids=None,
-        head_mask=None,
-        inputs_embeds=None,
-        labels=None,
-        output_h=False,
-        input_h=None,
-        mixup=None,
-        shuffle_idx=None,
-        l=1,
-        manifold_mixup=None,
-        no_pretrained_pool=False
-    ):
-        if input_h is None:
-            if mixup == 'word':
-                mixup_layer = random.randint(0, self.layers) if manifold_mixup else 0
-            elif mixup == 'word_cls':
-                mixup_layer = random.randint(0, self.layers+1) if manifold_mixup else 0
-            elif mixup == 'cls':
-                mixup_layer = self.layers + 1
-            else:
-                mixup_layer = -1
-
-        outputs = self.roberta(
-            input_ids,
-            attention_mask=attention_mask,
-            token_type_ids=token_type_ids,
-            position_ids=position_ids,
-            head_mask=head_mask,
-            inputs_embeds=inputs_embeds,
-        )
-
-        sequence_output = outputs[0]
-        logits = self.classifier(sequence_output)
-
-        return logits
