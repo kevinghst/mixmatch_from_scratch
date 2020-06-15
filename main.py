@@ -215,8 +215,6 @@ elif cfg.model == 'albert':
         num_labels = NUM_LABELS[cfg.task]
     )
 
-if cfg.debug:
-    pdb.set_trace()
 
 # Tell pytorch to run this model on the GPU.
 model.cuda()
