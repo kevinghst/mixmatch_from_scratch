@@ -175,6 +175,7 @@ class Trainer():
 
         print("Running Test...")
 
+        pdb.set_trace()
         avg_prec1, avg_prec3, matt_corr, avg_val_loss, validation_time, y_true, y_pred, y_conf = self.validate(test=True)
 
         ece = calculate_ece(y_true, y_pred, y_conf, cfg.ece)
