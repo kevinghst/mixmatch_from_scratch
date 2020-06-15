@@ -36,6 +36,14 @@ class DataSet():
             self.tokenizer = AlbertTokenizer.from_pretrained('albert-large-v2', do_lower_case=True)
         self.ssl = ssl
 
+    def assert_equal(self, tensors):
+        size = tensors[0].size(0)
+
+        for tensor in tensors:
+            if tensor.size(0) != size:
+                return False
+        return True
+
     def preprocess(self, df):
         sentences = df.sentence.values
         labels = df.label.values
