@@ -175,7 +175,6 @@ class Trainer():
 
         print("Running Test...")
 
-        pdb.set_trace()
         avg_prec1, avg_prec3, matt_corr, avg_val_loss, validation_time, y_true, y_pred, y_conf = self.validate(test=True)
 
         ece = calculate_ece(y_true, y_pred, y_conf, cfg.ece)
@@ -214,8 +213,13 @@ class Trainer():
         y_true = np.array([])
         y_conf = np.array([])
 
+
         # Evaluate data for one epoch
         for batch in val_loader:
+            if cfg.debug and test:
+                pdb.set_trace()
+
+
             batch = [t.to(device) for t in batch]
             b_input_ids, b_segment_ids, b_input_mask, b_labels = batch
             batch_size = b_input_ids.size(0)
