@@ -1,6 +1,6 @@
-from transformers.modeling_albert import AlbertLayer, load_tf_weights_in_albert
+from transformers.modeling_albert import AlbertAttention, load_tf_weights_in_albert
 from transformers.configuration_albert import AlbertConfig
-from transformers.modeling_bert import BertEmbeddings
+from transformers.modeling_bert import BertEmbeddings, ACT2FN
 from transformers import AlbertPreTrainedModel
 
 import torch
@@ -24,6 +24,25 @@ class AlbertEmbeddings(BertEmbeddings):
         self.token_type_embeddings = nn.Embedding(config.type_vocab_size, config.embedding_size)
         self.LayerNorm = torch.nn.LayerNorm(config.embedding_size, eps=config.layer_norm_eps)
 
+class AlbertLayer(nn.Module):
+    def __init__(self, config):
+        super().__init__()
+
+        self.config = config
+        self.full_layer_layer_norm = nn.LayerNorm(config.hidden_size, eps=config.layer_norm_eps)
+        self.attention = AlbertAttention(config)
+        self.ffn = nn.Linear(config.hidden_size, config.intermediate_size)
+        self.ffn_output = nn.Linear(config.intermediate_size, config.hidden_size)
+        self.activation = ACT2FN[config.hidden_act]
+
+    def forward(self, hidden_states, attention_mask=None, head_mask=None, output_attentions=False):
+        attention_output = self.attention(hidden_states, attention_mask, head_mask, output_attentions)
+        ffn_output = self.ffn(attention_output[0])
+        ffn_output = self.activation(ffn_output)
+        ffn_output = self.ffn_output(ffn_output)
+        hidden_states = self.full_layer_layer_norm(ffn_output + attention_output[0])
+
+        return (hidden_states,) + attention_output[1:]  # add attentions if we output them
 
 class AlbertLayerGroup(nn.Module):
     def __init__(self, config):
