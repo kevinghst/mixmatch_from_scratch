@@ -115,7 +115,7 @@ class AlbertModel(AlbertPreTrainedModel):
         return head_mask
 
 
-    def get_head_mask(self, head_mask: Tensor, num_hidden_layers: int, is_attention_chunked: bool = False):
+    def get_head_mask(self, head_mask, num_hidden_layers, is_attention_chunked = False):
         if head_mask is not None:
             head_mask = convert_head_mask_to_5d(head_mask, num_hidden_layers)
             if is_attention_chunked is True:
