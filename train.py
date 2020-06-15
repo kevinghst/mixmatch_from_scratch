@@ -231,7 +231,7 @@ class Trainer():
                 loss_fct = CrossEntropyLoss()
 
 
-                if cfg.debug and test:
+                if cfg.debug:
                     pdb.set_trace()
                 loss = loss_fct(logits, b_labels)
             # Accumulate the validation loss.
