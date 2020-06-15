@@ -1,4 +1,4 @@
-from transformers.modeling_albert import AlbertLayerGroup, load_tf_weights_in_albert
+from transformers.modeling_albert import AlbertLayer, load_tf_weights_in_albert
 from transformers.configuration_albert import AlbertConfig
 from transformers.modeling_bert import BertEmbeddings
 from transformers import AlbertPreTrainedModel
@@ -8,6 +8,7 @@ import torch.nn as nn
 from torch.nn import CrossEntropyLoss, MSELoss
 
 import pdb
+
 
 
 class AlbertEmbeddings(BertEmbeddings):
@@ -22,6 +23,36 @@ class AlbertEmbeddings(BertEmbeddings):
         self.position_embeddings = nn.Embedding(config.max_position_embeddings, config.embedding_size)
         self.token_type_embeddings = nn.Embedding(config.type_vocab_size, config.embedding_size)
         self.LayerNorm = torch.nn.LayerNorm(config.embedding_size, eps=config.layer_norm_eps)
+
+
+class AlbertLayerGroup(nn.Module):
+    def __init__(self, config):
+        super().__init__()
+
+        self.output_hidden_states = config.output_hidden_states
+        self.albert_layers = nn.ModuleList([AlbertLayer(config) for _ in range(config.inner_group_num)])
+
+    def forward(self, hidden_states, attention_mask=None, head_mask=None, output_attentions=False):
+        layer_hidden_states = ()
+        layer_attentions = ()
+
+        for layer_index, albert_layer in enumerate(self.albert_layers):
+            layer_output = albert_layer(hidden_states, attention_mask, head_mask[layer_index], output_attentions)
+            hidden_states = layer_output[0]
+
+            if output_attentions:
+                layer_attentions = layer_attentions + (layer_output[1],)
+
+            if self.output_hidden_states:
+                layer_hidden_states = layer_hidden_states + (hidden_states,)
+
+        outputs = (hidden_states,)
+        if self.output_hidden_states:
+            outputs = outputs + (layer_hidden_states,)
+        if output_attentions:
+            outputs = outputs + (layer_attentions,)
+        return outputs  # last-layer hidden state, (layer hidden states), (layer attentions)
+
 
 class AlbertTransformer(nn.Module):
     def __init__(self, config):
@@ -47,7 +78,6 @@ class AlbertTransformer(nn.Module):
             # Index of the hidden group
             group_idx = int(i / (self.config.num_hidden_layers / self.config.num_hidden_groups))
 
-            pdb.set_trace()
             layer_group_output = self.albert_layer_groups[group_idx](
                 hidden_states,
                 attention_mask,
