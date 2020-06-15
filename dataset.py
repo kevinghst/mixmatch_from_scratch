@@ -121,6 +121,9 @@ class DataSet():
         labels = torch.tensor(labels)
         num_tokens = torch.tensor(num_tokens)
 
+        print("here it is")
+        print(smaller_than_cap)
+
         return input_ids, attention_masks, segment_ids, labels, num_tokens
 
     def sample_dataset(self, df, total):
