@@ -263,8 +263,8 @@ class DataSet():
             #df.loc[df['column_name'] == some_value]
 
         elif self.cfg.task == 'agnews':
-            df_train = pd.read_csv("./agnews/train.csv", header=None, names=['label', 'title', 'sentence']).iloc[1:]
-            df_dev = pd.read_csv("./agnews/test.csv", header=None, names=['label', 'title', 'sentence']).iloc[1:]
+            df_train = pd.read_csv("./agnews/train.csv", header=None, names=['label', 'title', 'sentence'])
+            df_dev = pd.read_csv("./agnews/test.csv", header=None, names=['label', 'title', 'sentence'])
 
             if self.cfg.test_also or self.cfg.test_mode:
                 df_test = df_dev.copy()
