@@ -216,10 +216,6 @@ class Trainer():
 
         # Evaluate data for one epoch
         for batch in val_loader:
-            if cfg.debug and test:
-                pdb.set_trace()
-
-
             batch = [t.to(device) for t in batch]
             b_input_ids, b_segment_ids, b_input_mask, b_labels = batch
             batch_size = b_input_ids.size(0)
@@ -234,6 +230,9 @@ class Trainer():
                 loss_fct = CrossEntropyLoss()
                 loss = loss_fct(logits, b_labels)
             # Accumulate the validation loss.
+
+            if cfg.debug and test:
+                pdb.set_trace()
             total_eval_loss += loss.item()
 
             # Calculate the accuracy for this batch of test sentences, and
