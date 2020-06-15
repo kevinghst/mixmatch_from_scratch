@@ -266,6 +266,8 @@ class DataSet():
             df_train = pd.read_csv("./agnews/train.csv", header=None, names=['label', 'title', 'sentence']).iloc[1:]
             df_dev = pd.read_csv("./agnews/test.csv", header=None, names=['label', 'title', 'sentence']).iloc[1:]
 
+            if self.cfg.test_also or self.cfg.test_mode:
+                df_test = df_dev.copy()
 
         df_train = self.sample_dataset(df_train, self.cfg.train_cap)
         print('Number of training sentences: {:,}\n'.format(df_train.shape[0]))
