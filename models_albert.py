@@ -166,6 +166,7 @@ class AlbertForSequenceClassification(AlbertPreTrainedModel):
     def forward(
         self,
         input_ids=None,
+        c_input_ids=None,
         attention_mask=None,
         token_type_ids=None,
         position_ids=None,
@@ -173,6 +174,14 @@ class AlbertForSequenceClassification(AlbertPreTrainedModel):
         inputs_embeds=None,
         labels=None,
         output_attentions=None,
+        output_h=False,
+        input_h=None,
+        mixup=None,
+        shuffle_idx=None,
+        l=1,
+        manifold_mixup=None,
+        manifold_upper_cap=999,
+        no_pretrained_pool=False
     ):
         outputs = self.albert(
             input_ids=input_ids,
@@ -189,16 +198,4 @@ class AlbertForSequenceClassification(AlbertPreTrainedModel):
         pooled_output = self.dropout(pooled_output)
         logits = self.classifier(pooled_output)
 
-        outputs = (logits,) + outputs[2:]  # add hidden states and attention if they are here
-
-        if labels is not None:
-            if self.num_labels == 1:
-                #  We are doing regression
-                loss_fct = MSELoss()
-                loss = loss_fct(logits.view(-1), labels.view(-1))
-            else:
-                loss_fct = CrossEntropyLoss()
-                loss = loss_fct(logits.view(-1, self.num_labels), labels.view(-1))
-            outputs = (loss,) + outputs
-
-        return outputs  # (loss), logits, (hidden_states), (attentions)
+        return logits

@@ -1,5 +1,5 @@
 import pandas as pd
-from transformers import BertTokenizer, RobertaTokenizer
+from transformers import BertTokenizer, RobertaTokenizer, AlbertTokenizer
 from torch.utils.data import TensorDataset, random_split
 import torch
 import ast
@@ -30,8 +30,10 @@ class DataSet():
         self.cfg = cfg
         if self.cfg.model == "bert":
             self.tokenizer = BertTokenizer.from_pretrained('bert-base-uncased', do_lower_case=True)
-        else:
+        elif self.cfg.model == "roberta":
             self.tokenizer = RobertaTokenizer.from_pretrained('roberta-base')
+        elif self.cfg.model == "albert":
+            self.tokenizer = AlbertTokenizer.from_pretrained('albert-large-v2', do_lower_case=True)
         self.ssl = ssl
 
     def preprocess(self, df):
@@ -293,5 +295,8 @@ class DataSet():
         unsup_dataset = None
         if self.ssl:
             unsup_dataset = TensorDataset(ori_input_ids, ori_seg_ids, ori_input_mask, aug_input_ids, aug_seg_ids, aug_input_mask, ori_num_tokens, aug_num_tokens)
+
+        if self.cfg.debug:
+            pdb.set_trace()
 
         return train_dataset, val_dataset, unsup_dataset, test_dataset
