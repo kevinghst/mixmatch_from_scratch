@@ -62,6 +62,8 @@ class DataSet():
         combined_lengths = []
         
         smaller_than_cap = 0
+        first_overflow = []
+        second_overflow = []
         # For every sentence...
         for i, sent in enumerate(sentences):
             # `encode_plus` will:
@@ -87,6 +89,8 @@ class DataSet():
 
                 if len(tokens) + len(tokens2) > max_len - 3:
                     smaller_than_cap += 1
+                    first_overflow.append(len(tokens))
+                    second_overflow.append(len(tokens2))
                     continue
                     #raise Exception('Total length exceeds max length')
 
@@ -131,6 +135,8 @@ class DataSet():
 
         print("here it is")
         print(smaller_than_cap)
+        print(first_overflow)
+        print(second_overflow)
 
         return input_ids, attention_masks, segment_ids, labels, num_tokens
 
