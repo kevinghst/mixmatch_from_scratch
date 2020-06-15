@@ -86,7 +86,7 @@ class DataSet():
 
                 if len(tokens) + len(tokens2) > max_len - 3:
                     pdb.set_trace()
-                    tokens = tokens[-(max_len - 3):]
+                    tokens = tokens[-(max_len - 3 - len(tokens2)):]
                     pdb.set_trace()
                     #raise Exception('Total length exceeds max length')
 
