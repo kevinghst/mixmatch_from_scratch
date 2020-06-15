@@ -12,7 +12,7 @@ MAX_LENGTHS = {
     "imdb": 128,
     "CoLA": 128,
     "agnews": 128,
-    "RTE": 512
+    "RTE": 256
 }
 
 NUM_LABELS = {
@@ -53,6 +53,7 @@ class DataSet():
 
         combined_lengths = []
         
+        smaller_than_cap = 0
         # For every sentence...
         for i, sent in enumerate(sentences):
             # `encode_plus` will:
@@ -77,7 +78,9 @@ class DataSet():
                 combined_lengths.append(len(tokens) + len(tokens2) + 3)
 
                 if len(tokens) + len(tokens2) > max_len - 3:
-                    raise Exception('Total length exceeds max length')
+                    smaller_than_cap += 1
+                    continue
+                    #raise Exception('Total length exceeds max length')
 
 
             if sentences2 is not None:
