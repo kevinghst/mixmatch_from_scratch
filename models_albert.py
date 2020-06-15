@@ -1,6 +1,7 @@
-from transformers.modeling_albert import AlbertPreTrainedModel, AlbertLayerGroup, load_tf_weights_in_albert
+from transformers.modeling_albert import AlbertLayerGroup, load_tf_weights_in_albert
 from transformers.configuration_albert import AlbertConfig
 from transformers.modeling_bert import BertEmbeddings
+from transformers import AlbertPreTrainedModel
 
 import torch
 import torch.nn as nn
