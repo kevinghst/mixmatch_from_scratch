@@ -61,9 +61,6 @@ class DataSet():
 
         combined_lengths = []
         
-        smaller_than_cap = 0
-        first_overflow = []
-        second_overflow = []
         # For every sentence...
         for i, sent in enumerate(sentences):
             # `encode_plus` will:
@@ -88,10 +85,9 @@ class DataSet():
                 combined_lengths.append(len(tokens) + len(tokens2) + 3)
 
                 if len(tokens) + len(tokens2) > max_len - 3:
-                    smaller_than_cap += 1
-                    first_overflow.append(len(tokens))
-                    second_overflow.append(len(tokens2))
-                    continue
+                    pdb.set_trace()
+                    tokens = tokens[-(max_len - 3):]
+                    pdb.set_trace()
                     #raise Exception('Total length exceeds max length')
 
 
@@ -132,11 +128,6 @@ class DataSet():
         segment_ids = torch.cat(segment_ids, dim=0)
         labels = torch.tensor(labels)
         num_tokens = torch.tensor(num_tokens)
-
-        print("here it is")
-        print(smaller_than_cap)
-        print(first_overflow)
-        print(second_overflow)
 
         return input_ids, attention_masks, segment_ids, labels, num_tokens
 
