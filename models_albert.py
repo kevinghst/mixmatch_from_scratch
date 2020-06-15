@@ -47,6 +47,7 @@ class AlbertTransformer(nn.Module):
             # Index of the hidden group
             group_idx = int(i / (self.config.num_hidden_layers / self.config.num_hidden_groups))
 
+            pdb.set_trace()
             layer_group_output = self.albert_layer_groups[group_idx](
                 hidden_states,
                 attention_mask,
