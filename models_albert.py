@@ -51,7 +51,7 @@ class AlbertTransformer(nn.Module):
                 hidden_states,
                 attention_mask,
                 head_mask[group_idx * layers_per_group : (group_idx + 1) * layers_per_group],
-                output_attentions,
+                output_attentions
             )
             hidden_states = layer_group_output[0]
 
