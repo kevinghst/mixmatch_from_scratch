@@ -235,7 +235,6 @@ class AlbertForSequenceClassification(AlbertPreTrainedModel):
             position_ids=position_ids,
             head_mask=head_mask,
             inputs_embeds=inputs_embeds,
-            output_attentions=output_attentions,
         )
 
         pooled_output = outputs[1]
