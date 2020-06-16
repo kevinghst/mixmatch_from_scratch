@@ -3,7 +3,6 @@ from transformers.modeling_roberta import RobertaModel, RobertaClassificationHea
 from transformers.configuration_roberta import RobertaConfig
 
 class RobertaForSequenceClassification(BertPreTrainedModel):
-    config_class = RobertaConfig
     base_model_prefix = "roberta"
 
     def __init__(self, config):
