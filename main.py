@@ -211,7 +211,7 @@ elif cfg.model == 'roberta':
     )
 elif cfg.model == 'albert':
     model = AlbertForSequenceClassification.from_pretrained(
-        'albert-base-v1',
+        'albert-base-v2',
         num_labels = NUM_LABELS[cfg.task]
     )
 
