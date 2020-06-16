@@ -33,7 +33,7 @@ class DataSet():
         elif self.cfg.model == "roberta":
             self.tokenizer = RobertaTokenizer.from_pretrained('roberta-base')
         elif self.cfg.model == "albert":
-            self.tokenizer = AlbertTokenizer.from_pretrained('albert-base-v2', do_lower_case=True)
+            self.tokenizer = AlbertTokenizer.from_pretrained('albert-large-v2', do_lower_case=True)
         self.ssl = ssl
 
     def assert_equal(self, tensors):
