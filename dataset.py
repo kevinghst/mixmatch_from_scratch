@@ -273,8 +273,14 @@ class DataSet():
         print('Number of training sentences: {:,}\n'.format(df_train.shape[0]))
         input_ids_train, attention_masks_train, seg_ids_train, label_ids_train, num_tokens_train = self.preprocess(df_train)
 
+        if self.cfg.debug:
+            pdb.set_trace()
+
         df_dev = self.sample_dataset(df_dev, self.cfg.dev_cap)
         print('Number of dev sentences: {:,}\n'.format(df_dev.shape[0]))
+
+        if self.cfg.debug:
+            pdb.set_trace()
 
         if df_test is not None:
             print('Number of test sentences: {:,}\n'.format(df_test.shape[0]))
@@ -306,8 +312,5 @@ class DataSet():
         unsup_dataset = None
         if self.ssl:
             unsup_dataset = TensorDataset(ori_input_ids, ori_seg_ids, ori_input_mask, aug_input_ids, aug_seg_ids, aug_input_mask, ori_num_tokens, aug_num_tokens)
-        
-        if self.cfg.debug:
-            pdb.set_trace()
 
         return train_dataset, val_dataset, unsup_dataset, test_dataset
