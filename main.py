@@ -38,7 +38,7 @@ parser.add_argument('--do_lower_case', default=True, type=bool)
 
 parser.add_argument('--train_batch_size', default=16, type=int)
 parser.add_argument('--val_batch_size', default=16, type=int)
-parser.add_argument('--results_dir', default='results')
+parser.add_argument('--results_dir', default='none')
 parser.add_argument('--hide_tqdm', action='store_true')
 parser.add_argument('--total_steps', default=1000, type=int)
 parser.add_argument('--check_steps', default=1, type=int)

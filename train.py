@@ -442,6 +442,9 @@ class Trainer():
 
     def save(self, i):
         """ save model """
+        if self.cfg.results_dir == 'none':
+            return
+
         save_path = os.path.join('results', self.cfg.results_dir, 'save')
 
         if os.path.isdir(save_path):
