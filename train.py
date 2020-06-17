@@ -442,7 +442,12 @@ class Trainer():
 
     def save(self, i):
         """ save model """
-        if not os.path.isdir(os.path.join('results', self.cfg.results_dir, 'save')):
-            os.makedirs(os.path.join('results', self.cfg.results_dir, 'save'))
+        save_path = os.path.join('results', self.cfg.results_dir, 'save')
+
+        if os.path.isdir(save_path):
+            shutil.rmtree(save_path)
+
+        os.makedirs(save_path)
+
         torch.save(self.model.state_dict(),
                         os.path.join('results', self.cfg.results_dir, 'save', 'model_steps_'+str(i)+'.pt'))
