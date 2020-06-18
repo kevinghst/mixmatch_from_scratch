@@ -3,6 +3,7 @@ from transformers import BertTokenizer, RobertaTokenizer, AlbertTokenizer
 from torch.utils.data import TensorDataset, random_split
 import torch
 import ast
+import json
 
 import pdb
 
@@ -196,6 +197,15 @@ class DataSet():
 
         return tensors
 
+    def create_df_from_json(self, path):
+        data = []
+        with open(path) as f:
+            for line in f:
+                data.append(json.loads(line))
+
+        pdb.set_trace()
+        exit = "exit"
+
     def swap_binary_label(self, df):
         df['label'].replace(0, "1", inplace=True)
         df['label'].replace(1, 0, inplace=True)
@@ -274,6 +284,10 @@ class DataSet():
             if self.cfg.test_also or self.cfg.test_mode:
                 df_test = df_dev.copy()
                 self.change_multi_label(df_test)
+
+        elif self.cfg.task == 'BoolQ':
+            df_train = self.create_df_from_json('./BoolQ/train.jsonl')
+            df_dev = self.create_df_from_json('./BoolQ/val.jsonl')
 
         df_train = self.sample_dataset(df_train, self.cfg.train_cap)
         print('Number of training sentences: {:,}\n'.format(df_train.shape[0]))
