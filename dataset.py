@@ -207,12 +207,11 @@ class DataSet():
 
         df = pd.DataFrame.from_records(data)
 
-        pdb.set_trace()
         if task == "BoolQ":
-            df.rename(columns={"question": "sentence", "passage": "sentence2"})
-            df['label'].replace('True', 1, inplace=True)
-            df['label'].replace('False', 0, inplace=True)
-        pdb.set_trace()
+            df.rename(columns={"question": "sentence", "passage": "sentence2"}, inplace=True)
+            df['label'].replace(True, 1, inplace=True)
+            df['label'].replace(False, 0, inplace=True)
+
         return df
 
     def swap_binary_label(self, df):
