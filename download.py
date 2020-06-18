@@ -103,3 +103,14 @@ if not path.exists("./agnews"):
         tar_ref.extractall('.')
     os.remove(data_file)
     os.rename('ag_news_csv', 'agnews')
+
+# Downalod BOOLQ
+task = "BoolQ"
+task_path = "https://dl.fbaipublicfiles.com/glue/superglue/data/v2/BoolQ.zip"
+data_dir = './'
+if not path.exists('./BoolQ'):
+    data_file = "%s.zip" % task
+    urllib.request.urlretrieve(task_path, data_file)
+    with zipfile.ZipFile(data_file) as zip_ref:
+        zip_ref.extractall(data_dir)
+    os.remove(data_file)
