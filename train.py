@@ -193,9 +193,11 @@ class Trainer():
         print("Expected Calibration Error: {}".format(ece))
 
         if cfg.test_generate:
-            pdb.set_trace()
-            exit = "exit"
-
+            indices = np.arange(len(y_pred))
+            save_df = pd.DataFrame({'index': indices, 'prediction': y_pred})
+            save_path = os.path.join(beegfs_path, run, 'prediction.tsv')
+            
+            save_df.to_csv(save_path, index=False, encoding="utf-8-sig")
 
     def validate(self, test=False):
         t0 = time.time()
