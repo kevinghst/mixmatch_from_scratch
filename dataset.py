@@ -270,7 +270,7 @@ class DataSet():
             df_train['label'] = df_train['label'].astype(int)
             df_dev['label'] = df_dev['label'].astype(int)
 
-            if self.cfg.test_generate:
+            if self.cfg.test_mode:
                 df_test = pd.read_csv("./CoLA/test.tsv", delimiter='\t', header=None, names=['index', 'sentence', 'label']).iloc[1:]
                 df_test = df_test.assign(label=-1)
 
@@ -338,8 +338,5 @@ class DataSet():
         unsup_dataset = None
         if self.ssl:
             unsup_dataset = TensorDataset(ori_input_ids, ori_seg_ids, ori_input_mask, aug_input_ids, aug_seg_ids, aug_input_mask, ori_num_tokens, aug_num_tokens)
-
-        if self.cfg.debug:
-            pdb.set_trace()
 
         return train_dataset, val_dataset, unsup_dataset, test_dataset
