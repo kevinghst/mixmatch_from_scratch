@@ -192,9 +192,6 @@ class Trainer():
         print("Test Loss: {}".format(avg_val_loss))
         print("Expected Calibration Error: {}".format(ece))
 
-        if cfg.save_test:
-            pdb.set_trace()
-            exit = "exit"
 
     def validate(self, test=False):
         t0 = time.time()
