@@ -272,7 +272,7 @@ class DataSet():
 
             if self.cfg.test_mode:
                 df_test = pd.read_csv("./CoLA/test.tsv", delimiter='\t', header=None, names=['index', 'sentence', 'label']).iloc[1:]
-                df_test = df_test.assign(label=-1)
+                df_test = df_test.assign(label=0)
 
         elif self.cfg.task == 'RTE':
             df_train = pd.read_csv('./RTE/train.tsv', delimiter='\t', header=None, names=['idx', 'sentence', 'sentence2', 'label']).iloc[1:]
