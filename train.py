@@ -197,6 +197,7 @@ class Trainer():
             save_df = pd.DataFrame({'index': indices, 'prediction': y_pred})
             save_path = os.path.join(beegfs_path, run, 'prediction.tsv')
             
+            pdb.set_trace()
             save_df.to_csv(save_path, index=False, encoding="utf-8-sig", sep="\t")
 
     def validate(self, test=False):
