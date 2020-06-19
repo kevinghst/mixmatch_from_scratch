@@ -169,7 +169,12 @@ class Trainer():
         cfg = self.cfg
         model = self.model
 
-        path = os.path.join('results', run, 'save', 'model_steps_'+ epoch +'.pt')
+        if run[0] == 'b':
+            run = run[2:]
+            beegfs_path = "/beegfs/wz1232/mixmatch_from_scratch/results"
+            path = os.path.join(beegfs_path, run, 'save', 'model_steps_'+ epoch +'.pt')
+        else:
+            path = os.path.join('results', run, 'save', 'model_steps_'+ epoch +'.pt')
         checkpoint = torch.load(path)
         self.model.load_state_dict(checkpoint)
 
