@@ -197,7 +197,7 @@ class Trainer():
             save_df = pd.DataFrame({'index': indices, 'prediction': y_pred})
             save_path = os.path.join(beegfs_path, run, 'prediction.tsv')
             
-            save_df.to_csv(save_path, index=False, encoding="utf-8-sig")
+            save_df.to_csv(save_path, index=False, encoding="utf-8-sig", sep="\t")
 
     def validate(self, test=False):
         t0 = time.time()
