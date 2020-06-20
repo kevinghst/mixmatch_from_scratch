@@ -195,7 +195,11 @@ class Trainer():
         print("Expected Calibration Error: {}".format(ece))
 
         if cfg.test_generate:
-            indices = np.arange(len(y_pred))
+            if cfg.task == "RTE":
+                df_test = pd.read_csv('./RTE/test.tsv', delimiter='\t', header=None, names=['idx', 'sentence', 'sentence2', 'label']).iloc[1:]
+                indices = df_test['idx'].to_numpy()
+            else:
+                indices = np.arange(len(y_pred))
             save_df = pd.DataFrame({'index': indices, 'prediction': y_pred})
 
             if beegfs_path:
