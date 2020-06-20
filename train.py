@@ -199,8 +199,9 @@ class Trainer():
                 df_test = pd.read_csv('./RTE/test.tsv', delimiter='\t', header=None, names=['idx', 'sentence', 'sentence2', 'label']).iloc[1:]
                 indices = df_test['idx'].to_numpy()
                 pdb.set_trace()
-                y_pred = np.where(y_pred==1, "entailment", y_pred)
-                y_pred = np.where(y_pred==0, "not_entailment", y_pred)
+                y_pred = y_pred.astype(str)
+                y_pred = np.where(y_pred=="1", "entailment", y_pred)
+                y_pred = np.where(y_pred=="0", "not_entailment", y_pred)
             else:
                 indices = np.arange(len(y_pred))
             save_df = pd.DataFrame({'index': indices, 'prediction': y_pred})
