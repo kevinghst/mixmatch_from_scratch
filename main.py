@@ -181,7 +181,8 @@ validation_dataloader = DataLoader(
         )
 
 test_dataloader = None
-if cfg.test_also or cfg.test_mode:
+
+if test_dataset is not None:
     test_dataloader = DataLoader(
                 test_dataset, # The validation samples.
                 sampler = SequentialSampler(test_dataset), # Pull out batches sequentially.

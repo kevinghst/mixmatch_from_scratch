@@ -169,6 +169,8 @@ class Trainer():
         cfg = self.cfg
         model = self.model
 
+        beegfs_path = ""
+
         if run[0] == 'b':
             run = run[2:]
             beegfs_path = "/beegfs/wz1232/mixmatch_from_scratch/results"
@@ -195,7 +197,11 @@ class Trainer():
         if cfg.test_generate:
             indices = np.arange(len(y_pred))
             save_df = pd.DataFrame({'index': indices, 'prediction': y_pred})
-            save_path = os.path.join(beegfs_path, run, 'prediction.tsv')
+
+            if beegfs_path:
+                save_path = os.path.join(beegfs_path, run, 'prediction.tsv')
+            else:
+                save_path = os.path.join('results', run, 'prediction.tsv')
             
             save_df.to_csv(save_path, index=False, sep="\t")
 
