@@ -288,7 +288,7 @@ class DataSet():
             df_dev['label'] = df_dev['label'].astype(int)
 
             if self.cfg.test_also or self.cfg.test_mode:
-                df_test = pd.read_csv('./RTE/test.tsv', delimiter='\t', header=None, names=['idx', 'sentence', 'sentence2', 'label'])
+                df_test = pd.read_csv('./RTE/test.tsv', delimiter='\t', header=None, names=['idx', 'sentence', 'sentence2', 'label']).iloc[1:]
                 df_test = df_test.assign(label=0)
 
             #df.loc[df['column_name'] == some_value]
