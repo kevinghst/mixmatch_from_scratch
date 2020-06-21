@@ -5,6 +5,7 @@ import numpy as np
 from torch.nn import CrossEntropyLoss
 import torch.nn.functional as F
 from sklearn.metrics import matthews_corrcoef
+import csv
 
 import torch
 import torch.nn as nn
@@ -209,10 +210,20 @@ class Trainer():
 
             if beegfs_path:
                 save_path = os.path.join(beegfs_path, run, 'prediction.tsv')
+                save_path_debug = os.path.join(beegfs_path, run, 'prediction_debug.tsv')
             else:
                 save_path = os.path.join('results', run, 'prediction.tsv')
-            
+                save_path_debug = os.path.join('results', run, 'prediction_debug.tsv')
+
             save_df.to_csv(save_path, index=False, sep="\t")
+
+            if cfg.debug:
+                with open(save_path_debug, 'w', newline='') as f_output:
+                    tsv_output = csv.writer(f_output, delimiter='\t')
+                    tsv_output.writerow(['index', 'prediction'])
+                    for i, index in enumerate(indices):
+                        tsv_output.writerrow([index, y_pred[i]])
+           
 
     def validate(self, test=False):
         t0 = time.time()
