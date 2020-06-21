@@ -13,7 +13,7 @@ MAX_LENGTHS = {
     "imdb": 128,
     "CoLA": 128,
     "agnews": 128,
-    "RTE": 256,
+    "RTE": 128,
     "BoolQ": 128
 }
 
