@@ -222,7 +222,7 @@ class Trainer():
                     tsv_output = csv.writer(f_output, delimiter='\t')
                     tsv_output.writerow(['index', 'prediction'])
                     for i, index in enumerate(indices):
-                        tsv_output.writerrow([index, y_pred[i]])
+                        tsv_output.writerow([index, y_pred[i]])
            
 
     def validate(self, test=False):
