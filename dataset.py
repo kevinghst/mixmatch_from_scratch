@@ -14,7 +14,7 @@ MAX_LENGTHS = {
     "CoLA": 128,
     "agnews": 128,
     "RTE": 128,
-    "BoolQ": 128
+    "BoolQ": 256
 }
 
 NUM_LABELS = {
@@ -88,8 +88,10 @@ class DataSet():
                 combined_lengths.append(len(tokens) + len(tokens2) + 3)
 
                 if len(tokens) + len(tokens2) > max_len - 3:
-                    tokens = tokens[-(max_len - 3 - len(tokens2)):]
-                    #raise Exception('Total length exceeds max length')
+                    if self.cfg.task == "BoolQ":
+                        tokens2 = tokens2[-(max_len - 3 - len(tokens)):]
+                    else:
+                        tokens = tokens[-(max_len - 3 - len(tokens2)):]
 
 
             if sentences2 is not None:

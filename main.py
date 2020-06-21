@@ -112,7 +112,7 @@ MAX_LENGTHS = {
     "CoLA": 128,
     "agnews": 128,
     "RTE": 128,
-    "BoolQ": 128
+    "BoolQ": 256
 }
 
 NUM_LABELS = {
