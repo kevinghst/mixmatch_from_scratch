@@ -348,6 +348,4 @@ class DataSet():
         if self.ssl:
             unsup_dataset = TensorDataset(ori_input_ids, ori_seg_ids, ori_input_mask, aug_input_ids, aug_seg_ids, aug_input_mask, ori_num_tokens, aug_num_tokens)
 
-        if self.cfg.debug:
-            pdb.set_trace()
         return train_dataset, val_dataset, unsup_dataset, test_dataset
