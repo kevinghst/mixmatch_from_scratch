@@ -184,7 +184,8 @@ class Trainer():
 
         avg_prec1, avg_prec3, matt_corr, avg_val_loss, validation_time, y_true, y_pred, y_conf = self.validate(test=True)
 
-        ece = calculate_ece(y_true, y_pred, y_conf, cfg.ece)
+        abs_ece = calculate_ece(y_true, y_pred, y_conf, 'abs')
+        rms_ece = calculate_ece(y_true, y_pred, y_conf, 'rms')
 
         if cfg.task == "CoLA":
             print("Test Matthew Correlation: {0:.4f}".format(matt_corr))
@@ -192,7 +193,8 @@ class Trainer():
             print("Test Accuracy: {0:.4f}".format(avg_prec1))
 
         print("Test Loss: {}".format(avg_val_loss))
-        print("Expected Calibration Error: {}".format(ece))
+        print("Abs ECE: {}".format(abs_ece))
+        print("Rms ECE: {}".format(rms_ece))
 
         if cfg.test_generate:
             if cfg.task == "RTE":
@@ -438,7 +440,8 @@ class Trainer():
                 print("Early stopped")
                 break
 
-        ece = calculate_ece(best_true, best_pred, best_conf, cfg.ece)
+        abs_ece = calculate_ece(best_true, best_pred, best_conf, 'abs')
+        rms_ece = calculate_ece(best_true, best_pred, best_conf, 'rms')
 
         if cfg.save_predictions:
             df = pd.DataFrame({"pred": best_pred, "true": best_true})
@@ -458,7 +461,8 @@ class Trainer():
         print("Best Val Loss: {}".format(best_val_loss))
         print("Best Training Loss: {}".format(best_train_loss))
         print("Best Epoch: {}".format(best_epoch))
-        print("Expected Calibration Error: {}".format(ece))
+        print("Abs ECE: {}".format(abs_ece))
+        print("RMS ECE: {}".format(rms_ece))
 
         if cfg.test_also:
             self.test(cfg.results_dir, str(best_epoch))
