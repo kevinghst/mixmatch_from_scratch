@@ -163,10 +163,6 @@ class DataSet():
                 df_sub['label'] = 0
             df_sample = pd.concat([df_sample, df_sub])
 
-        if self.cfg.debug:
-            pdb.set_trace()
-
-
         self.reindex(df_sample)
         return df_sample
 
@@ -307,7 +303,10 @@ class DataSet():
             df_dev = pd.read_csv("./agnews/test.csv", header=None, names=['label', 'title', 'sentence'])
 
             if self.cfg.test_also or self.cfg.test_mode:
-                df_test = df_dev.copy()
+                if self.cfg.test_path != "none":
+                    df_test = pd.read_csv(test_path, header=None, names=['label', 'title', 'sentence']).iloc[1:]
+                else:
+                    df_test = df_dev.copy()
                 self.change_multi_label(df_test)
 
         elif self.cfg.task == 'BoolQ':
