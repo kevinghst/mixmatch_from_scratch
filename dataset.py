@@ -163,6 +163,10 @@ class DataSet():
                 df_sub['label'] = 0
             df_sample = pd.concat([df_sample, df_sub])
 
+        if self.cfg.debug:
+            pdb.set_trace()
+
+
         self.reindex(df_sample)
         return df_sample
 
