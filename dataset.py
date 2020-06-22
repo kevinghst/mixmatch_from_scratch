@@ -309,6 +309,9 @@ class DataSet():
                 if self.cfg.test_path == "full":
                     df_test = pd.read_csv('./agnews/test_full.csv', header=None, names=['label', 'title', 'sentence']).iloc[1:]
                     df_test['label'] = df_test['label'].astype(int)
+                elif self.cfg.test_path == "32":
+                    df_test = pd.read_csv('./agnews/test_32.csv', header=None, names=['label', 'title', 'sentence']).iloc[1:]
+                    df_test['label'] = df_test['label'].astype(int)
                 else:
                     df_test = df_dev.copy()
                 self.change_multi_label(df_test)
