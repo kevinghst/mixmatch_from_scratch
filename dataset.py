@@ -163,9 +163,6 @@ class DataSet():
                 df_sub['label'] = 0
             df_sample = pd.concat([df_sample, df_sub])
 
-        if self.cfg.debug:
-            pdb.set_trace()
-
         self.reindex(df_sample)
         return df_sample
 
@@ -308,6 +305,7 @@ class DataSet():
             if self.cfg.test_also or self.cfg.test_mode:
                 if self.cfg.test_path != "none":
                     df_test = pd.read_csv(self.cfg.test_path, header=None, names=['label', 'title', 'sentence']).iloc[1:]
+                    df_test['label'] = df_test['label'].astype(int)
                 else:
                     df_test = df_dev.copy()
                 self.change_multi_label(df_test)
