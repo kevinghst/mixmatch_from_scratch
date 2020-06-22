@@ -273,8 +273,11 @@ class DataSet():
             df_dev['label'] = df_dev['label'].astype(int)
 
             if self.cfg.test_also or self.cfg.test_mode:
-                df_test = pd.read_csv("./CoLA/test.tsv", delimiter='\t', header=None, names=['index', 'sentence', 'label']).iloc[1:]
-                df_test = df_test.assign(label=0)
+                if self.cfg.test_dev:
+                    df_test = df_dev.copy()
+                else:
+                    df_test = pd.read_csv("./CoLA/test.tsv", delimiter='\t', header=None, names=['index', 'sentence', 'label']).iloc[1:]
+                    df_test = df_test.assign(label=0)
 
         elif self.cfg.task == 'RTE':
             df_train = pd.read_csv('./RTE/train.tsv', delimiter='\t', header=None, names=['idx', 'sentence', 'sentence2', 'label']).iloc[1:]
