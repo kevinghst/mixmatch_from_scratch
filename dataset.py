@@ -306,8 +306,8 @@ class DataSet():
             df_dev = pd.read_csv("./agnews/test.csv", header=None, names=['label', 'title', 'sentence'])
 
             if self.cfg.test_also or self.cfg.test_mode:
-                if self.cfg.test_path != "none":
-                    df_test = pd.read_csv(self.cfg.test_path, header=None, names=['label', 'title', 'sentence']).iloc[1:]
+                if self.cfg.test_path == "full":
+                    df_test = pd.read_csv('./agnews/test_full.csv', header=None, names=['label', 'title', 'sentence']).iloc[1:]
                     df_test['label'] = df_test['label'].astype(int)
                 else:
                     df_test = df_dev.copy()
