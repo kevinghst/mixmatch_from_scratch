@@ -304,7 +304,7 @@ class DataSet():
 
             if self.cfg.test_also or self.cfg.test_mode:
                 if self.cfg.test_path != "none":
-                    df_test = pd.read_csv(test_path, header=None, names=['label', 'title', 'sentence']).iloc[1:]
+                    df_test = pd.read_csv(self.cfg.test_path, header=None, names=['label', 'title', 'sentence']).iloc[1:]
                 else:
                     df_test = df_dev.copy()
                 self.change_multi_label(df_test)
