@@ -206,6 +206,8 @@ class Trainer():
                 y_pred = np.where(y_pred=="0.0", "not_entailment", y_pred)
             else:
                 indices = np.arange(len(y_pred))
+
+            pdb.set_trace()
             save_df = pd.DataFrame({'index': indices, 'prediction': y_pred})
 
             if beegfs_path:
