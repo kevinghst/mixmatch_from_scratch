@@ -298,7 +298,7 @@ class DataSet():
             if self.cfg.test_also or self.cfg.test_mode:
                 with open('./RTE/test.tsv') as f:
                     raw_data = f.read()
-                    data = [row.split('\t') for row in raw_data.split('\n')[:-1]]
+                    data = [row.split('\t') for row in raw_data.split('\n')[:-1]][1:]
                     pdb.set_trace()
                     exit = "exit"
 
