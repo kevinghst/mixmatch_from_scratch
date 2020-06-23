@@ -299,12 +299,8 @@ class DataSet():
                 with open('./RTE/test.tsv') as f:
                     raw_data = f.read()
                     data = [row.split('\t') for row in raw_data.split('\n')[:-1]][1:]
-                    pdb.set_trace()
-                    exit = "exit"
-
-
-                df_test = pd.read_csv('./RTE/test.tsv', delimiter='\t', header=None, names=['idx', 'sentence', 'sentence2', 'label']).iloc[1:]
-                df_test = df_test.assign(label=0)
+                    df_test = pd.DataFrame(data, columns=['idx', 'sentence', 'sentence2'])
+                    df_test['label'] = 0
 
             #df.loc[df['column_name'] == some_value]
 
