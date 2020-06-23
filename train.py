@@ -204,6 +204,7 @@ class Trainer():
                 y_pred = y_pred.astype(str)
                 y_pred = np.where(y_pred=="1.0", "entailment", y_pred)
                 y_pred = np.where(y_pred=="0.0", "not_entailment", y_pred)
+                pdb.set_trace()
             else:
                 indices = np.arange(len(y_pred))
                 y_pred = y_pred.astype(int)
