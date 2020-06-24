@@ -326,6 +326,11 @@ class DataSet():
             df_train['label'] = df_train['label'].astype(int)
             df_dev['label'] = df_dev['label'].astype(int)
 
+            if self.cfg.test_also or self.cfg.test_mode:
+                df_test = self.create_df_from_json('./BoolQ/test.jsonl', self.cfg.task)
+                pdb.set_trace()
+                exit = "exit"
+
         df_train = self.sample_dataset(df_train, self.cfg.train_cap)
         print('Number of training sentences: {:,}\n'.format(df_train.shape[0]))
         input_ids_train, attention_masks_train, seg_ids_train, label_ids_train, num_tokens_train = self.preprocess(df_train)
