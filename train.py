@@ -198,16 +198,24 @@ class Trainer():
         print("Rms ECE: {}".format(rms_ece))
 
         if cfg.test_generate:
+            indices = np.arange(len(y_pred))
+
             if cfg.task == "RTE":
-                indices = np.arange(len(y_pred))
                 y_pred = y_pred.astype(str)
                 y_pred = np.where(y_pred=="1.0", "entailment", y_pred)
                 y_pred = np.where(y_pred=="0.0", "not_entailment", y_pred)
+            elif cfg.task == "BoolQ":
+                y_pred = y_pred.astype(str)
+                y_pred = np.where(y_pred=="1.0", "true", y_pred)
+                y_pred = np.where(y_pred=="0.0", "false", y_pred)
             else:
-                indices = np.arange(len(y_pred))
                 y_pred = y_pred.astype(int)
 
             save_df = pd.DataFrame({'index': indices, 'prediction': y_pred})
+            pdb.set_trace()
+
+
+
 
             if beegfs_path:
                 save_path = os.path.join(beegfs_path, run, 'prediction.tsv')

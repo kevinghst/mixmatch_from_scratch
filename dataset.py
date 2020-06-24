@@ -212,10 +212,11 @@ class DataSet():
 
         df = pd.DataFrame.from_records(data)
 
-        pdb.set_trace()
-
         if task == "BoolQ":
             df.rename(columns={"question": "sentence", "passage": "sentence2"}, inplace=True)
+            if 'test' in path:
+                df['label'] = False
+
             df['label'].replace(True, 1, inplace=True)
             df['label'].replace(False, 0, inplace=True)
 
@@ -330,8 +331,7 @@ class DataSet():
 
             if self.cfg.test_also or self.cfg.test_mode:
                 df_test = self.create_df_from_json('./BoolQ/test.jsonl', self.cfg.task)
-                pdb.set_trace()
-                exit = "exit"
+                df_test['label'] = df_test['label'].astype(int)
 
         df_train = self.sample_dataset(df_train, self.cfg.train_cap)
         print('Number of training sentences: {:,}\n'.format(df_train.shape[0]))
