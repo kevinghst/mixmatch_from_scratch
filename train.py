@@ -17,6 +17,7 @@ import shutil
 import os
 import pdb
 import pandas as pd
+import json
 
 
 class Trainer():
@@ -204,34 +205,34 @@ class Trainer():
                 y_pred = y_pred.astype(str)
                 y_pred = np.where(y_pred=="1.0", "entailment", y_pred)
                 y_pred = np.where(y_pred=="0.0", "not_entailment", y_pred)
+                save_df = pd.DataFrame({'index': indices, 'prediction': y_pred})
             elif cfg.task == "BoolQ":
                 y_pred = y_pred.astype(str)
                 y_pred = np.where(y_pred=="1.0", "true", y_pred)
                 y_pred = np.where(y_pred=="0.0", "false", y_pred)
+                
+                dics = []
+                for idx, pred in enumerate(y_pred):
+                    dics.append({"idx": idx, "label": pred})
+
             else:
                 y_pred = y_pred.astype(int)
-
-            save_df = pd.DataFrame({'index': indices, 'prediction': y_pred})
-            pdb.set_trace()
-
-
+                save_df = pd.DataFrame({'index': indices, 'prediction': y_pred})
 
 
             if beegfs_path:
                 save_path = os.path.join(beegfs_path, run, 'prediction.tsv')
-                save_path_debug = os.path.join(beegfs_path, run, 'prediction_debug.tsv')
             else:
                 save_path = os.path.join('results', run, 'prediction.tsv')
-                save_path_debug = os.path.join('results', run, 'prediction_debug.tsv')
 
-            save_df.to_csv(save_path, index=False, sep="\t")
+            if cfg.task == "BoolQ":
+                output_file = open(save_path, 'w', encoding='utf-8')
+                for dic in dics:
+                    json.dump(dic, output_file)
+                    output_file.write("\n")
+            else:
+                save_df.to_csv(save_path, index=False, sep="\t")
 
-            if cfg.debug:
-                with open(save_path_debug, 'w', newline='') as f_output:
-                    tsv_output = csv.writer(f_output, delimiter='\t')
-                    tsv_output.writerow(['index', 'prediction'])
-                    for i, index in enumerate(indices):
-                        tsv_output.writerow([index, y_pred[i]])
            
 
     def validate(self, test=False):
