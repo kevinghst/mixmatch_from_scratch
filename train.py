@@ -214,6 +214,7 @@ class Trainer():
                 dics = []
                 for idx, pred in enumerate(y_pred):
                     dics.append({"idx": idx, "label": pred})
+       
 
             else:
                 y_pred = y_pred.astype(int)
@@ -221,16 +222,18 @@ class Trainer():
 
 
             if beegfs_path:
-                save_path = os.path.join(beegfs_path, run, 'prediction.tsv')
+                save_path = os.path.join(beegfs_path, run, 'prediction')
             else:
-                save_path = os.path.join('results', run, 'prediction.tsv')
+                save_path = os.path.join('results', run, 'prediction')
 
             if cfg.task == "BoolQ":
+                save_path += '.jsonl'
                 output_file = open(save_path, 'w', encoding='utf-8')
                 for dic in dics:
                     json.dump(dic, output_file)
                     output_file.write("\n")
             else:
+                save_path += '.tsv'
                 save_df.to_csv(save_path, index=False, sep="\t")
 
            
