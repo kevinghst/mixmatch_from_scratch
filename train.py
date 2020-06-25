@@ -164,7 +164,8 @@ class Trainer():
                     'steps': self.num_steps,
                     'acc': avg_prec1,
                     'mcc': matt_corr,
-                    'loss': avg_val_loss
+                    'val_loss': avg_val_loss,
+                    'train_loss': loss.item()
                 }
                 self.steps_metrics.append(metrics_dic)
 
@@ -510,7 +511,7 @@ class Trainer():
 
             file = open(save_path, 'w', newline = '')
             with file:
-                header = ['steps', 'acc', 'mcc', 'loss']
+                header = ['steps', 'acc', 'mcc', 'val_loss', 'train_loss']
                 csv_writer = csv.DictWriter(file, fieldnames = header)
 
                 csv_writer.writeheader()
