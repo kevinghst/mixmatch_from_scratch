@@ -37,6 +37,8 @@ class Trainer():
         self.unsup_loader = unsup_loader
         self.cfg = cfg
         self.num_labels = num_labels
+        self.num_steps = 0
+        self.steps_metrics = []
 
     # TSA
     def get_tsa_thresh(schedule, current, rampup_length, start, end):
@@ -154,6 +156,18 @@ class Trainer():
 
             # Update the learning rate.
             scheduler.step()
+
+            self.num_steps += 1
+            if cfg.check_every and self.num_steps % self.check_every == 0:
+                avg_prec1, avg_prec3, matt_corr, avg_val_loss, validation_time, y_true, y_pred, y_conf = self.validate()
+                metrics_dic = {
+                    'steps': self.num_steps,
+                    'acc': avg_prec1,
+                    'mcc': matt_corr,
+                    'loss': avg_val_loss
+                }
+                self.steps_metrics.append(metrics_dic)
+
 
         # Calculate the average loss over all of the batches.
         avg_train_loss = total_train_loss / len(train_loader)   
@@ -490,6 +504,19 @@ class Trainer():
 
         if cfg.test_also:
             self.test(cfg.results_dir, str(best_epoch))
+
+        if cfg.check_every:
+            save_path = os.path.join('results', run, 'steps_metrics.csv')
+
+            file = open(save_path, 'w', newline = '')
+            with file:
+                header = ['steps', 'acc', 'mcc', 'loss']
+                csv_writer = csv.DictWriter(file, fieldnames = header)
+
+                csv_writer.writeheader()
+                for metric in self.steps_metrics:
+                    csv_writer.writerow(metric)
+
 
         writer.close()
 
