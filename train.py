@@ -506,7 +506,7 @@ class Trainer():
             self.test(cfg.results_dir, str(best_epoch))
 
         if cfg.check_every:
-            save_path = os.path.join('results', run, 'steps_metrics.csv')
+            save_path = os.path.join('results', cfg.results_dir, 'steps_metrics.csv')
 
             file = open(save_path, 'w', newline = '')
             with file:
