@@ -158,7 +158,7 @@ class Trainer():
             scheduler.step()
 
             self.num_steps += 1
-            if cfg.check_every and self.num_steps % self.check_every == 0:
+            if cfg.check_every and self.num_steps % cfg.check_every == 0:
                 avg_prec1, avg_prec3, matt_corr, avg_val_loss, validation_time, y_true, y_pred, y_conf = self.validate()
                 metrics_dic = {
                     'steps': self.num_steps,
