@@ -89,9 +89,12 @@ class Trainer():
             sup_idx = torch.randperm(batch_size)
 
             if cfg.sup_mixup and 'word' in cfg.sup_mixup:
-                input_ids, c_input_ids = pad_for_word_mixup(
-                    input_ids, input_mask, num_tokens, sup_idx, cfg.model    
-                )
+                if cfg.padding != "none":
+                    input_ids, c_input_ids = pad_for_word_mixup(
+                        input_ids, input_mask, num_tokens, sup_idx, cfg.model, cfg.padding
+                    )
+                else:
+                    c_input_ids = input_ids.clone()
             else:
                 c_input_ids=None
             
