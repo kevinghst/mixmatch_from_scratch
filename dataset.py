@@ -80,6 +80,15 @@ class DataSet():
             if len(tokens) > max_len - 2:
                 tokens = tokens[-(max_len - 2):]
 
+            if self.cfg.pad_all:
+                # pad all tokens to the same length using UNS token
+                max_sent_length = 66
+                paddings = max_sent_length - 2 - len(tokens)
+
+                for i in range(0, paddings):
+                    unused_token = '[SEP]'
+                    tokens.append(unused_token)
+
             if sentences2 is not None:
                 tokens2 = self.tokenizer.tokenize(sentences2[i])
                 if len(tokens2) > max_len - 2:
