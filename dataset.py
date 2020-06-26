@@ -132,6 +132,9 @@ class DataSet():
         labels = torch.tensor(labels)
         num_tokens = torch.tensor(num_tokens)
 
+        if self.cfg.debug:
+            pdb.set_trace()
+
         return input_ids, attention_masks, segment_ids, labels, num_tokens
 
     def change_multi_label(self, df):
