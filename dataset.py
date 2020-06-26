@@ -96,6 +96,14 @@ class DataSet():
                 for i in range(0, paddings):
                     unused_token = '[unused0]'
                     tokens.append(unused_token)
+            elif self.cfg.pad_all == 'pad':
+                # pad all tokens to the same length using UNS token
+                max_sent_length = 66
+                paddings = max_sent_length - 2 - len(tokens)
+
+                for i in range(0, paddings):
+                    unused_token = '[PAD]'
+                    tokens.append(unused_token)
 
             if sentences2 is not None:
                 tokens2 = self.tokenizer.tokenize(sentences2[i])

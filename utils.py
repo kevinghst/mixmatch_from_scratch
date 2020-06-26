@@ -69,6 +69,8 @@ def pad_for_word_mixup(input_ids, input_mask, num_tokens, idx, model, padding):
         unused = 1
     elif padding == 'sep':
         unused = 102
+    elif padding == 'pad':
+        unused = 0
 
     batch_size = input_ids.size(0)
     c_input_ids = input_ids.clone()
