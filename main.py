@@ -60,7 +60,7 @@ parser.add_argument('--test_run', default='', type=str)
 parser.add_argument('--test_epoch', default='', type=str)
 parser.add_argument('--model', default='bert', type=str)
 parser.add_argument('--padding', default='none', type=str)
-parser.add_argument('--pad_all', action='store_true')
+parser.add_argument('--pad_all', default='none', type=str)
 
 # mixup
 parser.add_argument('--sup_mixup', choices=['cls', 'word', 'word_cls'])

@@ -65,9 +65,11 @@ def mixup_op(input, l, idx):
     return mixed_input
 
 def pad_for_word_mixup(input_ids, input_mask, num_tokens, idx, model, padding):
-    if padding == 'UNK':
+    if padding == 'unused':
+        pdb.set_trace()
         unused = 1
-    elif padding == 'SEP':
+    elif padding == 'sep':
+        pdb.set_trace()
         unused = 102
 
     batch_size = input_ids.size(0)

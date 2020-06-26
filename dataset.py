@@ -80,7 +80,7 @@ class DataSet():
             if len(tokens) > max_len - 2:
                 tokens = tokens[-(max_len - 2):]
 
-            if self.cfg.pad_all == 'SEP':
+            if self.cfg.pad_all == 'sep':
                 # pad all tokens to the same length using UNS token
                 max_sent_length = 66
                 paddings = max_sent_length - 2 - len(tokens)
@@ -88,7 +88,7 @@ class DataSet():
                 for i in range(0, paddings):
                     unused_token = '[SEP]'
                     tokens.append(unused_token)
-            elif self.cfg.pad_all == 'UNK':
+            elif self.cfg.pad_all == 'unused':
                 # pad all tokens to the same length using UNS token
                 max_sent_length = 66
                 paddings = max_sent_length - 2 - len(tokens)
