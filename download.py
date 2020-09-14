@@ -93,6 +93,16 @@ if not path.exists('./RTE'):
         zip_ref.extractall(data_dir)
     os.remove(data_file)
 
+task = "MNLI"
+task_path = "https://firebasestorage.googleapis.com/v0/b/mtl-sentence-representations.appspot.com/o/data%2FMNLI.zip?alt=media&token=50329ea1-e339-40e2-809c-10c40afff3ce"
+data_dir = './'
+if not path.exists('./MNLI'):
+    data_file = "%s.zip" % task
+    urllib.request.urlretrieve(task_path, data_file)
+    with zipfile.ZipFile(data_file) as zip_ref:
+        zip_ref.extractall(data_dir)
+    os.remove(data_file)
+
 # Download AG News
 data_file = 'ag_news_csv.tgz'
 destination = './agnews/' + data_file
