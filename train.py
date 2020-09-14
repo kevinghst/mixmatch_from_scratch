@@ -251,6 +251,11 @@ class Trainer():
                     json.dump(dic, output_file)
                     output_file.write("\n")
             else:
+                if cfg.test_out_domain:
+                    save_path += '_out_domain'
+
+                pdb.set_trace()
+
                 save_path += '.tsv'
                 save_df.to_csv(save_path, index=False, sep="\t")
 
