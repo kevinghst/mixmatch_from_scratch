@@ -328,17 +328,17 @@ class DataSet():
                     df_test = pd.read_csv('./MNLI/dev_matched.tsv', delimiter='\t', header=None, names=header_names).iloc[1:]
                     df_test['label'].replace({'entailment': 1, 'neutral': 0, 'contradiction': 0}, inplace=True)
                 else:
-                    #with open('./RTE/dev.tsv') as f:
-                    #    raw_data = f.read()
-                    #    data = [row.split('\t') for row in raw_data.split('\n')[:-1]][1:]
-                    #    df_test = pd.DataFrame(data, columns=['idx', 'sentence', 'sentence2', 'label'])
-                    #    df_test['label'].replace({'not_entailment': 0, 'entailment': 1}, inplace=True)
-
-                    with open('./RTE/test.tsv') as f:
+                    with open('./RTE/dev.tsv') as f:
                         raw_data = f.read()
                         data = [row.split('\t') for row in raw_data.split('\n')[:-1]][1:]
-                        df_test = pd.DataFrame(data, columns=['idx', 'sentence', 'sentence2'])
-                        df_test['label'] = 0
+                        df_test = pd.DataFrame(data, columns=['idx', 'sentence', 'sentence2', 'label'])
+                        df_test['label'].replace({'not_entailment': 0, 'entailment': 1}, inplace=True)
+
+                    #with open('./RTE/test.tsv') as f:
+                    #    raw_data = f.read()
+                    #    data = [row.split('\t') for row in raw_data.split('\n')[:-1]][1:]
+                    #    df_test = pd.DataFrame(data, columns=['idx', 'sentence', 'sentence2'])
+                    #    df_test['label'] = 0
 
             #df.loc[df['column_name'] == some_value]
 
