@@ -351,9 +351,11 @@ class DataSet():
             header_names = ['idx', 'promptID', 'pairID', 'genre', 'sb1', 'sb2', 'sp1', 'sp2', 'sentence', 'sentence2', 'label', 'gold_label']
             df_train = pd.read_csv('./MNLI/train.tsv', delimiter='\t', header=None, names=header_names).iloc[1:]
             df_train['label'].replace({'entailment': 1, 'neutral': 0, 'contradiction': 0}, inplace=True)
+            df_train['label'] = df_train['label'].astype(int)
 
             df_dev = pd.read_csv('./MNLI/dev_matched.tsv', delimiter='\t', header=None, names=header_names).iloc[1:]
             df_dev['label'].replace({'entailment': 1, 'neutral': 0, 'contradiction': 0}, inplace=True)
+            df_dev['label'] = df_dev['label'].astype(int)
 
             if self.cfg.test_also or self.cfg.test_mode:
                 if self.cfg.test_out_domain:
@@ -362,7 +364,7 @@ class DataSet():
                     df_test = pd.read_csv('./MNLI/test_matched.tsv', delimiter='\t', header=None, names=header_names).iloc[1:]
 
                 df_test['label'].replace({'entailment': 1, 'neutral': 0, 'contradiction': 0}, inplace=True)
-
+                df_test['label'] = df_test['label'].astype(int)
 
         elif self.cfg.task == 'agnews':
             df_train = pd.read_csv("./agnews/train.csv", header=None, names=['label', 'title', 'sentence'])
