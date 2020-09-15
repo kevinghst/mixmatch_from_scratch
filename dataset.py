@@ -50,6 +50,8 @@ class DataSet():
         return True
 
     def preprocess(self, df):
+        pdb.set_trace()
+
         sentences = df.sentence.values
         labels = df.label.values
 
