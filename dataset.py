@@ -415,7 +415,6 @@ class DataSet():
                 #    df_test = self.filter_domain(df_test)
 
                 #df_test['label'] = 0
-            pdb.set_trace()
 
         elif self.cfg.task == 'agnews':
             df_train = pd.read_csv("./agnews/train.csv", header=None, names=['label', 'title', 'sentence'])
