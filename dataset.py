@@ -351,14 +351,14 @@ class DataSet():
             header_names = ['idx', 'promptID', 'pairID', 'genre', 'sb1', 'sb2', 'sp1', 'sp2', 'sentence', 'sentence2', 'label', 'gold_label']
             df_train = pd.read_csv('./MNLI/train.tsv', delimiter='\t', header=None, names=header_names).iloc[1:]
             df_train['label'].replace({'entailment': 1, 'neutral': 0, 'contradiction': 0}, inplace=True)
-            bad = df_train[df_train['label'] != 1 & df_train['label'] != 0]
+            bad = df_train[(df_train['label'] != 1) & (df_train['label'] != 0)]
             df_train.drop(bad.index, inplace=True)
             df_train['label'] = df_train['label'].astype(int)
 
 
             df_dev = pd.read_csv('./MNLI/dev_matched.tsv', delimiter='\t', header=None, names=header_names).iloc[1:]
             df_dev['label'].replace({'entailment': 1, 'neutral': 0, 'contradiction': 0}, inplace=True)
-            bad = df_dev[df_dev['label'] != 1 & df_dev['label'] != 0]
+            bad = df_dev[(df_dev['label'] != 1) & (df_dev['label'] != 0)]
             df_dev.drop(bad.index, inplace=True)
             df_dev['label'] = df_dev['label'].astype(int)
 
