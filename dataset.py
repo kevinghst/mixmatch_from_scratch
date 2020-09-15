@@ -14,7 +14,8 @@ MAX_LENGTHS = {
     "CoLA": 128,
     "agnews": 128,
     "RTE": 128,
-    "BoolQ": 256
+    "BoolQ": 256,
+    "MNLI": 128
 }
 
 NUM_LABELS = {
@@ -24,7 +25,8 @@ NUM_LABELS = {
     "CoLA": 2,
     "agnews": 4,
     "RTE": 2,
-    "BoolQ": 2
+    "BoolQ": 2,
+    "MNLI": 2
 }
 
 
@@ -157,7 +159,7 @@ class DataSet():
         labels = torch.tensor(labels)
         num_tokens = torch.tensor(num_tokens)
 
-
+        pdb.set_trace()
         return input_ids, attention_masks, segment_ids, labels, num_tokens
 
     def change_multi_label(self, df):
@@ -347,8 +349,16 @@ class DataSet():
             df_train = pd.read_csv('./MNLI/train.tsv', delimiter='\t', header=None, names=header_names).iloc[1:]
             df_train['label'].replace({'entailment': 1, 'neutral': 0, 'contradiction': 0}, inplace=True)
 
-            df_dev_matched = pd.read_csv('./MNLI/dev_matched.tsv', delimiter='\t', header=None, names=header_names).iloc[1:]
-            
+            df_dev = pd.read_csv('./MNLI/dev_matched.tsv', delimiter='\t', header=None, names=header_names).iloc[1:]
+            df_dev['label'].replace({'entailment': 1, 'neutral': 0, 'contradiction': 0}, inplace=True)
+
+            if self.cfg.test_also or self.cfg.test_mode:
+                if self.cfg.test_out_domain:
+                    df_test = pd.read_csv('./MNLI/test_mismatched.tsv', delimiter='\t', header=None, names=header_names).iloc[1:]
+                else:
+                    df_test = pd.read_csv('./MNLI/test_matched.tsv', delimiter='\t', header=None, names=header_names).iloc[1:]
+
+                df_test['label'].replace({'entailment': 1, 'neutral': 0, 'contradiction': 0}, inplace=True)
 
 
         elif self.cfg.task == 'agnews':

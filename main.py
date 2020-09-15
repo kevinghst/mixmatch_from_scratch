@@ -118,7 +118,8 @@ MAX_LENGTHS = {
     "CoLA": 128,
     "agnews": 128,
     "RTE": 128,
-    "BoolQ": 256
+    "BoolQ": 256,
+    "MNLI": 128
 }
 
 NUM_LABELS = {
@@ -128,7 +129,8 @@ NUM_LABELS = {
     "CoLA": 2,
     "agnews": 4,
     "RTE": 2,
-    "BoolQ": 2
+    "BoolQ": 2,
+    "MNLI": 2
 }
 
 model_cfg = {
