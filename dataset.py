@@ -257,7 +257,7 @@ class DataSet():
         if not self.cfg.data_domain:
             return
 
-        domains = self.cfg.data_domain.split(',')
+        domains = self.cfg.data_domain.split('&')
         sub = df.loc[df['genre'].isin(domains)]
         self.reindex(sub)
 
@@ -383,6 +383,7 @@ class DataSet():
                     df_test = pd.read_csv('./MNLI/test_mismatched.tsv', delimiter='\t', header=None, names=header_names).iloc[1:]
                 else:
                     df_test = pd.read_csv('./MNLI/test_matched.tsv', delimiter='\t', header=None, names=header_names).iloc[1:]
+                    df_test = self.filter_domain(df_test)
 
                 df_test['label'] = 0
 
