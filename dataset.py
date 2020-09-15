@@ -58,8 +58,6 @@ class DataSet():
         else:
             sentences2 = None
 
-        pdb.set_trace()
-
         # Tokenize all of the sentences and map the tokens to thier word IDs.
         input_ids = []
         attention_masks = []
@@ -110,7 +108,11 @@ class DataSet():
                     tokens.append(unused_token)
 
             if sentences2 is not None:
-                tokens2 = self.tokenizer.tokenize(sentences2[i])
+                try:
+                    tokens2 = self.tokenizer.tokenize(sentences2[i])
+                except:
+                    pdb.set_trace()
+
                 if len(tokens2) > max_len - 2:
                     tokens2 = tokens2[-(max_len - 2):]
 
