@@ -263,6 +263,8 @@ class DataSet():
         if not self.cfg.data_domain:
             return
 
+        pdb.set_trace()
+
         domains = self.cfg.data_domain.split('&')
         sub = df.loc[df['genre'].isin(domains)]
         self.reindex(sub)
