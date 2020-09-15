@@ -394,13 +394,28 @@ class DataSet():
 
             if self.cfg.test_also or self.cfg.test_mode:
                 header_names = ['idx', 'promptID', 'pairID', 'genre', 'sb1', 'sb2', 'sp1', 'sp2', 'sentence', 'sentence2']
-                if self.cfg.test_out_domain:
-                    df_test = pd.read_csv('./MNLI/test_mismatched.tsv', delimiter='\t', header=None, names=header_names).iloc[1:]
+                    
+                if self.cfg.test_out_domain and not self.cfg.dev_mismatch:
+                    df_test = pd.read_csv('./MNLI/dev_mismatched.tsv', delimiter='\t', header=None, names=header_names).iloc[1:]
+                    df_test['label'].replace({'entailment': 1, 'neutral': 0, 'contradiction': 0}, inplace=True)
+                    bad = df_test[(df_test['label'] != 1) & (df_test['label'] != 0)]
+                    df_test.drop(bad.index, inplace=True)
+                    df_test['label'] = df_test['label'].astype(int)
                 else:
-                    df_test = pd.read_csv('./MNLI/test_matched.tsv', delimiter='\t', header=None, names=header_names).iloc[1:]
-                    df_test = self.filter_domain(df_test)
+                    df_test = df_dev.sample(frac=0.5, random_state=self.cfg.data_seed)
+                    df_dev.drop(df_test.index, inplace=True)
+                    self.reindex(df_test)
+                    self.reindex(df_dev)
 
-                df_test['label'] = 0
+                #header_names = ['idx', 'promptID', 'pairID', 'genre', 'sb1', 'sb2', 'sp1', 'sp2', 'sentence', 'sentence2']
+                #if self.cfg.test_out_domain:
+                #    df_test = pd.read_csv('./MNLI/test_mismatched.tsv', delimiter='\t', header=None, names=header_names).iloc[1:]
+                #else:
+                #    df_test = pd.read_csv('./MNLI/test_matched.tsv', delimiter='\t', header=None, names=header_names).iloc[1:]
+                #    df_test = self.filter_domain(df_test)
+
+                #df_test['label'] = 0
+            pdb.set_trace()
 
         elif self.cfg.task == 'agnews':
             df_train = pd.read_csv("./agnews/train.csv", header=None, names=['label', 'title', 'sentence'])
