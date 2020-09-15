@@ -263,8 +263,6 @@ class DataSet():
         if not self.cfg.data_domain:
             return
 
-        pdb.set_trace()
-
         domains = self.cfg.data_domain.split('&')
         sub = df.loc[df['genre'].isin(domains)]
         self.reindex(sub)
@@ -388,7 +386,7 @@ class DataSet():
             df_dev.drop(bad.index, inplace=True)
             df_dev['label'] = df_dev['label'].astype(int)
 
-            def_dev = self.filter_domain(df_dev)
+            df_dev = self.filter_domain(df_dev)
 
             if self.cfg.test_also or self.cfg.test_mode:
                 header_names = ['idx', 'promptID', 'pairID', 'genre', 'sb1', 'sb2', 'sp1', 'sp2', 'sentence', 'sentence2']
