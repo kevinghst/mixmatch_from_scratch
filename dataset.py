@@ -76,6 +76,9 @@ class DataSet():
             #   (5) Pad or truncate the sentence to `max_length`
             #   (6) Create attention masks for [PAD] tokens.
 
+            if not isinstance(sent, str) or sentences2 is not None and not isinstance(sentences2[i], str):
+                continue
+
             max_len = MAX_LENGTHS[self.cfg.task]
 
             tokens = self.tokenizer.tokenize(sent)
@@ -108,10 +111,7 @@ class DataSet():
                     tokens.append(unused_token)
 
             if sentences2 is not None:
-                try:
-                    tokens2 = self.tokenizer.tokenize(sentences2[i])
-                except:
-                    pdb.set_trace()
+                tokens2 = self.tokenizer.tokenize(sentences2[i])
 
                 if len(tokens2) > max_len - 2:
                     tokens2 = tokens2[-(max_len - 2):]
