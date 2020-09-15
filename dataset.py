@@ -380,13 +380,17 @@ class DataSet():
                 'label1', 'label2', 'label3', 'label4', 'label5', 'label'
             ]
 
-            df_dev = pd.read_csv('./MNLI/dev_matched.tsv', delimiter='\t', header=None, names=header_names).iloc[1:]
+
+            if self.cfg.dev_mismatch:
+                df_dev = pd.read_csv('./MNLI/dev_mismatched.tsv', delimiter='\t', header=None, names=header_names).iloc[1:]
+            else:
+                df_dev = pd.read_csv('./MNLI/dev_matched.tsv', delimiter='\t', header=None, names=header_names).iloc[1:]
+                df_dev = self.filter_domain(df_dev)
+
             df_dev['label'].replace({'entailment': 1, 'neutral': 0, 'contradiction': 0}, inplace=True)
             bad = df_dev[(df_dev['label'] != 1) & (df_dev['label'] != 0)]
             df_dev.drop(bad.index, inplace=True)
             df_dev['label'] = df_dev['label'].astype(int)
-
-            df_dev = self.filter_domain(df_dev)
 
             if self.cfg.test_also or self.cfg.test_mode:
                 header_names = ['idx', 'promptID', 'pairID', 'genre', 'sb1', 'sb2', 'sp1', 'sp2', 'sentence', 'sentence2']
