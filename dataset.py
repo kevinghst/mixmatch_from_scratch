@@ -50,7 +50,13 @@ class DataSet():
         return True
 
     def preprocess(self, df):
-        pdb.set_trace()
+        nan_value = float("NaN")
+        df.replace("", nan_value, inplace=True)
+
+        if "sentence2" in df:
+            df.dropna(subset = ["sentence", "sentence2"], inplace=True)
+        else:
+            df.dropna(subset = ["sentence"], inplace=True)
 
         sentences = df.sentence.values
         labels = df.label.values
@@ -440,8 +446,6 @@ class DataSet():
                 input_ids_test, attention_masks_test, seg_ids_test, label_ids_test, num_tokens_test = self.preprocess(df_test)
 
         # Combine the training inputs into a TensorDataset.
-
-        pdb.set_trace()
         train_dataset = TensorDataset(input_ids_train, seg_ids_train, attention_masks_train, label_ids_train, num_tokens_train)
         val_dataset = TensorDataset(input_ids_dev, seg_ids_dev, attention_masks_dev, label_ids_dev)
 
