@@ -58,6 +58,8 @@ class DataSet():
         else:
             sentences2 = None
 
+        pdb.set_trace()
+
         # Tokenize all of the sentences and map the tokens to thier word IDs.
         input_ids = []
         attention_masks = []
@@ -159,7 +161,6 @@ class DataSet():
         labels = torch.tensor(labels)
         num_tokens = torch.tensor(num_tokens)
 
-        pdb.set_trace()
         return input_ids, attention_masks, segment_ids, labels, num_tokens
 
     def change_multi_label(self, df):
