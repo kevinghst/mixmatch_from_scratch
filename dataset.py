@@ -251,6 +251,7 @@ class DataSet():
 
         if task == "BoolQ":
             df.rename(columns={"question": "sentence", "passage": "sentence2"}, inplace=True)
+            pdb.set_trace()
             if 'test' in path:
                 df['label'] = False
 
