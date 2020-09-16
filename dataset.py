@@ -437,7 +437,10 @@ class DataSet():
             df_dev['label'] = df_dev['label'].astype(int)
 
             if self.cfg.test_also or self.cfg.test_mode:
-                df_test = self.create_df_from_json('./BoolQ/test.jsonl', self.cfg.task)
+                if self.cfg.test_out_domain:
+                    df_test = self.create_df_from_json('./MultiRC/train_binary.jsonl', self.cfg.task)
+                else:
+                    df_test = self.create_df_from_json('./BoolQ/test.jsonl', self.cfg.task)
                 df_test['label'] = df_test['label'].astype(int)
 
         df_train = self.sample_dataset(df_train, self.cfg.train_cap)
