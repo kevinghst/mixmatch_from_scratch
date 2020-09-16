@@ -439,6 +439,8 @@ class DataSet():
             if self.cfg.test_also or self.cfg.test_mode:
                 if self.cfg.test_out_domain:
                     df_test = self.create_df_from_json('./MultiRC/train_binary.jsonl', self.cfg.task)
+                elif self.cfg.test_contrastive:
+                    df_test = self.create_df_from_json('./BoolQ/boolq_perturbed.jsonl', self.cfg.task)
                 else:
                     df_test = self.create_df_from_json('./BoolQ/test.jsonl', self.cfg.task)
                 df_test['label'] = df_test['label'].astype(int)
