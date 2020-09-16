@@ -124,3 +124,14 @@ if not path.exists('./BoolQ'):
     with zipfile.ZipFile(data_file) as zip_ref:
         zip_ref.extractall(data_dir)
     os.remove(data_file)
+
+# Downalod multirc
+task = "multirc"
+task_path = "https://dl.fbaipublicfiles.com/glue/superglue/data/v2/MultiRC.zip"
+data_dir = './'
+if not path.exists('./multirc'):
+    data_file = "%s.zip" % task
+    urllib.request.urlretrieve(task_path, data_file)
+    with zipfile.ZipFile(data_file) as zip_ref:
+        zip_ref.extractall(data_dir)
+    os.remove(data_file)
