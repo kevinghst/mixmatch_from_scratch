@@ -26,7 +26,7 @@ NUM_LABELS = {
     "agnews": 4,
     "RTE": 2,
     "BoolQ": 2,
-    "MNLI": 2
+    "MNLI": 3
 }
 
 
@@ -381,7 +381,7 @@ class DataSet():
         elif self.cfg.task == 'MNLI':
             header_names = ['idx', 'promptID', 'pairID', 'genre', 'sb1', 'sb2', 'sp1', 'sp2', 'sentence', 'sentence2', 'label1', 'label']
             df_train = pd.read_csv('./MNLI/train.tsv', delimiter='\t', header=None, names=header_names).iloc[1:]
-            df_train['label'].replace({'entailment': 1, 'neutral': 0, 'contradiction': 0}, inplace=True)
+            df_train['label'].replace({'entailment': 0, 'neutral': 1, 'contradiction': 2}, inplace=True)
             bad = df_train[(df_train['label'] != 1) & (df_train['label'] != 0)]
             df_train.drop(bad.index, inplace=True)
             df_train['label'] = df_train['label'].astype(int)
@@ -400,7 +400,7 @@ class DataSet():
                 df_dev = pd.read_csv('./MNLI/dev_matched.tsv', delimiter='\t', header=None, names=header_names).iloc[1:]
                 df_dev = self.filter_domain(df_dev)
 
-            df_dev['label'].replace({'entailment': 1, 'neutral': 0, 'contradiction': 0}, inplace=True)
+            df_dev['label'].replace({'entailment': 0, 'neutral': 1, 'contradiction': 2}, inplace=True)
             bad = df_dev[(df_dev['label'] != 1) & (df_dev['label'] != 0)]
             df_dev.drop(bad.index, inplace=True)
             df_dev['label'] = df_dev['label'].astype(int)
@@ -408,7 +408,7 @@ class DataSet():
             if self.cfg.test_also or self.cfg.test_mode:                    
                 if self.cfg.test_out_domain and not self.cfg.dev_mismatch:
                     df_test = pd.read_csv('./MNLI/dev_mismatched.tsv', delimiter='\t', header=None, names=header_names).iloc[1:]
-                    df_test['label'].replace({'entailment': 1, 'neutral': 0, 'contradiction': 0}, inplace=True)
+                    df_test['label'].replace({'entailment': 0, 'neutral': 1, 'contradiction': 2}, inplace=True)
                     bad = df_test[(df_test['label'] != 1) & (df_test['label'] != 0)]
                     df_test.drop(bad.index, inplace=True)
                     df_test['label'] = df_test['label'].astype(int)

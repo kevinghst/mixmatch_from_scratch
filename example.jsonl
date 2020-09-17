@@ -1,0 +1,13 @@
+{
+	"promptID": "391905n", 
+	"annotator_labels": ["neutral", "neutral", "neutral", "neutral", "neutral"], 
+	"sentence1_binary_parse": "( because ( ( ( ( like Tech ) ( is ( known ( to ( be ( a ( good ( engineering school ) ) ) ) ) ) ) ) and ) ( ( ( A and ) M ) ( maybe ( is ( ( known more ) ( for computers ) ) ) ) ) ) )", 
+	"sentence2_parse": "(ROOT (S (S (NP (NNP Tech)) (VP (VBZ is) (VP (VBN known) (PP (IN as) (NP (NP (DT a) (JJ goof) (NN place)) (PP (IN for) (NP (NN engineering)))))))) (, ,) (CC but) (S (NP (PRP I)) (VP (VBP think) (SBAR (IN that) (S (NP (PRP it)) (VP (VBZ is) (VP (VBN overrated))))))) (. .)))", "label": 1, 
+	"sentence2_binary_parse": "( ( ( ( ( Tech ( is ( known ( as ( ( a ( goof place ) ) ( for engineering ) ) ) ) ) ) , ) but ) ( I ( think ( that ( it ( is overrated ) ) ) ) ) ) . )", 
+	"pairID": "391905n", 
+	"sentence2": "Tech is known as a goof place for engineering, but I think that it is overrated.", 
+	"sentence1_parse": "(ROOT (SBAR (IN because) (S (S (NP (JJ like) (NNS Tech)) (VP (VBZ is) (VP (VBN known) (S (VP (TO to) (VP (VB be) (NP (DT a) (JJ good) (NN engineering) (NN school)))))))) (CC and) (S (NP (NNP A) (CC and) (NNP M)) (ADVP (RB maybe)) (VP (VBZ is) (VP (VBN known) (ADVP (RBR more)) (PP (IN for) (NP (NNS computers)))))))))", 
+	"genre": "telephone", 
+	"gold_label": "neutral", 
+	"sentence1": "because like Tech is known to be a good engineering school and A and M maybe is known more for computers"	
+}

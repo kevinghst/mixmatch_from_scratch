@@ -134,7 +134,7 @@ NUM_LABELS = {
     "agnews": 4,
     "RTE": 2,
     "BoolQ": 2,
-    "MNLI": 2
+    "MNLI": 3
 }
 
 model_cfg = {
