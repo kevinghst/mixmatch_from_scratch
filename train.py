@@ -216,8 +216,6 @@ class Trainer():
         print("Abs ECE: {}".format(abs_ece))
         print("Rms ECE: {}".format(rms_ece))
 
-        pdb.set_trace()
-
         if cfg.test_generate:
             indices = np.arange(len(y_pred))
 
