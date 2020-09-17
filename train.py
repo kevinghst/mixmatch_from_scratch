@@ -236,6 +236,10 @@ class Trainer():
 
             else:
                 y_pred = y_pred.astype(int)
+
+                if cfg.task == "CoLA" and (cfg.test_out_domain or cfg.test_in_domain):
+                    indices = [x+1 for x in indices]
+
                 save_df = pd.DataFrame({'index': indices, 'prediction': y_pred})
 
 
@@ -256,8 +260,12 @@ class Trainer():
                 elif cfg.test_in_domain:
                     save_path += '_in_domain'
 
-                save_path += '.tsv'
-                save_df.to_csv(save_path, index=False, sep="\t")
+                if cfg.task == "CoLA" and (cfg.test_out_domain or cfg.test_in_domain):
+                    save_path += '.csv'
+                    save_df.to_csv(save_path, index=False)
+                else:
+                    save_path += '.tsv'
+                    save_df.to_csv(save_path, index=False, sep="\t")
 
            
 
