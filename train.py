@@ -253,7 +253,8 @@ class Trainer():
             else:
                 if cfg.test_out_domain:
                     save_path += '_out_domain'
-                        
+                elif cfg.test_in_domain:
+                    save_path += '_in_domain'
 
                 save_path += '.tsv'
                 save_df.to_csv(save_path, index=False, sep="\t")
