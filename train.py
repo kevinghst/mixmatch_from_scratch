@@ -239,8 +239,9 @@ class Trainer():
 
                 if cfg.task == "CoLA" and (cfg.test_out_domain or cfg.test_in_domain):
                     indices = [x+1 for x in indices]
-
-                save_df = pd.DataFrame({'index': indices, 'prediction': y_pred})
+                    save_df = pd.DataFrame({'Id': indices, 'Label': y_pred})
+                else:
+                    save_df = pd.DataFrame({'index': indices, 'prediction': y_pred})
 
 
             if beegfs_path:
