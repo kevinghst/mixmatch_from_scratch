@@ -328,6 +328,12 @@ class DataSet():
             if self.cfg.test_also or self.cfg.test_mode:
                 if self.cfg.test_dev:
                     df_test = df_dev.copy()
+                elif self.cfg.test_out_domain:
+                    df_test = pd.read_csv("./CoLA/cola_out_of_domain_test.tsv", delimiter='\t', header=None, names=['index', 'sentence', 'label']).iloc[1:]
+                    df_test = df_test.assign(label=0)
+                elif self.cfg.test_in_domain:
+                    df_test = pd.read_csv("./CoLA/cola_in_domain_test.tsv", delimiter='\t', header=None, names=['index', 'sentence', 'label']).iloc[1:]
+                    df_test = df_test.assign(label=0)
                 else:
                     df_test = pd.read_csv("./CoLA/test.tsv", delimiter='\t', header=None, names=['index', 'sentence', 'label']).iloc[1:]
                     df_test = df_test.assign(label=0)
