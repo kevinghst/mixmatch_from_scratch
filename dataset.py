@@ -262,7 +262,7 @@ class DataSet():
 
     def filter_domain(self, df):
         if not self.cfg.data_domain:
-            return
+            return df
 
         domains = self.cfg.data_domain.split('&')
         sub = df.loc[df['genre'].isin(domains)]
