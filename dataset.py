@@ -406,8 +406,14 @@ class DataSet():
             df_dev.drop(bad.index, inplace=True)
             df_dev['label'] = df_dev['label'].astype(int)
 
-            if self.cfg.test_also or self.cfg.test_mode:                    
-                if self.cfg.test_out_domain and not self.cfg.dev_mismatch:
+            if self.cfg.test_also or self.cfg.test_mode:
+                if self.cfg.stress_test == 'spelling_error':
+                    df_test = self.create_df_from_json('./MNLI/stress/Spelling_Error/mnli_spelling_error.jsonl', self.cfg.task)
+                    df_test['label'].replace({'entailment': 0, 'neutral': 1, 'contradiction': 2}, inplace=True)
+                    bad = df_test[(df_test['label'] != 0) & (df_test['label'] != 1) &  (df_test['label'] != 2)]
+                    df_test.drop(bad.index, inplace=True)
+                    df_test['label'] = df_test['label'].astype(int)
+                elif self.cfg.test_out_domain and not self.cfg.dev_mismatch:
                     df_test = pd.read_csv('./MNLI/dev_mismatched.tsv', delimiter='\t', header=None, names=header_names).iloc[1:]
                     df_test['label'].replace({'entailment': 0, 'neutral': 1, 'contradiction': 2}, inplace=True)
                     bad = df_test[(df_test['label'] != 0) & (df_test['label'] != 1) &  (df_test['label'] != 2)]
